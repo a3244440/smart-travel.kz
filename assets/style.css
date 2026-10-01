@@ -162,7 +162,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
   .side{position:static;grid-template-columns:1fr}
 }
 @media (max-width:560px){
-  .wrap{padding:0 18px}
+  .wrap{padding-left:18px;padding-right:18px}
   .fields{grid-template-columns:1fr}
   .panel{padding:22px 18px}
 }
@@ -230,8 +230,8 @@ body[data-page="admin"] .wrap{max-width:1400px}
 td b{white-space:nowrap}
 nav.main a{white-space:nowrap}
 @media (max-width:720px){
-  header .wrap{height:auto;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;row-gap:4px}
-  nav.main{order:3;width:100%;gap:18px;overflow-x:auto;padding:2px 0 4px}
+  header .wrap{height:auto;flex-wrap:wrap;padding-top:8px;padding-bottom:12px;row-gap:8px}
+  nav.main{order:3;width:100%;gap:22px;overflow-x:auto;padding:4px 0 2px;justify-content:center;justify-content:safe center}
   nav.main .ig{display:inline}
 }
 @media (max-width:560px){
