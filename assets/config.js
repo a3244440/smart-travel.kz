@@ -1,7 +1,7 @@
 // Настройки сайта — меняйте здесь
 window.SITE = {
   brand: "smart-travel.kz",
-  whatsapp: "77000000000",          // номер Алины без + и пробелов (ЗАМЕНИТЬ)
+  whatsapp: "77716666669",          // WhatsApp для заявок (+7 771 666 6669), без + и пробелов
   instagram: "https://www.instagram.com/alina.smarttravel.kz/",
   city: "Астана",
   currency: "₸",
