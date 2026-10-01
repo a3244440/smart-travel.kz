@@ -2,28 +2,28 @@
 
   // ---------- schema ----------
   const PASSPORT = [
-    ['surname','Фамилия','text'],
-    ['given_names','Имя','text'],
-    ['sex','Пол','select',[['','—'],['M','Мужской'],['F','Женский']]],
-    ['date_of_birth','Дата рождения','date'],
-    ['place_of_birth','Место рождения','text'],
-    ['nationality','Гражданство','text'],
-    ['passport_number','Номер паспорта','text'],
-    ['personal_number','ИИН / личный номер','text'],
-    ['issue_date','Дата выдачи','date'],
-    ['expiry_date','Действителен до','date'],
-    ['issuing_authority','Кем выдан','text','wide'],
-    ['mrz','Машиночитаемая строка (MRZ)','textarea','wide']
+    ['surname','f.surname','text'],
+    ['given_names','f.given_names','text'],
+    ['sex','f.sex','select',[['','—'],['M','sex.M'],['F','sex.F']]],
+    ['date_of_birth','f.date_of_birth','date'],
+    ['place_of_birth','f.place_of_birth','text'],
+    ['nationality','f.nationality','text'],
+    ['passport_number','f.passport_number','text'],
+    ['personal_number','f.personal_number','text'],
+    ['issue_date','f.issue_date','date'],
+    ['expiry_date','f.expiry_date','date'],
+    ['issuing_authority','f.issuing_authority','text','wide'],
+    ['mrz','f.mrz','textarea','wide']
   ];
   const REQUIRED = ['surname','given_names','sex','date_of_birth','nationality','passport_number','issue_date','expiry_date'];
   const TRIP = [
-    ['purpose','Цель поездки','select',[['umrah','Умра'],['tourism','Туризм'],['cruise_umrah','Круиз + Умра'],['business','Деловая']]],
-    ['arrival','Дата въезда','date'],
-    ['nights','Количество ночей','number'],
-    ['contact_name','Контактное лицо','text'],
-    ['phone','Телефон / WhatsApp','tel'],
-    ['email','Email','email'],
-    ['comment','Пожелания','textarea2','wide']
+    ['purpose','f.purpose','select',[['umrah','p.umrah'],['tourism','p.tourism'],['cruise_umrah','p.cruise_umrah'],['business','p.business']]],
+    ['arrival','f.arrival','date'],
+    ['nights','f.nights','number'],
+    ['contact_name','f.contact_name','text'],
+    ['phone','f.phone','tel'],
+    ['email','f.email','email'],
+    ['comment','f.comment','textarea2','wide']
   ];
 
   let uid = 0;
@@ -46,6 +46,9 @@
   const $ = s => document.querySelector(s);
   const fmt = iso => { if(!iso) return ''; const [y,m,d] = iso.split('-'); return d && m && y ? `${d}.${m}.${y}` : iso; };
   const isISO = s => /^\d{4}-\d{2}-\d{2}$/.test(s||'');
+  const L = key => key.includes('.') ? t(key) : key;                // подпись на языке сайта
+  const RU = (key, vars) => I18N.tIn('ru', key, vars);             // для менеджера — всегда по-русски
+  const fieldName = k => t('f.' + k).toLowerCase();
 
   function mrzDigit(str){
     const w=[7,3,1]; let sum=0;
@@ -100,7 +103,7 @@
       else throw new Error('type');
     }catch(e){
       t.status='error';
-      t.error = e.message==='type' ? 'Этот формат не подходит. Загрузите JPG, PNG или PDF.' : 'Не удалось открыть PDF. Сделайте фото разворота и загрузите его.';
+      t.error = e.message==='type' ? 'm.badType' : 'm.badPdf';
       render(); return;
     }
     if(t.preview) URL.revokeObjectURL(t.preview);
@@ -116,7 +119,7 @@
         t.partial = true;
       }catch(e){
         t.status='error';
-        t.error = 'Не удалось прочитать машиночитаемую строку внизу паспорта. Загрузите ровное фото без бликов или заполните поля вручную.';
+        t.error = 'm.mrzFail';
       }
       render(); return;
     }
@@ -130,17 +133,17 @@ Reply with only this JSON object:
       const data = await sample.json(prompt, { images: blob });
       if(!data || typeof data!=='object') throw {code:'invalid_json'};
       if(data.error==='not_passport'){
-        t.status='error'; t.error='На фото не видно разворота паспорта. Загрузите страницу с фотографией и данными.'; render(); return;
+        t.status='error'; t.error='m.notPassport'; render(); return;
       }
       applyData(t, data);
       t.status='done'; t.partial=false;
     }catch(e){
       t.status='error';
       const code = e && e.code;
-      t.error = code==='not_granted' || code==='sampling_disabled' ? 'Автозаполнение не разрешено. Введите данные вручную.'
-        : code==='rate_limited' ? 'Слишком много запросов подряд. Подождите минуту и загрузите файл снова.'
-        : code==='image_rejected' ? 'Файл не удалось прочитать. Попробуйте другое фото — ровное, без бликов.'
-        : 'Не удалось распознать паспорт. Загрузите более чёткое фото или заполните поля вручную.';
+      t.error = code==='not_granted' || code==='sampling_disabled' ? 'm.notGranted'
+        : code==='rate_limited' ? 'm.rate'
+        : code==='image_rejected' ? 'm.imgRejected'
+        : 'm.recognizeFail';
     }
     render();
   }
@@ -201,14 +204,14 @@ Reply with only this JSON object:
   }
   let tessWorker = null;
   async function readMRZ(blob, onMsg){
-    onMsg && onMsg('Загружаем распознавание… (первый раз ~10 секунд)');
+    onMsg && onMsg('m.loadingOcr');
     if(!window.Tesseract) await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
     if(!tessWorker){
       tessWorker = await Tesseract.createWorker('eng');
       await tessWorker.setParameters({ tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<', preserve_interword_spaces:'0' });
     }
     const img = await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=URL.createObjectURL(blob); });
-    onMsg && onMsg('Читаем строку MRZ внизу паспорта…');
+    onMsg && onMsg('m.readingMrz');
     let lastErr;
     for(const fromY of [0.62, 0.45, 0]){
       try{
@@ -225,45 +228,46 @@ Reply with only this JSON object:
   }
   function travellerLabel(t,i){
     const n = [t.fields.given_names, t.fields.surname].filter(Boolean).join(' ');
-    return n ? n.split(' ').map(w=>w[0]+w.slice(1).toLowerCase()).join(' ') : `Путешественник ${i+1}`;
+    return n ? n.split(' ').filter(Boolean).map(w=>w[0]+w.slice(1).toLowerCase()).join(' ') : window.t('traveller', { n: i+1 });
   }
   function renderTabs(){
     const el = $('#tabs');
     el.innerHTML = state.travellers.map((t,i) =>
       `<button class="tab" role="tab" aria-selected="${i===state.active}" data-i="${i}"><span class="dot ${t.status}"></span>${esc(travellerLabel(t,i))}</button>`
-    ).join('') + `<button class="tab add" id="addT">+ Ещё паспорт</button>`;
+    ).join('') + `<button class="tab add" id="addT">${t('addPassport')}</button>`;
   }
   function renderDoc(){
     const t = cur();
     $('#docBox').innerHTML = t.preview
-      ? `<div class="doc"><img src="${t.preview}" alt="Загруженный паспорт"><div class="cap"><span>${esc(t.fileName)}</span><button id="replace">Заменить</button></div></div>`
-      : `<button class="btn ghost" id="replace" style="width:100%">Загрузить паспорт</button>`;
+      ? `<div class="doc"><img src="${t.preview}" alt="${window.t('uploadedAlt')}"><div class="cap"><span>${esc(t.fileName)}</span><button id="replace">${window.t('replace')}</button></div></div>`
+      : `<button class="btn ghost" id="replace" style="width:100%">${window.t('uploadBtn')}</button>`;
     let s = '';
-    if(t.status==='reading') s = `<div class="status reading">${esc(t.progress||'Читаем паспорт… обычно 10–30 секунд.')}<div class="bar"><i></i></div></div>`;
-    else if(t.status==='error') s = `<div class="status error">${esc(t.error)}</div>`;
+    if(t.status==='reading') s = `<div class="status reading">${esc(window.t(t.progress||'m.reading'))}<div class="bar"><i></i></div></div>`;
+    else if(t.status==='error') s = `<div class="status error">${esc(window.t(t.error))}</div>`;
     else if(t.status==='done') s = t.partial
-      ? `<div class="status">Заполнено по строке MRZ. Добавьте вручную место рождения, дату выдачи и кем выдан.</div>`
-      : `<div class="status">Поля заполнены по фото. Сверьте каждое с паспортом.</div>`;
+      ? `<div class="status">${window.t('m.partial')}</div>`
+      : `<div class="status">${window.t('m.full')}</div>`;
     $('#statusBox').innerHTML = s;
   }
   function fieldHTML(def, val, scope, extraCls=''){
     const [k,label,type,a] = def;
     const wide = (a==='wide' || def[3]==='wide' || def[4]==='wide') ? ' wide' : '';
     const id = `${scope}_${k}`;
+    const dir = scope==='p' || ['tel','email','date','number'].includes(type) ? 'ltr' : 'auto';
     let ctrl;
     if(type==='select'){
-      ctrl = `<select id="${id}" data-k="${k}" data-s="${scope}">${a.map(([v,l])=>`<option value="${v}"${v===(val||'')?' selected':''}>${l}</option>`).join('')}</select>`;
+      ctrl = `<select id="${id}" data-k="${k}" data-s="${scope}">${a.map(([v,l])=>`<option value="${v}"${v===(val||'')?' selected':''}>${L(l)}</option>`).join('')}</select>`;
     }else if(type==='textarea' || type==='textarea2'){
-      ctrl = `<textarea id="${id}" data-k="${k}" data-s="${scope}" ${type==='textarea2'?'style="font-family:var(--sans);font-size:15px;letter-spacing:0"':''} rows="2" spellcheck="false">${esc(val)}</textarea>`;
+      ctrl = `<textarea id="${id}" data-k="${k}" data-s="${scope}" dir="${dir}" ${type==='textarea2'?'style="font-family:var(--sans);font-size:15px;letter-spacing:0"':''} rows="2" spellcheck="false">${esc(val)}</textarea>`;
     }else{
-      ctrl = `<input id="${id}" data-k="${k}" data-s="${scope}" type="${type}" value="${esc(val)}" class="${extraCls}" ${type==='number'?'min="1" max="60"':''} autocomplete="off" spellcheck="false">`;
+      ctrl = `<input id="${id}" data-k="${k}" data-s="${scope}" dir="${dir}" type="${type}" value="${esc(val)}" class="${extraCls}" ${type==='number'?'min="1" max="60"':''} autocomplete="off" spellcheck="false">`;
     }
-    return `<div class="f${wide}"><label for="${id}">${label}</label>${ctrl}<span class="hint" id="${id}_h"></span></div>`;
+    return `<div class="f${wide}"><label for="${id}">${L(label)}</label>${ctrl}<span class="hint" id="${id}_h"></span></div>`;
   }
   function renderPassport(){
     const t = cur();
     $('#passportFields').innerHTML = PASSPORT.map(d => fieldHTML(d, t.fields[d[0]], 'p', t.ai[d[0]]?'ai':'')).join('');
-    $('#pSub').textContent = t.status==='done' ? 'Заполнено автоматически. Исправьте, если что-то не так.' : 'Как в паспорте, латиницей.';
+    $('#pSub').textContent = window.t(t.status==='done' ? 'visa.pAuto' : 'visa.pLatin');
     updateHints();
   }
   function renderTrip(){
@@ -273,8 +277,8 @@ Reply with only this JSON object:
     const f = cur().fields;
     const latin = /^[A-Z][A-Z' \-]*$/;
     const set = (k,msg) => { const h=$(`#p_${k}_h`), i=$(`#p_${k}`); if(!h) return; h.textContent=msg||''; h.className='hint'+(msg?' bad':''); i && i.classList.toggle('bad',!!msg); };
-    set('surname', f.surname && !latin.test(f.surname) ? 'Только латиница, как в паспорте' : '');
-    set('given_names', f.given_names && !latin.test(f.given_names) ? 'Только латиница, как в паспорте' : '');
+    set('surname', f.surname && !latin.test(f.surname) ? t('h.latin') : '');
+    set('given_names', f.given_names && !latin.test(f.given_names) ? t('h.latin') : '');
     const v = validity(f);
     set('expiry_date', v && v.level==='err' ? v.short : '');
   }
@@ -283,28 +287,28 @@ Reply with only this JSON object:
     const from = isISO(state.trip.arrival) ? new Date(state.trip.arrival) : new Date();
     const exp = new Date(f.expiry_date);
     const need = addMonths(from,6);
-    const fromTxt = isISO(state.trip.arrival) ? 'даты въезда' : 'сегодня';
-    if(exp < from) return {level:'err', title:'Паспорт просрочен', note:`Истёк ${fmt(f.expiry_date)}`, short:'Паспорт просрочен'};
-    if(exp < need) return {level:'err', title:'Срок паспорта меньше 6 месяцев', note:`Нужно действие минимум до ${need.toLocaleDateString('ru-RU')} (6 мес. от ${fromTxt})`, short:'Нужно минимум 6 месяцев'};
-    return {level:'ok', title:'Срок паспорта подходит', note:`Действителен до ${fmt(f.expiry_date)}`};
+    const fromTxt = t(isISO(state.trip.arrival) ? 'v.fromArrival' : 'v.fromToday');
+    if(exp < from) return {level:'err', title:t('v.expired'), note:t('v.expiredOn', { date: fmt(f.expiry_date) }), short:t('v.expired')};
+    if(exp < need) return {level:'err', title:t('v.less6'), note:t('v.need', { date: need.toLocaleDateString(I18N.locale), from: fromTxt }), short:t('v.need6')};
+    return {level:'ok', title:t('v.ok'), note:t('v.validUntil', { date: fmt(f.expiry_date) })};
   }
   function renderChecks(){
     const f = cur().fields;
     const items = [];
     const missing = REQUIRED.filter(k => !f[k]);
     items.push(missing.length
-      ? {level: missing.length===REQUIRED.length?'idle':'warn', title:'Заполнены не все поля', note:'Осталось: '+missing.map(k=>PASSPORT.find(d=>d[0]===k)[1].toLowerCase()).join(', ')}
-      : {level:'ok', title:'Обязательные поля заполнены'});
+      ? {level: missing.length===REQUIRED.length?'idle':'warn', title:t('c.notAll'), note:t('c.left', { list: missing.map(fieldName).join(t('sep')) })}
+      : {level:'ok', title:t('c.allDone')});
     const v = validity(f);
-    items.push(v || {level:'idle', title:'Срок действия паспорта', note:'Укажите дату окончания'});
+    items.push(v || {level:'idle', title:t('c.validity'), note:t('c.enterExpiry')});
     const m = checkMRZ(f.mrz, f);
-    if(!m) items.push({level:'idle', title:'Сверка MRZ', note:'Появится, когда будет строка MRZ'});
-    else if(!m.sumsOk) items.push({level:'warn', title:'MRZ прочитана с ошибкой', note:'Контрольные цифры не сходятся — сверьте строку с паспортом'});
-    else if(!m.numMatch) items.push({level:'warn', title:'Номер не совпадает с MRZ', note:'Проверьте номер паспорта'});
-    else items.push({level:'ok', title:'MRZ сверена', note:'Контрольные цифры совпадают'});
+    if(!m) items.push({level:'idle', title:t('c.mrz'), note:t('c.mrzWait')});
+    else if(!m.sumsOk) items.push({level:'warn', title:t('c.mrzBad'), note:t('c.mrzBadNote')});
+    else if(!m.numMatch) items.push({level:'warn', title:t('c.numMismatch'), note:t('c.checkNumber')});
+    else items.push({level:'ok', title:t('c.mrzOk'), note:t('c.mrzOkNote')});
     if(isISO(f.date_of_birth)){
       const age = Math.floor((Date.now()-new Date(f.date_of_birth))/31557600000);
-      if(age<18) items.push({level:'warn', title:`Несовершеннолетний (${age})`, note:'Понадобится свидетельство о рождении и согласие родителей'});
+      if(age<18) items.push({level:'warn', title:t('c.minor', { age }), note:t('c.minorNote')});
     }
     const icon = {ok:'✓',warn:'!',err:'×',idle:''};
     $('#checks').innerHTML = items.map(i=>`<li class="${i.level}"><i>${icon[i.level]}</i><div>${esc(i.title)}${i.note?`<small>${esc(i.note)}</small>`:''}</div></li>`).join('');
@@ -322,14 +326,14 @@ Reply with only this JSON object:
       PASSPORT.forEach(([k,l,type])=>{
         if(k==='mrz') return;
         let v = t.fields[k]||''; if(type==='date') v = fmt(v); if(k==='sex') v = v==='M'?'Мужской':v==='F'?'Женский':'';
-        out += `${l}: ${v||'—'}\n`;
+        out += `${RU(l)}: ${v||'—'}\n`;
       });
     });
     return out;
   }
   function buildCsv(){
     const cols = [...PASSPORT.filter(d=>d[0]!=='mrz').map(d=>d[0]), 'purpose','arrival','nights','contact_name','phone','email','comment'];
-    const head = [...PASSPORT.filter(d=>d[0]!=='mrz').map(d=>d[1]), 'Цель','Дата въезда','Ночей','Контакт','Телефон','Email','Пожелания'];
+    const head = [...PASSPORT.filter(d=>d[0]!=='mrz').map(d=>RU(d[1])), 'Цель','Дата въезда','Ночей','Контакт','Телефон','Email','Пожелания'];
     const q = v => `"${String(v??'').replace(/"/g,'""')}"`;
     const rows = state.travellers.map(t => cols.map(c => {
       if(c in state.trip || ['purpose','arrival','nights','contact_name','phone','email','comment'].includes(c)){
@@ -339,6 +343,17 @@ Reply with only this JSON object:
       return q(type==='date'?fmt(t.fields[c]):t.fields[c]);
     }).join(';'));
     return '\uFEFF' + [head.map(q).join(';'), ...rows].join('\r\n');
+  }
+  let sent = null;
+  function renderDone(){
+    if(!sent) return;
+    const msg = t('s.waHello', { id: sent.id }) + '\n\n' + sent.text;
+    $('#done').innerHTML = `<div class="success" role="status">
+        <h3>${t('s.sent')}</h3>
+        <p style="margin:0 0 6px;color:var(--ink-2)">${t('s.sentText')}</p>
+        <div class="code" dir="ltr">${esc(sent.id)}</div>
+        <div class="actions"><a class="btn" href="${waLink(msg)}" target="_blank" rel="noopener">${t('s.sendWa')}</a>
+        <a class="btn ghost" href="cabinet.html?id=${encodeURIComponent(sent.id)}">${t('s.checkStatus')}</a></div></div>`;
   }
   function toast(msg,bad){ const el=$('#toast'); el.textContent=msg; el.className='toast'+(bad?' bad':''); clearTimeout(toast.t); toast.t=setTimeout(()=>el.textContent='',4000); }
 
@@ -360,26 +375,21 @@ Reply with only this JSON object:
       const problems = [];
       state.travellers.forEach((t,i) => {
         const miss = REQUIRED.filter(k => !t.fields[k]);
-        if(miss.length) problems.push(`${travellerLabel(t,i)}: не заполнено — ${miss.map(k=>PASSPORT.find(d=>d[0]===k)[1].toLowerCase()).join(', ')}`);
+        if(miss.length) problems.push(window.t('s.missing', { who: travellerLabel(t,i), list: miss.map(fieldName).join(window.t('sep')) }));
         const v = validity(t.fields); if(v && v.level==='err') problems.push(`${travellerLabel(t,i)}: ${v.title.toLowerCase()}`);
       });
-      if(!state.trip.phone) problems.push('Укажите телефон для связи');
+      if(!state.trip.phone) problems.push(t('s.phone'));
       if(problems.length){ toast(problems[0], true); return; }
       const btn = e.target.closest('#submitApp');
       if(btn.disabled) return;
-      btn.disabled = true; toast('Отправляем…');
+      btn.disabled = true; toast(t('s.sending'));
       let rec;
       try { rec = await Store.add({ trip: Object.assign({}, state.trip), travellers: state.travellers.map(t => ({ fields: Object.assign({}, t.fields) })) }); }
-      catch(err){ toast('Не удалось отправить заявку. Проверьте интернет и попробуйте ещё раз', true); return; }
+      catch(err){ toast(t('s.fail'), true); return; }
       finally { btn.disabled = false; }
       toast('');
-      const msg = `Здравствуйте! Отправляю заявку на визу ${rec.id}.\n\n` + buildText();
-      $('#done').innerHTML = `<div class="success" role="status">
-        <h3>Заявка отправлена</h3>
-        <p style="margin:0 0 6px;color:var(--ink-2)">Номер заявки — сохраните его, по нему можно проверить статус:</p>
-        <div class="code">${rec.id}</div>
-        <div class="actions"><a class="btn" href="${waLink(msg)}" target="_blank" rel="noopener">Отправить в WhatsApp</a>
-        <a class="btn ghost" href="cabinet.html?id=${rec.id}">Проверить статус</a></div></div>`;
+      sent = { id: rec.id, text: buildText() };
+      renderDone();
       $('#done').scrollIntoView({behavior:'smooth', block:'center'});
       return;
     }
@@ -388,19 +398,19 @@ Reply with only this JSON object:
       const filename = `viza-saudi-${name}.csv`;
       await ready;
       if(downloads){
-        try{ await downloads.save({filename, data: buildCsv()}); toast('Файл сохранён'); }
-        catch(err){ if(err && err.code!=='declined') toast('Не удалось сохранить файл', true); }
+        try{ await downloads.save({filename, data: buildCsv()}); toast(t('s.saved')); }
+        catch(err){ if(err && err.code!=='declined') toast(t('s.saveFail'), true); }
         return;
       }
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([buildCsv()], {type:'text/csv;charset=utf-8'}));
       a.download = filename; document.body.appendChild(a); a.click(); a.remove();
-      toast('Файл сохранён');
+      toast(t('s.saved'));
       return;
     }
     if(e.target.closest('#copyTxt')){
-      try{ await navigator.clipboard.writeText(buildText()); toast('Текст скопирован — вставьте его в WhatsApp менеджеру'); }
-      catch(err){ toast('Браузер не дал скопировать. Используйте «Сохранить заявку»', true); }
+      try{ await navigator.clipboard.writeText(buildText()); toast(t('s.copied')); }
+      catch(err){ toast(t('s.copyFail'), true); }
     }
   });
 
@@ -425,5 +435,6 @@ Reply with only this JSON object:
     }
   });
 
+  document.addEventListener('langchange', () => { render(); renderDone(); $('#toast').textContent = ''; });
   render();
 })();

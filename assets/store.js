@@ -1,13 +1,11 @@
-// Хранилище заявок — Supabase (схема и права: supabase/schema.sql).
+// Хранилище заявок — Supabase (схема и права: supabase/migrations).
 // Клиент может только отправить заявку и узнать её статус по номеру + телефону.
 // Видеть и менять все заявки может только менеджер (вход по email и паролю).
-window.STATUSES = {
-  new:       { label:"Заявка получена",        tone:"idle" },
-  review:    { label:"Проверяем документы",    tone:"warn" },
-  submitted: { label:"Подана на визу",         tone:"warn" },
-  approved:  { label:"Виза одобрена",          tone:"ok"   },
-  fix:       { label:"Нужны исправления",      tone:"err"  }
-};
+const STATUS_TONES = { new:"idle", review:"warn", submitted:"warn", approved:"ok", fix:"err" };
+window.STATUSES = {};
+Object.keys(STATUS_TONES).forEach(k => Object.defineProperty(STATUSES, k, {
+  enumerable: true, value: { tone: STATUS_TONES[k], get label(){ return t("st." + k); } }
+}));
 window.Store = (function(){
   const S = window.SITE || {};
   const db = window.supabase.createClient(S.supabaseUrl, S.supabaseKey);

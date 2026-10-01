@@ -7,27 +7,28 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Forum&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Forum&family=Manrope:wght@400;500;600;700&family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/config.js"></script>
+<script src="assets/i18n.js"></script>
 <title>Мои заявки — Alina Smart Travel</title>
 </head>
-<body data-page="cabinet">
+<body data-page="cabinet" data-title="title.cabinet">
 <main class="wrap" style="padding-bottom:80px">
   <div class="page-head">
-    <h1>Статус визы</h1>
-    <p>Введите номер заявки и телефон, который указали при оформлении.</p>
+    <h1 data-i18n="cab.h1">Статус визы</h1>
+    <p data-i18n="cab.lead">Введите номер заявки и телефон, который указали при оформлении.</p>
   </div>
   <div class="grid" style="grid-template-columns:minmax(0,380px) 1fr">
     <form class="panel" id="lookup" novalidate>
       <div class="fields" style="grid-template-columns:1fr">
-        <div class="f"><label for="aid">Номер заявки</label><input id="aid" placeholder="AST-XXXXXX" autocomplete="off" style="text-transform:uppercase"></div>
-        <div class="f"><label for="aphone">Телефон</label><input id="aphone" type="tel" placeholder="+7 7__ ___ __ __"></div>
+        <div class="f"><label for="aid" data-i18n="cab.id">Номер заявки</label><input id="aid" dir="ltr" placeholder="AST-XXXXXX" autocomplete="off" style="text-transform:uppercase"></div>
+        <div class="f"><label for="aphone" data-i18n="cab.phone">Телефон</label><input id="aphone" dir="ltr" type="tel" placeholder="+7 7__ ___ __ __"></div>
       </div>
-      <div class="actions"><button class="btn" type="submit">Показать статус</button></div>
+      <div class="actions"><button class="btn" type="submit" data-i18n="cab.show">Показать статус</button></div>
       <p class="toast bad" id="err" role="status" aria-live="polite" style="margin:14px 0 0"></p>
     </form>
-    <div id="result"><div class="panel empty">Здесь появится ход оформления визы.</div></div>
+    <div id="result"><div class="panel empty" data-i18n="cab.empty">Здесь появится ход оформления визы.</div></div>
   </div>
   <div id="mine" style="margin-top:40px"></div>
 </main>
@@ -39,7 +40,9 @@
   const ORDER = ["new","review","submitted","approved"];
   const $ = s => document.querySelector(s);
   function names(a){ return a.travellers.map(t => [t.fields.given_names, t.fields.surname].filter(Boolean).join(" ")).filter(Boolean).join(", ") || "—"; }
+  let current = null;
   function show(a){
+    current = a;
     const hist = {}; a.history.forEach(h => hist[h.status] = h.at);
     const steps = a.status === "fix"
       ? [...ORDER.slice(0, Math.max(1, ORDER.indexOf(a.history.filter(h=>h.status!=="fix").slice(-1)[0]?.status)+1)), "fix"]
@@ -47,36 +50,36 @@
     const curIdx = steps.indexOf(a.status);
     const items = steps.map((s,i) => {
       const cls = s==="fix" ? "fix" : i < curIdx ? "done" : i===curIdx ? "now" : "todo";
-      const when = hist[s] ? `<small>${new Date(hist[s]).toLocaleString("ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"})}</small>` : "";
+      const when = hist[s] ? `<small>${new Date(hist[s]).toLocaleString(I18N.locale,{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"})}</small>` : "";
       return `<li class="${cls}"><span class="node"></span><div>${STATUSES[s].label}${when}</div></li>`;
     }).join("");
     $("#result").innerHTML = `<div class="panel">
-      <h3>Заявка ${esc(a.id)}</h3>
-      <p class="sub">${esc(names(a))} · въезд ${esc(fmtDate(a.trip.arrival)) || "дата не указана"}</p>
+      <h3>${esc(t("cab.app", { id: a.id }))}</h3>
+      <p class="sub">${esc(names(a))} · ${esc(a.trip.arrival ? t("cab.arrival", { date: fmtDate(a.trip.arrival) }) : t("cab.noDate"))}</p>
       <ul class="timeline">${items}</ul>
-      ${a.note ? `<div class="status ${a.status==="fix"?"error":""}" style="margin-top:4px"><b>Комментарий менеджера:</b> ${esc(a.note)}</div>` : ""}
-      <div class="actions"><a class="btn ghost" href="${waLink("Здравствуйте! Вопрос по заявке " + a.id)}" target="_blank" rel="noopener">Написать менеджеру</a></div>
+      ${a.note ? `<div class="status ${a.status==="fix"?"error":""}" style="margin-top:4px"><b>${t("cab.note")}</b> ${esc(a.note)}</div>` : ""}
+      <div class="actions"><a class="btn ghost" href="${waLink(t("cab.waAsk", { id: a.id }))}" target="_blank" rel="noopener">${t("cab.write")}</a></div>
     </div>`;
   }
   async function lookup(id, phone, quiet){
     $("#err").textContent = "";
     let a;
     try { a = await Store.find(id, phone); }
-    catch(err){ if(!quiet) $("#err").textContent = "Не удалось связаться с сервером. Проверьте интернет и попробуйте ещё раз."; return; }
-    if(!a){ if(!quiet) $("#err").textContent = "Заявка не найдена. Проверьте номер и телефон — или напишите менеджеру."; return; }
+    catch(err){ if(!quiet) $("#err").textContent = t("cab.server"); return; }
+    if(!a){ if(!quiet) $("#err").textContent = t("cab.notFound"); return; }
     show(a);
     $("#result").scrollIntoView({behavior:"smooth",block:"start"});
   }
   $("#lookup").addEventListener("submit", e => {
     e.preventDefault();
     const id = $("#aid").value.trim(), phone = $("#aphone").value.trim();
-    if(!id || !phone){ $("#err").textContent = "Укажите номер заявки и телефон."; return; }
+    if(!id || !phone){ $("#err").textContent = t("cab.need"); return; }
     lookup(id, phone);
   });
   // заявки, отправленные с этого устройства
   const mine = Store.mine();
   if(mine.length){
-    $("#mine").innerHTML = `<h2 style="font-family:var(--serif);font-weight:400;font-size:28px;margin:0 0 14px">Заявки с этого устройства</h2>
+    $("#mine").innerHTML = `<h2 style="font-family:var(--serif);font-weight:400;font-size:28px;margin:0 0 14px" data-i18n="cab.mine">${t("cab.mine")}</h2>
       <div class="tabs">${mine.map(m => `<button class="tab" data-id="${esc(m.id)}">${esc(m.id)}</button>`).join("")}</div>`;
     $("#mine").addEventListener("click", e => {
       const b = e.target.closest("[data-id]"); if(!b) return;
@@ -91,6 +94,7 @@
     const m = mine.find(x => x.id.toUpperCase() === q.trim().toUpperCase());
     if(m){ $("#aphone").value = m.phone || ""; lookup(m.id, m.phone, true); }
   }
+  document.addEventListener("langchange", () => { if(current) show(current); $("#err").textContent = ""; });
 })();
 </script>
 </body>

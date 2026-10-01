@@ -7,23 +7,24 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Forum&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Forum&family=Manrope:wght@400;500;600;700&family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/config.js"></script>
+<script src="assets/i18n.js"></script>
 <title>Alina Smart Travel — Умра, Мекка, Медина и туры по миру</title>
 <meta name="description" content="Умра VIP, Luxe и Standard, круиз с Умрой, халяль-туры в Дубай и Турцию. Виза в Саудовскую Аравию по фото паспорта.">
 <meta property="og:title" content="smart-travel.kz — Умра, Мекка, Медина и туры по миру">
 <meta property="og:image" content="https://smart-travel.kz/assets/logo.png">
 </head>
-<body data-page="home">
+<body data-page="home" data-title="title.home">
 <main>
   <section class="wrap hero">
     <div>
-      <h1>Умра, Мекка и Медина — с заботой о каждой детали</h1>
-      <p class="lead">Туры VIP, Luxe и Standard, круиз с Умрой и халяль-отдых по миру. Визу в Саудовскую Аравию оформим по фото паспорта.</p>
+      <h1 data-i18n="home.h1">Умра, Мекка и Медина — с заботой о каждой детали</h1>
+      <p class="lead" data-i18n="home.lead">Туры VIP, Luxe и Standard, круиз с Умрой и халяль-отдых по миру. Визу в Саудовскую Аравию оформим по фото паспорта.</p>
       <div class="row" style="display:flex;gap:12px;flex-wrap:wrap">
-        <a class="btn" href="#tours">Выбрать тур</a>
-        <a class="btn ghost" href="visa.html">Оформить визу</a>
+        <a class="btn" href="#tours" data-i18n="home.choose">Выбрать тур</a>
+        <a class="btn ghost" href="visa.html" data-i18n="home.getVisa">Оформить визу</a>
       </div>
     </div>
     <div class="arch-col">
@@ -31,12 +32,13 @@
         <a class="arch" href="visa.html" style="text-decoration:none;color:inherit">
           <span class="arch-inner">
             <svg class="seal" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width=".9" aria-hidden="true">
-              <rect x="8.3" y="8.3" width="23.4" height="23.4"/><rect x="8.3" y="8.3" width="23.4" height="23.4" transform="rotate(45 20 20)"/>
-              <circle cx="20" cy="20" r="5"/><circle cx="20" cy="20" r="18.5" stroke-dasharray="1 2.2"/>
+              <path d="M18.82 9.06A12 12 0 1 0 31.47 24.52A10 10 0 0 1 18.82 9.06Z" fill="currentColor" fill-opacity=".16"/>
+              <circle cx="31" cy="9.5" r=".9" fill="currentColor" stroke="none"/><circle cx="35" cy="15.5" r=".6" fill="currentColor" stroke="none"/><circle cx="26.5" cy="5.5" r=".5" fill="currentColor" stroke="none"/>
+              <circle cx="20" cy="20" r="18.5" stroke-dasharray="1 2.2" stroke-opacity=".7"/>
             </svg>
-            <h2>Виза за 5 минут</h2>
-            <p>Загрузите фото паспорта —<br>анкета заполнится сама</p>
-            <span class="btn">Начать</span>
+            <h2 data-i18n="home.archTitle">Виза за 5 минут</h2>
+            <p data-i18n-html="home.archText">Загрузите фото паспорта —<br>анкета заполнится сама</p>
+            <span class="btn" data-i18n="home.start">Начать</span>
           </span>
         </a>
       </div>
@@ -45,11 +47,11 @@
 
   <section class="wrap" id="tours">
     <div class="work-head" style="margin-bottom:18px">
-      <h2>Туры</h2>
+      <h2 data-i18n="nav.tours">Туры</h2>
       <div class="filter" role="tablist" id="filter">
-        <button class="tab" role="tab" aria-selected="true" data-g="all">Все</button>
-        <button class="tab" role="tab" aria-selected="false" data-g="umrah">Умра</button>
-        <button class="tab" role="tab" aria-selected="false" data-g="world">Туры по миру</button>
+        <button class="tab" role="tab" aria-selected="true" data-g="all" data-i18n="filter.all">Все</button>
+        <button class="tab" role="tab" aria-selected="false" data-g="umrah" data-i18n="filter.umrah">Умра</button>
+        <button class="tab" role="tab" aria-selected="false" data-g="world" data-i18n="filter.world">Туры по миру</button>
       </div>
     </div>
     <div class="tours" id="tourList"></div>
@@ -60,14 +62,16 @@
 <script>
 (function(){
   let group = "all";
-  function card(t, feature){
-    const price = t.price != null
-      ? `<div class="price"><b>${money(t.price)}</b>${t.oldPrice?`<s>${money(t.oldPrice)}</s>`:""}</div>`
-      : `<div class="price"><span style="color:var(--ink-2)">Цена по запросу</span></div>`;
-    const ask = waLink(`Здравствуйте! Интересует тур «${t.title}». Подскажите даты и стоимость.`);
-    const btns = `<div class="row"><a class="btn" href="${ask}" target="_blank" rel="noopener">Узнать подробнее</a>${t.visa?'<a class="btn ghost" href="visa.html">Оформить визу</a>':''}</div>`;
-    const head = `<span class="tier">${esc(t.tier)}</span><h3>${esc(t.title)}</h3><span class="dur">${esc(t.duration)}</span>`;
-    const list = `<ul>${t.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`;
+  const P = v => I18N.pick(v);
+  function card(tour, feature){
+    const title = P(tour.title);
+    const price = tour.price != null
+      ? `<div class="price"><b>${money(tour.price)}</b>${tour.oldPrice?`<s>${money(tour.oldPrice)}</s>`:""}</div>`
+      : `<div class="price"><span style="color:var(--ink-2)">${t("tour.onRequest")}</span></div>`;
+    const ask = waLink(t("tour.ask", { title }));
+    const btns = `<div class="row"><a class="btn" href="${ask}" target="_blank" rel="noopener">${t("tour.more")}</a>${tour.visa?`<a class="btn ghost" href="visa.html">${t("home.getVisa")}</a>`:''}</div>`;
+    const head = `<span class="tier">${esc(P(tour.tier))}</span><h3>${esc(title)}</h3><span class="dur">${esc(P(tour.duration))}</span>`;
+    const list = `<ul>${P(tour.points).map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`;
     return feature
       ? `<article class="tour feature"><div style="display:flex;flex-direction:column;gap:14px">${head}${list}</div><div style="display:flex;flex-direction:column;gap:18px;justify-content:flex-end">${price}${btns}</div></article>`
       : `<article class="tour">${head}${list}${price}${btns}</article>`;
@@ -82,6 +86,7 @@
     document.querySelectorAll("#filter .tab").forEach(x => x.setAttribute("aria-selected", x===b));
     render();
   });
+  document.addEventListener("langchange", render);
   render();
 })();
 </script>
