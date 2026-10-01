@@ -26,7 +26,7 @@
 
 ## Публикация (GitHub Pages)
 
-Settings → Pages → Source: `Deploy from a branch` → `main` / `root`. Сайт откроется по адресу `https://a3244440.github.io/smart-travel.kz/`.
+Settings → Pages → Source: `Deploy from a branch` → `main` / `root`. Сайт: https://smart-travel.kz (домен задан в файле `CNAME`; DNS: A-записи `@` → 185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153; CNAME `www` → `a3244440.github.io`).
 
 ## Ограничения прототипа — что нужно до запуска для клиентов
 
