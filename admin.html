@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Forum&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/config.js"></script>
+<meta name="robots" content="noindex,nofollow">
+<title>Заявки — панель менеджера</title>
+</head>
+<body data-page="admin">
+<main class="wrap" style="padding-bottom:80px">
+  <div class="page-head" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:16px">
+    <div><h1>Заявки на визу</h1><p id="summary"></p></div>
+    <div class="actions" style="margin:0"><button class="btn ghost" id="exportAll">Скачать всё в CSV</button></div>
+  </div>
+  <div class="filter" id="sfilter"></div>
+  <div class="grid" style="grid-template-columns:minmax(0,1fr) 360px">
+    <div class="table-wrap"><table><thead><tr><th>Номер</th><th>Путешественники</th><th>Цель</th><th>Въезд</th><th>Телефон</th><th>Статус</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <aside class="side" id="detail"><div class="panel empty">Выберите заявку в таблице.</div></aside>
+  </div>
+</main>
+<script src="assets/store.js"></script>
+<script src="assets/layout.js"></script>
+<script>
+(function(){
+  const PURPOSE = {umrah:"Умра",tourism:"Туризм",cruise_umrah:"Круиз + Умра",business:"Деловая"};
+  const LABELS = {surname:"Фамилия",given_names:"Имя",sex:"Пол",date_of_birth:"Дата рождения",place_of_birth:"Место рождения",nationality:"Гражданство",passport_number:"Паспорт",personal_number:"ИИН",issue_date:"Выдан",expiry_date:"Действителен до",issuing_authority:"Кем выдан"};
+  const $ = s => document.querySelector(s);
+  let filter = "all", selected = null;
+  const names = a => a.travellers.map(t => [t.fields.surname, t.fields.given_names].filter(Boolean).join(" ")).filter(Boolean).join(", ") || "—";
+  function renderFilter(all){
+    const counts = {}; all.forEach(a => counts[a.status] = (counts[a.status]||0)+1);
+    $("#sfilter").innerHTML = [["all","Все",all.length], ...Object.entries(STATUSES).map(([k,v]) => [k, v.label, counts[k]||0])]
+      .map(([k,l,n]) => `<button class="tab" data-f="${k}" aria-selected="${filter===k}">${l} <span style="color:var(--ink-2)">${n}</span></button>`).join("");
+    const travellers = all.reduce((s,a) => s + a.travellers.length, 0);
+    $("#summary").textContent = all.length ? `${all.length} заявок · ${travellers} путешественников` : "Пока заявок нет.";
+  }
+  function render(){
+    const all = Store.all(); renderFilter(all);
+    const list = all.filter(a => filter==="all" || a.status===filter);
+    $("#rows").innerHTML = list.length ? list.map(a => `<tr data-id="${esc(a.id)}" class="${a.id===selected?"sel":""}">
+      <td><b>${esc(a.id)}</b><br><small style="color:var(--ink-2)">${new Date(a.created).toLocaleDateString("ru-RU")}</small></td>
+      <td>${esc(names(a))}</td><td>${esc(PURPOSE[a.trip.purpose]||"")}</td><td>${esc(fmtDate(a.trip.arrival))||"—"}</td>
+      <td>${esc(a.trip.phone||"—")}</td><td><span class="pill ${STATUSES[a.status].tone}">${STATUSES[a.status].label}</span></td></tr>`).join("")
+      : `<tr><td colspan="6" class="empty">Заявки появятся здесь, когда клиенты отправят их со страницы визы.</td></tr>`;
+    renderDetail();
+  }
+  function renderDetail(){
+    const a = selected && Store.all().find(x => x.id===selected);
+    if(!a){ $("#detail").innerHTML = '<div class="panel empty">Выберите заявку в таблице.</div>'; return; }
+    const people = a.travellers.map((t,i) => `<div style="border-top:1px solid var(--line-2);padding-top:12px;margin-top:12px">
+      <b>Путешественник ${i+1}</b>
+      <dl style="display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:8px 0 0;font-size:13.5px">${Object.entries(LABELS).map(([k,l]) => {
+        let v = t.fields[k]||""; if(/date/.test(k)) v = fmtDate(v); if(k==="sex") v = v==="M"?"М":v==="F"?"Ж":"";
+        return `<dt style="color:var(--ink-2)">${l}</dt><dd style="margin:0">${esc(v)||"—"}</dd>`; }).join("")}</dl></div>`).join("");
+    $("#detail").innerHTML = `<div class="panel" style="padding:22px">
+      <h3>${esc(a.id)}</h3>
+      <p class="sub">${esc(PURPOSE[a.trip.purpose]||"")} · ${esc(a.trip.contact_name||"")} ${esc(a.trip.phone||"")} ${esc(a.trip.email||"")}</p>
+      <div class="fields" style="grid-template-columns:1fr">
+        <div class="f"><label for="st">Статус</label><select id="st">${Object.entries(STATUSES).map(([k,v]) => `<option value="${k}"${k===a.status?" selected":""}>${v.label}</option>`).join("")}</select></div>
+        <div class="f"><label for="nt">Комментарий для клиента</label><textarea id="nt" rows="3" style="font-family:var(--sans);font-size:14px;letter-spacing:0">${esc(a.note)}</textarea></div>
+      </div>
+      <div class="actions"><button class="btn" id="saveSt">Сохранить</button>
+        <a class="btn ghost" href="https://wa.me/${String(a.trip.phone||"").replace(/\D/g,"")}?text=${encodeURIComponent("Здравствуйте! По вашей заявке " + a.id + ": " + STATUSES[a.status].label.toLowerCase() + ".")}" target="_blank" rel="noopener">Написать клиенту</a></div>
+      <span class="toast" id="tst" role="status" aria-live="polite"></span>
+      ${a.trip.comment ? `<p style="font-size:14px;margin:16px 0 0"><b>Пожелания:</b> ${esc(a.trip.comment)}</p>` : ""}
+      ${people}
+      <button class="btn ghost" id="del" style="margin-top:18px;color:var(--err);border-color:var(--err)">Удалить заявку</button>
+    </div>`;
+  }
+  function csv(){
+    const keys = Object.keys(LABELS), q = v => `"${String(v??"").replace(/"/g,'""')}"`;
+    const head = ["Номер","Создана","Статус",...Object.values(LABELS),"Цель","Въезд","Ночей","Контакт","Телефон","Email","Пожелания","Комментарий"];
+    const rows = [];
+    Store.all().forEach(a => a.travellers.forEach(t => rows.push([a.id, fmtDate(a.created), STATUSES[a.status].label,
+      ...keys.map(k => /date/.test(k) ? fmtDate(t.fields[k]) : t.fields[k]),
+      PURPOSE[a.trip.purpose], fmtDate(a.trip.arrival), a.trip.nights, a.trip.contact_name, a.trip.phone, a.trip.email, a.trip.comment, a.note].map(q).join(";"))));
+    return "\uFEFF" + [head.map(q).join(";"), ...rows].join("\r\n");
+  }
+  document.addEventListener("click", e => {
+    const f = e.target.closest("[data-f]"); if(f){ filter = f.dataset.f; render(); return; }
+    const r = e.target.closest("tr[data-id]"); if(r){ selected = r.dataset.id; render(); return; }
+    if(e.target.closest("#saveSt")){ Store.update(selected, { status: $("#st").value, note: $("#nt").value.trim() }); render(); $("#tst").textContent = "Сохранено"; return; }
+    if(e.target.closest("#del")){ if(confirm("Удалить заявку " + selected + "? Это нельзя отменить.")){ Store.remove(selected); selected = null; render(); } return; }
+    if(e.target.closest("#exportAll")){
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv()],{type:"text/csv;charset=utf-8"}));
+      a.download = "zayavki-" + new Date().toISOString().slice(0,10) + ".csv"; document.body.appendChild(a); a.click(); a.remove();
+    }
+  });
+  window.addEventListener("storage", render);
+  render();
+})();
+</script>
+</body>
+</html>

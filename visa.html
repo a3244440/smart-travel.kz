@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Forum&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/config.js"></script>
+<title>Виза в Саудовскую Аравию по фото паспорта — Alina Smart Travel</title>
+</head>
+<body data-page="visa">
+<main id="top">
+  <section class="wrap hero">
+    <div>
+      <h1>Виза в Саудовскую Аравию по фото паспорта</h1>
+      <p class="lead">Сфотографируйте разворот паспорта — анкета заполнится сама. Вам останется проверить данные и отправить их менеджеру.</p>
+      <ol class="steps">
+        <li><div><strong>Загрузите паспорт.</strong> <span>Фото или PDF разворота с фотографией.</span></div></li>
+        <li><div><strong>Проверьте анкету.</strong> <span>Мы сверим срок действия и машиночитаемую строку.</span></div></li>
+        <li><div><strong>Сохраните и отправьте.</strong> <span>Можно добавить паспорта всей семьи в одну заявку.</span></div></li>
+      </ol>
+    </div>
+    <div class="arch-col">
+      <div style="width:min(340px,100%)">
+        <label class="arch" id="drop" tabindex="0">
+          <input id="file" class="sr" type="file" accept="image/jpeg,image/png,image/webp,application/pdf">
+          <span class="arch-inner">
+            <svg class="seal" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width=".9" aria-hidden="true">
+              <rect x="8.3" y="8.3" width="23.4" height="23.4"/>
+              <rect x="8.3" y="8.3" width="23.4" height="23.4" transform="rotate(45 20 20)"/>
+              <circle cx="20" cy="20" r="5"/><circle cx="20" cy="20" r="18.5" stroke-dasharray="1 2.2"/>
+            </svg>
+            <h2>Загрузите паспорт</h2>
+            <p>Перетащите файл сюда или нажмите.<br>JPG, PNG или PDF</p>
+            <span class="btn">Выбрать файл</span>
+          </span>
+        </label>
+        <p class="fine" id="fine">Фото паспорта не сохраняется на сайте. Данные используются только для оформления визы.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="work" class="wrap" hidden>
+    <div class="work-head">
+      <h2>Заявка на визу</h2>
+      <div class="tabs" id="tabs" role="tablist"></div>
+    </div>
+
+    <div class="grid">
+      <aside class="side">
+        <div id="docBox"></div>
+        <div id="statusBox"></div>
+        <div class="panel" style="padding:20px">
+          <h3 style="font-size:20px;margin-bottom:12px">Проверка</h3>
+          <ul class="checks" id="checks"></ul>
+        </div>
+      </aside>
+
+      <div>
+        <div class="panel">
+          <h3>Паспортные данные</h3>
+          <p class="sub" id="pSub">Как в паспорте, латиницей.</p>
+          <div class="fields" id="passportFields"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Поездка и контакты</h3>
+          <p class="sub">Общие для всей заявки.</p>
+          <div class="fields" id="tripFields"></div>
+          <div class="actions">
+            <button class="btn" id="submitApp">Отправить заявку</button>
+            <button class="btn ghost" id="saveCsv">Скачать CSV</button>
+            <button class="btn ghost" id="copyTxt">Скопировать текст</button>
+            <span class="toast" id="toast" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+        <div id="done"></div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="assets/store.js"></script>
+<script src="assets/layout.js"></script>
+<script src="assets/visa.js"></script>
+</body>
+</html>

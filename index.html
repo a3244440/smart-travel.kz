@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Forum&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/config.js"></script>
+<title>Alina Smart Travel — Умра, Мекка, Медина и туры по миру</title>
+<meta name="description" content="Умра VIP, Luxe и Standard, круиз с Умрой, халяль-туры в Дубай и Турцию. Виза в Саудовскую Аравию по фото паспорта.">
+</head>
+<body data-page="home">
+<main>
+  <section class="wrap hero">
+    <div>
+      <h1>Умра, Мекка и Медина — с заботой о каждой детали</h1>
+      <p class="lead">Туры VIP, Luxe и Standard, круиз с Умрой и халяль-отдых по миру. Визу в Саудовскую Аравию оформим по фото паспорта.</p>
+      <div class="row" style="display:flex;gap:12px;flex-wrap:wrap">
+        <a class="btn" href="#tours">Выбрать тур</a>
+        <a class="btn ghost" href="visa.html">Оформить визу</a>
+      </div>
+    </div>
+    <div class="arch-col">
+      <div style="width:min(340px,100%)">
+        <a class="arch" href="visa.html" style="text-decoration:none;color:inherit">
+          <span class="arch-inner">
+            <svg class="seal" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width=".9" aria-hidden="true">
+              <rect x="8.3" y="8.3" width="23.4" height="23.4"/><rect x="8.3" y="8.3" width="23.4" height="23.4" transform="rotate(45 20 20)"/>
+              <circle cx="20" cy="20" r="5"/><circle cx="20" cy="20" r="18.5" stroke-dasharray="1 2.2"/>
+            </svg>
+            <h2>Виза за 5 минут</h2>
+            <p>Загрузите фото паспорта —<br>анкета заполнится сама</p>
+            <span class="btn">Начать</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="tours">
+    <div class="work-head" style="margin-bottom:18px">
+      <h2>Туры</h2>
+      <div class="filter" role="tablist" id="filter">
+        <button class="tab" role="tab" aria-selected="true" data-g="all">Все</button>
+        <button class="tab" role="tab" aria-selected="false" data-g="umrah">Умра</button>
+        <button class="tab" role="tab" aria-selected="false" data-g="world">Туры по миру</button>
+      </div>
+    </div>
+    <div class="tours" id="tourList"></div>
+  </section>
+</main>
+<script src="assets/tours.js"></script>
+<script src="assets/layout.js"></script>
+<script>
+(function(){
+  let group = "all";
+  function card(t, feature){
+    const price = t.price != null
+      ? `<div class="price"><b>${money(t.price)}</b>${t.oldPrice?`<s>${money(t.oldPrice)}</s>`:""}</div>`
+      : `<div class="price"><span style="color:var(--ink-2)">Цена по запросу</span></div>`;
+    const ask = waLink(`Здравствуйте! Интересует тур «${t.title}». Подскажите даты и стоимость.`);
+    const btns = `<div class="row"><a class="btn" href="${ask}" target="_blank" rel="noopener">Узнать подробнее</a>${t.visa?'<a class="btn ghost" href="visa.html">Оформить визу</a>':''}</div>`;
+    const head = `<span class="tier">${esc(t.tier)}</span><h3>${esc(t.title)}</h3><span class="dur">${esc(t.duration)}</span>`;
+    const list = `<ul>${t.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`;
+    return feature
+      ? `<article class="tour feature"><div style="display:flex;flex-direction:column;gap:14px">${head}${list}</div><div style="display:flex;flex-direction:column;gap:18px;justify-content:flex-end">${price}${btns}</div></article>`
+      : `<article class="tour">${head}${list}${price}${btns}</article>`;
+  }
+  function render(){
+    const list = TOURS.filter(t => group==="all" || t.group===group);
+    document.getElementById("tourList").innerHTML = list.map((t,i) => card(t, i===0 && t.oldPrice)).join("");
+  }
+  document.getElementById("filter").addEventListener("click", e => {
+    const b = e.target.closest("[data-g]"); if(!b) return;
+    group = b.dataset.g;
+    document.querySelectorAll("#filter .tab").forEach(x => x.setAttribute("aria-selected", x===b));
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>
