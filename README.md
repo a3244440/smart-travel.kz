@@ -1,4 +1,4 @@
-# Alina Smart Travel — платформа
+# smart-travel.kz — платформа
 
 Сайт для [@alina.smarttravel.kz](https://www.instagram.com/alina.smarttravel.kz/): Умра, Мекка, Медина и туры по миру, оформление визы в Саудовскую Аравию по фото паспорта.
 

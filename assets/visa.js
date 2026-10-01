@@ -318,7 +318,7 @@ Reply with only this JSON object:
   const PURPOSE = {umrah:'Умра',tourism:'Туризм',cruise_umrah:'Круиз + Умра',business:'Деловая'};
   function buildText(){
     const tr = state.trip;
-    let out = `ЗАЯВКА НА ВИЗУ — САУДОВСКАЯ АРАВИЯ\nAlina Smart Travel\n\n`;
+    let out = `ЗАЯВКА НА ВИЗУ — САУДОВСКАЯ АРАВИЯ\n${(window.SITE && SITE.brand) || "smart-travel.kz"}\n\n`;
     out += `Цель: ${PURPOSE[tr.purpose]||''}\nДата въезда: ${fmt(tr.arrival)||'—'}\nНочей: ${tr.nights||'—'}\nКонтакт: ${tr.contact_name||'—'}, ${tr.phone||'—'}, ${tr.email||'—'}\n`;
     if(tr.comment) out += `Пожелания: ${tr.comment}\n`;
     state.travellers.forEach((t,i)=>{
