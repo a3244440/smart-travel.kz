@@ -250,3 +250,17 @@ nav.main a{white-space:nowrap}
 [dir="rtl"] .hero h1{line-height:1.3}
 [dir="rtl"] .page-head h1,[dir="rtl"] .tour h3,[dir="rtl"] .work-head h2,[dir="rtl"] .arch h2{line-height:1.35}
 [dir="rtl"] .steps li::before{font-family:var(--sans)}
+
+/* самолёт под шапкой */
+.flight{position:absolute;left:0;right:0;bottom:-1px;height:14px;pointer-events:none}
+.flight .route{position:absolute;left:0;right:0;bottom:0;border-top:1px dashed var(--line)}
+.flight .trail{position:absolute;left:0;bottom:-.5px;height:2px;width:100%;transform-origin:0 50%;transform:scaleX(var(--fly,0));
+  background:linear-gradient(90deg,transparent,var(--brass));border-radius:2px}
+.flight .plane{position:absolute;left:0;bottom:-9px;width:20px;height:20px;fill:var(--brass);will-change:transform;
+  transform:translateX(var(--fly-x,0px)) rotate(90deg);filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}
+[dir="rtl"] .flight{transform:scaleX(-1)}
+
+/* плавное появление */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .7s ease var(--rv-d,0ms),transform .8s cubic-bezier(.2,.7,.2,1) var(--rv-d,0ms)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){ .rv{opacity:1;transform:none} }

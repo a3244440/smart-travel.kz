@@ -26,7 +26,9 @@
       <div class="tools">${langs}
         <button class="theme-btn" id="themeBtn" type="button" aria-label="${t(dark ? "theme.light" : "theme.dark")}" title="${t(dark ? "theme.light" : "theme.dark")}">${dark ? icons.sun : icons.moon}</button>
       </div>
-    </div>`;
+    </div>
+    <div class="flight" aria-hidden="true"><i class="route"></i><i class="trail"></i>
+      <svg class="plane" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></div>`;
     footer.innerHTML = `<div class="wrap"><span>${esc(S.brand)}</span><span>${t("footer.note")} · <a href="admin.html" style="color:inherit">${t("footer.manager")}</a></span></div>`;
   }
   header.addEventListener("change", e => { if(e.target.id === "langSel") I18N.setLang(e.target.value); });
@@ -44,7 +46,38 @@
   window.fmtDate = iso => { if(!iso) return ""; const [y,m,d] = String(iso).slice(0,10).split("-"); return d ? `${d}.${m}.${y}` : iso; };
   window.money = n => n == null ? "" : n.toLocaleString("ru-RU") + " " + (S.currency || "₸");
 
-  chrome(); setPattern();
+  // самолёт под шапкой: летит по мере прокрутки (одно свойство --fly, без перерисовки страницы)
+  let fly = 0, target = 0, raf = 0;
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function measure(){
+    const max = document.documentElement.scrollHeight - innerHeight;
+    target = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+    if(!raf) raf = requestAnimationFrame(step);
+  }
+  function step(){
+    fly = still ? target : fly + (target - fly) * 0.14;
+    if(Math.abs(target - fly) < 0.0005) fly = target;
+    header.style.setProperty("--fly", fly.toFixed(4));
+    header.style.setProperty("--fly-x", (fly * (header.clientWidth - 20)).toFixed(1) + "px");
+    raf = fly === target ? 0 : requestAnimationFrame(step);
+  }
+  addEventListener("scroll", measure, { passive:true });
+  addEventListener("resize", measure, { passive:true });
+
+  // плавное появление блоков при прокрутке
+  function reveal(){
+    if(still || page === "admin" || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(entries => entries.forEach(e => {
+      if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
+    }), { rootMargin:"0px 0px -8% 0px", threshold:0.08 });
+    document.querySelectorAll("main .hero > *, main .page-head, main .work-head, main .tour, main .panel, main .arch-col").forEach((el, i) => {
+      if(el.getBoundingClientRect().top > innerHeight * 0.92){ el.classList.add("rv"); io.observe(el); }
+      else { el.classList.add("rv", "rv-now"); el.style.setProperty("--rv-d", (i % 4) * 70 + "ms"); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("in"))); }
+    });
+  }
+
+  chrome(); setPattern(); measure();
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", reveal); else reveal();
   document.addEventListener("langchange", chrome);
   document.addEventListener("themechange", () => { chrome(); setPattern(); });
 })();
