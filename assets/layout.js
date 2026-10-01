@@ -22,6 +22,7 @@
        <select id="langSel" class="lang">${I18N.LANGS.map(l => `<option value="${l.code}"${l.code===I18N.lang?" selected":""} lang="${l.code}">${l.short}</option>`).join("")}</select>`;
     header.innerHTML = `<div class="wrap">
       <a class="mark" href="./" aria-label="${esc(S.brand)} — ${t("nav.home")}"><span class="logo" role="img" aria-label="smart-travel.kz"><i></i><i></i></span></a>
+      <a class="wordmark" href="./" tabindex="-1" aria-hidden="true"><span><i></i><i></i></span></a>
       <nav class="main">${page==="admin" ? "" : link("./#tours","tours",t("nav.tours")) + link("visa.html","visa",t("nav.visa")) + link("cabinet.html","cabinet",t("nav.cabinet")) + `<a class="ig" href="${S.instagram}" target="_blank" rel="noopener">Instagram</a>`}</nav>
       <div class="tools">${langs}
         <button class="theme-btn" id="themeBtn" type="button" aria-label="${t(dark ? "theme.light" : "theme.dark")}" title="${t(dark ? "theme.light" : "theme.dark")}">${dark ? icons.sun : icons.moon}</button>
