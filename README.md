@@ -13,7 +13,7 @@
 
 ## Как редактировать
 
-- **Номер WhatsApp, Instagram, город** — `assets/config.js`
+- **Номер WhatsApp, Instagram** — `assets/config.js`
 - **Туры и цены** — `assets/tours.js` (`price: null` показывает «Цена по запросу»)
 - **Статусы заявок** — `assets/store.js` (и список в `supabase/migrations`)
 - **Подключение к Supabase** — `assets/config.js` (`supabaseUrl`, `supabaseKey`)

@@ -25,7 +25,7 @@
         <button class="theme-btn" id="themeBtn" type="button" aria-label="${t(dark ? "theme.light" : "theme.dark")}" title="${t(dark ? "theme.light" : "theme.dark")}">${dark ? icons.sun : icons.moon}</button>
       </div>
     </div>`;
-    footer.innerHTML = `<div class="wrap"><span>${esc(S.brand)} · ${t("footer.city")}</span><span>${t("footer.note")} · <a href="admin.html" style="color:inherit">${t("footer.manager")}</a></span></div>`;
+    footer.innerHTML = `<div class="wrap"><span>${esc(S.brand)}</span><span>${t("footer.note")} · <a href="admin.html" style="color:inherit">${t("footer.manager")}</a></span></div>`;
   }
   header.addEventListener("change", e => { if(e.target.id === "langSel") I18N.setLang(e.target.value); });
   header.addEventListener("click", e => { if(e.target.closest("#themeBtn")) I18N.setTheme(I18N.theme() === "dark" ? "light" : "dark"); });
