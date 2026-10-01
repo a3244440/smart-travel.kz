@@ -70,11 +70,13 @@
       : `<div class="price"><span style="color:var(--ink-2)">${t("tour.onRequest")}</span></div>`;
     const ask = waLink(t("tour.ask", { title }));
     const btns = `<div class="row"><a class="btn" href="${ask}" target="_blank" rel="noopener">${t("tour.more")}</a>${tour.visa?`<a class="btn ghost" href="visa.html">${t("home.getVisa")}</a>`:''}</div>`;
+    const photo = tour.photo
+      ? `<figure class="ph"><img src="${esc(tour.photo)}" alt="${esc(title)}" loading="lazy" decoding="async" onerror="this.parentNode.remove()"></figure>` : "";
     const head = `<span class="tier">${esc(P(tour.tier))}</span><h3>${esc(title)}</h3><span class="dur">${esc(P(tour.duration))}</span>`;
     const list = `<ul>${P(tour.points).map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`;
     return feature
-      ? `<article class="tour feature"><div style="display:flex;flex-direction:column;gap:14px">${head}${list}</div><div style="display:flex;flex-direction:column;gap:18px;justify-content:flex-end">${price}${btns}</div></article>`
-      : `<article class="tour">${head}${list}${price}${btns}</article>`;
+      ? `<article class="tour feature">${photo}<div style="display:flex;flex-direction:column;gap:14px">${head}${list}</div><div style="display:flex;flex-direction:column;gap:18px;justify-content:flex-end">${price}${btns}</div></article>`
+      : `<article class="tour">${photo}${head}${list}${price}${btns}</article>`;
   }
   function render(){
     const list = TOURS.filter(t => group==="all" || t.group===group);

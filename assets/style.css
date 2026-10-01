@@ -188,6 +188,13 @@ nav.main a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--brass
   background:linear-gradient(var(--bg-2),var(--bg-2)) padding-box}
 .tour.feature h3{font-size:44px}
 @media (max-width:760px){ .tour.feature{grid-template-columns:1fr;gap:16px} .tour.feature h3{font-size:34px} }
+.tour{overflow:hidden}
+.tour .ph{margin:-26px -26px 6px;aspect-ratio:16/10;overflow:hidden;position:relative;background:var(--night)}
+.tour .ph img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+.tour .ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(14,22,54,.28));pointer-events:none}
+.tour:hover .ph img{transform:scale(1.04)}
+.tour.feature .ph{grid-column:1/-1;aspect-ratio:21/8;margin-bottom:-6px}
+@media (max-width:760px){ .tour.feature .ph{aspect-ratio:16/10} }
 .tour .tier{font-size:13px;color:var(--brass);font-weight:600}
 .tour h3{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.05;margin:0}
 .tour .dur{font-size:14px;color:var(--ink-2)}
