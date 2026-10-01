@@ -33,11 +33,12 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 /* header */
 header{border-bottom:1px solid var(--line)}
-header .wrap{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:76px;gap:16px}
 .mark{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
-.mark svg{width:30px;height:30px;color:var(--brass)}
-.mark b{font-family:var(--serif);font-weight:400;font-size:22px;letter-spacing:.02em}
-.mark small{display:block;font-size:12px;color:var(--ink-2);margin-top:-4px}
+.logo{display:block;position:relative;height:54px;aspect-ratio:668/120;flex:none}
+.logo i{position:absolute;inset:0;background:var(--ink);
+  -webkit-mask:url(logo-ink.png) left center/auto 100% no-repeat;mask:url(logo-ink.png) left center/auto 100% no-repeat}
+.logo i+i{background:var(--brass);-webkit-mask-image:url(logo-gold.png);mask-image:url(logo-gold.png)}
 .top-link{font-size:14px;color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px}
 .top-link:hover{color:var(--brass)}
 
@@ -141,7 +142,6 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
   .wrap{padding:0 18px}
   .fields{grid-template-columns:1fr}
   .panel{padding:22px 18px}
-  .mark small{display:none}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
@@ -205,10 +205,10 @@ tbody tr{cursor:pointer}
 .empty{padding:48px 24px;text-align:center;color:var(--ink-2)}
 body[data-page="admin"] .wrap{max-width:1400px}
 td b{white-space:nowrap}
-.mark b, nav.main a{white-space:nowrap}
+nav.main a{white-space:nowrap}
 @media (max-width:560px){
-  .mark b{font-size:18px} .mark svg{width:24px;height:24px} .mark{gap:8px}
+  .logo{height:44px;aspect-ratio:187/120}
   header .wrap{height:60px}
   nav.main{gap:12px}
 }
-@media (max-width:380px){ .mark b{font-size:16px} nav.main{font-size:12.5px;gap:10px} }
+@media (max-width:380px){ nav.main{font-size:12.5px;gap:10px} }

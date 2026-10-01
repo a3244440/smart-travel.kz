@@ -2,11 +2,10 @@
 (function(){
   const S = window.SITE || {};
   const page = document.body.dataset.page || "";
-  const logo = `<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="8.3" y="8.3" width="23.4" height="23.4"/><rect x="8.3" y="8.3" width="23.4" height="23.4" transform="rotate(45 20 20)"/><circle cx="20" cy="20" r="5"/></svg>`;
   const link = (href, key, text, cls="") => `<a href="${href}" class="${cls}"${page===key?' aria-current="page"':''}>${text}</a>`;
   const header = document.createElement("header");
   header.innerHTML = `<div class="wrap">
-    <a class="mark" href="index.html" aria-label="${S.brand}">${logo}<span><b>${S.brand}</b><small>Умра · Мекка · Медина</small></span></a>
+    <a class="mark" href="index.html" aria-label="${S.brand} — на главную"><span class="logo" role="img" aria-label="smart-travel.kz"><i></i><i></i></span></a>
     <nav class="main">${link("index.html#tours","tours","Туры")}${link("visa.html","visa","Виза")}${link("cabinet.html","cabinet","Мои заявки")}<a class="ig" href="${S.instagram}" target="_blank" rel="noopener">Instagram</a></nav>
   </div>`;
   document.body.prepend(header);
