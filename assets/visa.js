@@ -365,8 +365,14 @@ Reply with only this JSON object:
       });
       if(!state.trip.phone) problems.push('Укажите телефон для связи');
       if(problems.length){ toast(problems[0], true); return; }
-      const rec = Store.add({ trip: Object.assign({}, state.trip), travellers: state.travellers.map(t => ({ fields: Object.assign({}, t.fields) })) });
-      if(!rec){ toast('Не удалось сохранить заявку', true); return; }
+      const btn = e.target.closest('#submitApp');
+      if(btn.disabled) return;
+      btn.disabled = true; toast('Отправляем…');
+      let rec;
+      try { rec = await Store.add({ trip: Object.assign({}, state.trip), travellers: state.travellers.map(t => ({ fields: Object.assign({}, t.fields) })) }); }
+      catch(err){ toast('Не удалось отправить заявку. Проверьте интернет и попробуйте ещё раз', true); return; }
+      finally { btn.disabled = false; }
+      toast('');
       const msg = `Здравствуйте! Отправляю заявку на визу ${rec.id}.\n\n` + buildText();
       $('#done').innerHTML = `<div class="success" role="status">
         <h3>Заявка отправлена</h3>

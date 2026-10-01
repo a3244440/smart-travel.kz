@@ -1,7 +1,6 @@
-// Хранилище заявок.
-// Сейчас: localStorage (данные видны только в этом браузере — для демонстрации).
-// Для работы с реальными клиентами замените эти функции на запросы к серверу
-// (например, Supabase) — интерфейс Store останется тем же.
+// Хранилище заявок — Supabase (схема и права: supabase/schema.sql).
+// Клиент может только отправить заявку и узнать её статус по номеру + телефону.
+// Видеть и менять все заявки может только менеджер (вход по email и паролю).
 window.STATUSES = {
   new:       { label:"Заявка получена",        tone:"idle" },
   review:    { label:"Проверяем документы",    tone:"warn" },
@@ -9,29 +8,57 @@ window.STATUSES = {
   approved:  { label:"Виза одобрена",          tone:"ok"   },
   fix:       { label:"Нужны исправления",      tone:"err"  }
 };
-window.Store = {
-  KEY: "ast_applications_v1",
-  all(){ try { return JSON.parse(localStorage.getItem(this.KEY)) || []; } catch(e){ return []; } },
-  _save(list){ try { localStorage.setItem(this.KEY, JSON.stringify(list)); return true; } catch(e){ return false; } },
-  add(app){
-    const list = this.all();
-    const now = new Date().toISOString();
-    const rec = Object.assign({}, app, {
-      id: "AST-" + Math.random().toString(36).slice(2,8).toUpperCase(),
-      created: now, status: "new", note: "", history: [{ status:"new", at: now }]
-    });
-    list.unshift(rec); this._save(list); return rec;
-  },
-  update(id, patch){
-    const list = this.all(); const i = list.findIndex(a => a.id === id); if(i < 0) return null;
-    const rec = list[i];
-    if(patch.status && patch.status !== rec.status) rec.history.push({ status: patch.status, at: new Date().toISOString() });
-    Object.assign(rec, patch); this._save(list); return rec;
-  },
-  remove(id){ this._save(this.all().filter(a => a.id !== id)); },
-  find(id, phone){
-    const norm = s => String(s||"").replace(/\D/g,"").slice(-10);
-    return this.all().find(a => a.id.toUpperCase() === String(id).trim().toUpperCase() &&
-      (!phone || norm(a.trip && a.trip.phone) === norm(phone)));
-  }
-};
+window.Store = (function(){
+  const S = window.SITE || {};
+  const db = window.supabase.createClient(S.supabaseUrl, S.supabaseKey);
+  const MINE = "ast_mine_v1";   // номера заявок, отправленных с этого устройства
+  const fail = (error, what) => { if(error){ console.error(what, error); throw new Error(what); } };
+  const mine = () => { try { return JSON.parse(localStorage.getItem(MINE)) || []; } catch(e){ return []; } };
+  const remember = (id, phone) => {
+    try { localStorage.setItem(MINE, JSON.stringify([{ id, phone }, ...mine().filter(m => m.id !== id)].slice(0, 20))); } catch(e){}
+  };
+  return {
+    // клиент
+    async add(app){
+      const { data, error } = await db.rpc("submit_application", { p_trip: app.trip, p_travellers: app.travellers });
+      fail(error, "Не удалось отправить заявку");
+      remember(data, app.trip.phone);
+      return { id: data };
+    },
+    async find(id, phone){
+      const { data, error } = await db.rpc("find_application", { p_id: String(id || "").trim(), p_phone: String(phone || "") });
+      fail(error, "Не удалось проверить статус");
+      return data || null;
+    },
+    mine,
+    // менеджер
+    async all(){
+      const { data, error } = await db.from("applications").select("*").order("created", { ascending:false });
+      fail(error, "Не удалось загрузить заявки");
+      return data;
+    },
+    async update(id, patch){
+      const { data, error } = await db.from("applications").update(patch).eq("id", id).select().single();
+      fail(error, "Не удалось сохранить");
+      return data;
+    },
+    async remove(id){
+      const { error } = await db.from("applications").delete().eq("id", id);
+      fail(error, "Не удалось удалить заявку");
+    },
+    auth: {
+      async session(){ const { data } = await db.auth.getSession(); return data.session; },
+      async signIn(email, password){
+        const { error } = await db.auth.signInWithPassword({ email, password });
+        fail(error, "Неверный email или пароль");
+      },
+      async signOut(){ await db.auth.signOut(); },
+      async isManager(){
+        const { data, error } = await db.rpc("is_manager");
+        fail(error, "Не удалось проверить доступ");
+        return data === true;
+      },
+      onChange(cb){ db.auth.onAuthStateChange(() => cb()); }
+    }
+  };
+})();

@@ -30,6 +30,7 @@
   </div>
   <div id="mine" style="margin-top:40px"></div>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="assets/store.js"></script>
 <script src="assets/layout.js"></script>
 <script>
@@ -56,24 +57,39 @@
       <div class="actions"><a class="btn ghost" href="${waLink("Здравствуйте! Вопрос по заявке " + a.id)}" target="_blank" rel="noopener">Написать менеджеру</a></div>
     </div>`;
   }
+  async function lookup(id, phone, quiet){
+    $("#err").textContent = "";
+    let a;
+    try { a = await Store.find(id, phone); }
+    catch(err){ if(!quiet) $("#err").textContent = "Не удалось связаться с сервером. Проверьте интернет и попробуйте ещё раз."; return; }
+    if(!a){ if(!quiet) $("#err").textContent = "Заявка не найдена. Проверьте номер и телефон — или напишите менеджеру."; return; }
+    show(a);
+    $("#result").scrollIntoView({behavior:"smooth",block:"start"});
+  }
   $("#lookup").addEventListener("submit", e => {
     e.preventDefault();
     const id = $("#aid").value.trim(), phone = $("#aphone").value.trim();
-    $("#err").textContent = "";
     if(!id || !phone){ $("#err").textContent = "Укажите номер заявки и телефон."; return; }
-    const a = Store.find(id, phone);
-    if(!a){ $("#err").textContent = "Заявка не найдена. Проверьте номер и телефон — или напишите менеджеру."; return; }
-    show(a);
+    lookup(id, phone);
   });
   // заявки, отправленные с этого устройства
-  const mine = Store.all();
+  const mine = Store.mine();
   if(mine.length){
     $("#mine").innerHTML = `<h2 style="font-family:var(--serif);font-weight:400;font-size:28px;margin:0 0 14px">Заявки с этого устройства</h2>
-      <div class="tabs">${mine.map(a => `<button class="tab" data-id="${esc(a.id)}"><span class="dot ${STATUSES[a.status].tone==="ok"?"done":STATUSES[a.status].tone==="err"?"error":STATUSES[a.status].tone==="warn"?"reading":""}"></span>${esc(a.id)} · ${esc(names(a))}</button>`).join("")}</div>`;
-    $("#mine").addEventListener("click", e => { const b = e.target.closest("[data-id]"); if(b){ show(Store.find(b.dataset.id)); $("#result").scrollIntoView({behavior:"smooth",block:"start"}); } });
+      <div class="tabs">${mine.map(m => `<button class="tab" data-id="${esc(m.id)}">${esc(m.id)}</button>`).join("")}</div>`;
+    $("#mine").addEventListener("click", e => {
+      const b = e.target.closest("[data-id]"); if(!b) return;
+      const m = mine.find(x => x.id === b.dataset.id);
+      $("#aid").value = m.id; $("#aphone").value = m.phone || "";
+      lookup(m.id, m.phone);
+    });
   }
   const q = new URLSearchParams(location.search).get("id");
-  if(q){ $("#aid").value = q; const a = Store.find(q); if(a) show(a); }
+  if(q){
+    $("#aid").value = q;
+    const m = mine.find(x => x.id.toUpperCase() === q.trim().toUpperCase());
+    if(m){ $("#aphone").value = m.phone || ""; lookup(m.id, m.phone, true); }
+  }
 })();
 </script>
 </body>

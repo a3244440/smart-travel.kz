@@ -14,16 +14,30 @@
 </head>
 <body data-page="admin">
 <main class="wrap" style="padding-bottom:80px">
+  <section id="login" hidden>
+    <div class="page-head"><h1>Вход для менеджера</h1><p>Только для сотрудников Alina Smart Travel.</p></div>
+    <form class="panel" id="loginForm" style="max-width:380px" novalidate>
+      <div class="fields" style="grid-template-columns:1fr">
+        <div class="f"><label for="em">Email</label><input id="em" type="email" autocomplete="username" required></div>
+        <div class="f"><label for="pw">Пароль</label><input id="pw" type="password" autocomplete="current-password" required></div>
+      </div>
+      <div class="actions"><button class="btn" type="submit" id="loginBtn">Войти</button></div>
+      <p class="toast bad" id="loginErr" role="status" aria-live="polite" style="margin:14px 0 0"></p>
+    </form>
+  </section>
+  <section id="app" hidden>
   <div class="page-head" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:16px">
     <div><h1>Заявки на визу</h1><p id="summary"></p></div>
-    <div class="actions" style="margin:0"><button class="btn ghost" id="exportAll">Скачать всё в CSV</button></div>
+    <div class="actions" style="margin:0"><button class="btn ghost" id="reload">Обновить</button><button class="btn ghost" id="exportAll">Скачать всё в CSV</button><button class="btn ghost" id="logout">Выйти</button></div>
   </div>
   <div class="filter" id="sfilter"></div>
   <div class="grid" style="grid-template-columns:minmax(0,1fr) 360px">
     <div class="table-wrap"><table><thead><tr><th>Номер</th><th>Путешественники</th><th>Цель</th><th>Въезд</th><th>Телефон</th><th>Статус</th></tr></thead><tbody id="rows"></tbody></table></div>
     <aside class="side" id="detail"><div class="panel empty">Выберите заявку в таблице.</div></aside>
   </div>
+  </section>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="assets/store.js"></script>
 <script src="assets/layout.js"></script>
 <script>
@@ -31,7 +45,7 @@
   const PURPOSE = {umrah:"Умра",tourism:"Туризм",cruise_umrah:"Круиз + Умра",business:"Деловая"};
   const LABELS = {surname:"Фамилия",given_names:"Имя",sex:"Пол",date_of_birth:"Дата рождения",place_of_birth:"Место рождения",nationality:"Гражданство",passport_number:"Паспорт",personal_number:"ИИН",issue_date:"Выдан",expiry_date:"Действителен до",issuing_authority:"Кем выдан"};
   const $ = s => document.querySelector(s);
-  let filter = "all", selected = null;
+  let filter = "all", selected = null, apps = [];
   const names = a => a.travellers.map(t => [t.fields.surname, t.fields.given_names].filter(Boolean).join(" ")).filter(Boolean).join(", ") || "—";
   function renderFilter(all){
     const counts = {}; all.forEach(a => counts[a.status] = (counts[a.status]||0)+1);
@@ -41,7 +55,7 @@
     $("#summary").textContent = all.length ? `${all.length} заявок · ${travellers} путешественников` : "Пока заявок нет.";
   }
   function render(){
-    const all = Store.all(); renderFilter(all);
+    const all = apps; renderFilter(all);
     const list = all.filter(a => filter==="all" || a.status===filter);
     $("#rows").innerHTML = list.length ? list.map(a => `<tr data-id="${esc(a.id)}" class="${a.id===selected?"sel":""}">
       <td><b>${esc(a.id)}</b><br><small style="color:var(--ink-2)">${new Date(a.created).toLocaleDateString("ru-RU")}</small></td>
@@ -51,7 +65,7 @@
     renderDetail();
   }
   function renderDetail(){
-    const a = selected && Store.all().find(x => x.id===selected);
+    const a = selected && apps.find(x => x.id===selected);
     if(!a){ $("#detail").innerHTML = '<div class="panel empty">Выберите заявку в таблице.</div>'; return; }
     const people = a.travellers.map((t,i) => `<div style="border-top:1px solid var(--line-2);padding-top:12px;margin-top:12px">
       <b>Путешественник ${i+1}</b>
@@ -77,23 +91,56 @@
     const keys = Object.keys(LABELS), q = v => `"${String(v??"").replace(/"/g,'""')}"`;
     const head = ["Номер","Создана","Статус",...Object.values(LABELS),"Цель","Въезд","Ночей","Контакт","Телефон","Email","Пожелания","Комментарий"];
     const rows = [];
-    Store.all().forEach(a => a.travellers.forEach(t => rows.push([a.id, fmtDate(a.created), STATUSES[a.status].label,
+    apps.forEach(a => a.travellers.forEach(t => rows.push([a.id, fmtDate(a.created), STATUSES[a.status].label,
       ...keys.map(k => /date/.test(k) ? fmtDate(t.fields[k]) : t.fields[k]),
       PURPOSE[a.trip.purpose], fmtDate(a.trip.arrival), a.trip.nights, a.trip.contact_name, a.trip.phone, a.trip.email, a.trip.comment, a.note].map(q).join(";"))));
     return "\uFEFF" + [head.map(q).join(";"), ...rows].join("\r\n");
   }
-  document.addEventListener("click", e => {
+  async function load(){
+    try { apps = await Store.all(); $("#summary").textContent = ""; }
+    catch(err){ $("#summary").textContent = "Не удалось загрузить заявки. Обновите страницу."; return; }
+    render();
+  }
+  async function gate(){
+    const session = await Store.auth.session();
+    let ok = false;
+    if(session){ try { ok = await Store.auth.isManager(); } catch(e){} }
+    $("#login").hidden = ok; $("#app").hidden = !ok;
+    if(session && !ok) $("#loginErr").textContent = "У этой учётной записи нет доступа к заявкам.";
+    if(ok) load(); else { apps = []; selected = null; }
+  }
+  $("#loginForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const btn = $("#loginBtn"); $("#loginErr").textContent = ""; btn.disabled = true;
+    try { await Store.auth.signIn($("#em").value.trim(), $("#pw").value); $("#pw").value = ""; await gate(); }
+    catch(err){ $("#loginErr").textContent = err.message; }
+    finally { btn.disabled = false; }
+  });
+  document.addEventListener("click", async e => {
     const f = e.target.closest("[data-f]"); if(f){ filter = f.dataset.f; render(); return; }
     const r = e.target.closest("tr[data-id]"); if(r){ selected = r.dataset.id; render(); return; }
-    if(e.target.closest("#saveSt")){ Store.update(selected, { status: $("#st").value, note: $("#nt").value.trim() }); render(); $("#tst").textContent = "Сохранено"; return; }
-    if(e.target.closest("#del")){ if(confirm("Удалить заявку " + selected + "? Это нельзя отменить.")){ Store.remove(selected); selected = null; render(); } return; }
+    if(e.target.closest("#saveSt")){
+      const btn = e.target.closest("#saveSt"); btn.disabled = true;
+      try {
+        const rec = await Store.update(selected, { status: $("#st").value, note: $("#nt").value.trim() });
+        apps = apps.map(a => a.id === rec.id ? rec : a); render(); $("#tst").textContent = "Сохранено";
+      } catch(err){ $("#tst").textContent = err.message; btn.disabled = false; }
+      return;
+    }
+    if(e.target.closest("#del")){
+      if(!confirm("Удалить заявку " + selected + "? Это нельзя отменить.")) return;
+      try { await Store.remove(selected); apps = apps.filter(a => a.id !== selected); selected = null; render(); }
+      catch(err){ alert(err.message); }
+      return;
+    }
+    if(e.target.closest("#reload")){ load(); return; }
+    if(e.target.closest("#logout")){ await Store.auth.signOut(); $("#loginErr").textContent = ""; gate(); return; }
     if(e.target.closest("#exportAll")){
       const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv()],{type:"text/csv;charset=utf-8"}));
       a.download = "zayavki-" + new Date().toISOString().slice(0,10) + ".csv"; document.body.appendChild(a); a.click(); a.remove();
     }
   });
-  window.addEventListener("storage", render);
-  render();
+  gate();
 })();
 </script>
 </body>
