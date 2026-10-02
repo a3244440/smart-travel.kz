@@ -5,6 +5,7 @@
   --line:rgba(156,114,36,.28); --line-2:rgba(16,26,58,.10);
   --ok:#2F7A5E; --warn:#A8741A; --err:#B2483A;
   --btn:#101A3A; --btn-ink:#FBF7EF; --logo-ink:#101A3A;
+  --glow:255,255,255; --glow-a:1; --ayah-ar:#87601C;
   --night:#16204A; --night-2:#0E1636; --night-ink:#F4EEDF; --night-ink-2:#B9BCCD; --night-gold:#D8B46A;
   --header:rgba(255,255,255,.72); --shadow:0 1px 2px rgba(16,26,58,.04),0 8px 24px -12px rgba(16,26,58,.12);
   --serif:"Forum","Amiri",Georgia,"Times New Roman",serif;
@@ -20,7 +21,7 @@
     --ink:#ECE6D8; --ink-2:#A6A9B6; --brass:#C9A45E; --brass-soft:rgba(201,164,94,.12);
     --line:rgba(201,164,94,.3); --line-2:rgba(236,230,216,.12);
     --ok:#6DB394; --warn:#E0AE4E; --err:#E08676;
-    --btn:#C9A45E; --btn-ink:#141A2E; --logo-ink:#FFFFFF;
+    --btn:#C9A45E; --btn-ink:#141A2E; --logo-ink:#FFFFFF; --glow:216,180,106; --glow-a:.55; --ayah-ar:var(--brass);
     --night:#1B2340; --night-2:#1B2340; --night-ink:#ECE6D8; --night-ink-2:#A6A9B6; --night-gold:#C9A45E;
     --header:rgba(20,26,46,.8); --shadow:none;
     color-scheme:dark;
@@ -31,7 +32,7 @@
   --ink:#ECE6D8; --ink-2:#A6A9B6; --brass:#C9A45E; --brass-soft:rgba(201,164,94,.12);
   --line:rgba(201,164,94,.3); --line-2:rgba(236,230,216,.12);
   --ok:#6DB394; --warn:#E0AE4E; --err:#E08676;
-  --btn:#C9A45E; --btn-ink:#141A2E; --logo-ink:#FFFFFF;
+  --btn:#C9A45E; --btn-ink:#141A2E; --logo-ink:#FFFFFF; --glow:216,180,106; --glow-a:.55; --ayah-ar:var(--brass);
   --night:#1B2340; --night-2:#1B2340; --night-ink:#ECE6D8; --night-ink-2:#A6A9B6; --night-gold:#C9A45E;
   --header:rgba(20,26,46,.8); --shadow:none;
   color-scheme:dark;
@@ -311,7 +312,7 @@ nav.main a{white-space:nowrap}
 .ayah[hidden]{display:none}
 .ayah figure{position:relative;margin:0 auto;max-width:860px}
 .ayah figure::before{content:"";position:absolute;left:50%;top:52%;width:min(820px,100%);height:70%;transform:translate(-50%,-50%);
-  background:radial-gradient(closest-side,rgba(216,180,106,.2),transparent);pointer-events:none}
+  background:radial-gradient(closest-side,rgba(var(--glow),calc(var(--glow-a) * .55)),transparent);pointer-events:none}
 .ayah figure > *{position:relative}
 .ayah .orn{display:flex;align-items:center;justify-content:center;gap:14px;color:var(--brass);margin:0 auto 20px;max-width:420px}
 .ayah .orn::before,.ayah .orn::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--brass))}
@@ -319,10 +320,10 @@ nav.main a{white-space:nowrap}
 .ayah .orn svg{width:22px;height:22px}
 .ayah .orn.b{margin:26px auto 0}
 .ayah .label{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--brass);margin-bottom:16px;font-weight:600}
-.ayah-ar{margin:0 auto 14px;font-family:"Quran Text","Amiri Quran",serif;font-size:clamp(26px,3.4vw,40px);line-height:2.1;color:var(--brass);
-  text-shadow:0 0 20px rgba(216,180,106,.55);text-wrap:balance}
+.ayah-ar{margin:0 auto 14px;font-family:"Quran Text","Amiri Quran",serif;font-size:clamp(26px,3.4vw,40px);line-height:2.1;color:var(--ayah-ar);
+  text-shadow:0 0 20px rgba(var(--glow),var(--glow-a)),0 0 6px rgba(var(--glow),var(--glow-a));text-wrap:balance}
 .ayah blockquote{margin:0 auto;max-width:720px;font-family:"Cormorant Garamond",var(--serif);font-weight:500;font-size:clamp(21px,2.5vw,29px);line-height:1.5;color:var(--ink);
-  text-shadow:0 0 18px rgba(216,180,106,.55),0 0 2px rgba(216,180,106,.35);text-wrap:balance}
+  text-shadow:0 0 18px rgba(var(--glow),var(--glow-a)),0 0 3px rgba(var(--glow),var(--glow-a));text-wrap:balance}
 .ayah blockquote[hidden]{display:none}
 .ayah figcaption{margin-top:18px;font-size:14px;color:var(--ink-2)}
 [dir="rtl"] .ayah-ar{font-size:clamp(30px,4vw,46px)}
