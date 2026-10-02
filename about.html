@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Forum&family=Manrope:wght@400;500;600;700&family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/config.js"></script>
+<script src="assets/i18n.js"></script>
+<title>О нас — smart-travel.kz</title>
+</head>
+<body data-page="about" data-title="title.about">
+<main>
+  <section class="wrap about-hero">
+    <div>
+      <span class="kicker" data-i18n="about.kicker">О компании</span>
+      <h1 data-i18n="about.h1">Путь к Священным местам — спокойно и с заботой</h1>
+      <p class="lead" data-i18n="about.lead"></p>
+      <div id="since"></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a class="btn" href="./#tours" data-i18n="home.choose">Выбрать тур</a>
+        <a class="btn ghost" href="visa.html" data-i18n="home.getVisa">Оформить визу</a>
+      </div>
+    </div>
+    <div class="arch-col"><div class="about-photo"><img src="assets/tours/umrah-vip.jpg" alt="" loading="eager"></div></div>
+  </section>
+
+  <section class="wrap">
+    <h2 class="sec-title" data-i18n="about.valuesTitle">Наши принципы</h2>
+    <div class="values">
+      <div class="card"><span class="n">01</span><h3 data-i18n="about.v1t"></h3><p data-i18n="about.v1"></p></div>
+      <div class="card"><span class="n">02</span><h3 data-i18n="about.v2t"></h3><p data-i18n="about.v2"></p></div>
+      <div class="card"><span class="n">03</span><h3 data-i18n="about.v3t"></h3><p data-i18n="about.v3"></p></div>
+      <div class="card"><span class="n">04</span><h3 data-i18n="about.v4t"></h3><p data-i18n="about.v4"></p></div>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-top:32px">
+    <h2 class="sec-title" data-i18n="about.stepsTitle">Как проходит поездка</h2>
+    <div class="steps-row">
+      <div><h3 data-i18n="about.s1t"></h3><p data-i18n="about.s1"></p></div>
+      <div><h3 data-i18n="about.s2t"></h3><p data-i18n="about.s2"></p></div>
+      <div><h3 data-i18n="about.s3t"></h3><p data-i18n="about.s3"></p></div>
+      <div><h3 data-i18n="about.s4t"></h3><p data-i18n="about.s4"></p></div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="cta-band">
+      <div><h2 data-i18n="about.ctaTitle">Готовы обсудить поездку?</h2><p data-i18n="about.ctaText"></p></div>
+      <a class="btn" id="aboutWa" href="#" target="_blank" rel="noopener" data-i18n="foot.wa">Написать в WhatsApp</a>
+    </div>
+  </section>
+</main>
+<script src="assets/layout.js"></script>
+<script>
+(function(){
+  const since = () => {
+    const y = (window.SITE || {}).since;
+    document.getElementById("since").innerHTML = y ? `<span class="since">${esc(t("about.since", { year: y }))}</span>` : "";
+  };
+  document.getElementById("aboutWa").href = waLink("");
+  since(); document.addEventListener("langchange", since);
+})();
+</script>
+</body>
+</html>

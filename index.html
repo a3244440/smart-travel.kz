@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Forum&family=Manrope:wght@400;500;600;700&family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Forum&family=Manrope:wght@400;500;600;700&family=Amiri:wght@400;700&family=Playfair+Display:ital@1&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/config.js"></script>
 <script src="assets/i18n.js"></script>
@@ -56,6 +56,37 @@
     </div>
     <div class="tours" id="tourList"></div>
   </section>
+
+  <section class="wrap ayah" id="ayah" hidden aria-live="polite">
+    <figure>
+      <svg class="brush" viewBox="0 0 640 260" preserveAspectRatio="none" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true">
+        <path d="M118 52C86 70 70 98 72 128" stroke-width="7"/><path d="M146 36C128 40 116 46 104 56" stroke-width="4"/>
+        <path d="M522 208c32-18 48-46 46-76" stroke-width="7"/><path d="M494 224c18-4 30-10 42-20" stroke-width="4"/>
+      </svg>
+      <span class="label" data-i18n="ayah.label">Аят дня</span>
+      <blockquote id="ayahText"></blockquote>
+      <figcaption id="ayahCite"></figcaption>
+    </figure>
+  </section>
+
+  <section class="wrap faq" id="faq">
+    <div class="faq-head">
+      <div>
+        <h2 data-i18n="faq.title">Часто задаваемые вопросы</h2>
+        <p data-i18n="faq.lead">Не нашли ответ — напишите нам в WhatsApp, ответим лично.</p>
+        <a class="btn ghost" id="faqWa" href="#" target="_blank" rel="noopener" data-i18n="foot.wa">Написать в WhatsApp</a>
+      </div>
+      <div class="faq-list">
+        <details><summary data-i18n="faq.q1"></summary><p data-i18n="faq.a1"></p></details>
+        <details><summary data-i18n="faq.q2"></summary><p data-i18n="faq.a2"></p></details>
+        <details><summary data-i18n="faq.q3"></summary><p data-i18n="faq.a3"></p></details>
+        <details><summary data-i18n="faq.q4"></summary><p data-i18n="faq.a4"></p></details>
+        <details><summary data-i18n="faq.q5"></summary><p data-i18n="faq.a5"></p></details>
+        <details><summary data-i18n="faq.q6"></summary><p data-i18n="faq.a6"></p></details>
+        <details><summary data-i18n="faq.q7"></summary><p data-i18n="faq.a7"></p></details>
+      </div>
+    </div>
+  </section>
 </main>
 <script src="assets/tours.js"></script>
 <script src="assets/layout.js"></script>
@@ -88,7 +119,40 @@
     document.querySelectorAll("#filter .tab").forEach(x => x.setAttribute("aria-selected", x===b));
     render();
   });
-  document.addEventListener("langchange", render);
+  // аят дня: список в базе (тексты из api.alquran.cloud), выбор по дате в Казахстане (UTC+5)
+  const SURAH = {
+    2:["Аль-Бакара","Бақара","Al-Baqarah","البقرة"], 3:["Аль Имран","Әли Имран","Al Imran","آل عمران"], 9:["Ат-Тауба","Тәубе","At-Tawbah","التوبة"],
+    11:["Худ","Һуд","Hud","هود"], 13:["Ар-Рад","Рағд","Ar-Ra'd","الرعد"], 16:["Ан-Нахль","Нахыл","An-Nahl","النحل"],
+    22:["Аль-Хадж","Хаж","Al-Hajj","الحج"], 28:["Аль-Касас","Қасас","Al-Qasas","القصص"], 39:["Аз-Зумар","Зүмәр","Az-Zumar","الزمر"],
+    43:["Аз-Зухруф","Зухруф","Az-Zukhruf","الزخرف"], 94:["Аш-Шарх","Инширах","Ash-Sharh","الشرح"]
+  };
+  let ayat = null;
+  function loadAyat(){
+    try { const c = JSON.parse(localStorage.getItem("ast_ayat_v1")); if(c && Date.now() - c.at < 7*86400e3) return Promise.resolve(c.rows); } catch(e){}
+    return sbGet("ayat?select=ref,surah,ar,ru,en,kk,excerpt&active=eq.true&order=ord").then(rows => {
+      try { localStorage.setItem("ast_ayat_v1", JSON.stringify({ at:Date.now(), rows })); } catch(e){}
+      return rows;
+    });
+  }
+  function renderAyah(){
+    if(!ayat || !ayat.length) return;
+    const day = Math.floor((Date.now() + 5*3600e3) / 86400e3);
+    const a = ayat[day % ayat.length], L = I18N.lang, i = ["ru","kk","en","ar"].indexOf(L);
+    let text = String(a[L] || a.ru).trim();
+    if(!/[.!?»"”…]$/.test(text)) text += L === "ar" ? "" : ".";
+    if(a.excerpt) text = text.replace(/[.\s]*$/, "") + "…";
+    const q = $("#ayahText");
+    q.lang = L; q.textContent = L === "ar" ? text : "“" + text + "”";
+    const name = (SURAH[a.surah] || [])[i] || "";
+    $("#ayahCite").textContent = "— " + t("ayah.cite", { name, n: a.surah, ref: a.ref });
+    $("#ayah").hidden = false;
+  }
+  const $ = s => document.querySelector(s);
+  loadAyat().then(rows => { ayat = rows; renderAyah(); }).catch(() => {});
+  const setWa = () => { $("#faqWa").href = waLink(""); };
+  setWa();
+
+  document.addEventListener("langchange", () => { render(); renderAyah(); setWa(); });
   render();
 })();
 </script>

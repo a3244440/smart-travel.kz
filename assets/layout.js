@@ -9,10 +9,38 @@
     sun:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>`
   };
 
+  const topbar = document.createElement("div");
   const header = document.createElement("header");
   const footer = document.createElement("footer");
+  topbar.className = "topbar";
   document.body.prepend(header);
+  if(page !== "admin") document.body.prepend(topbar);
   if(page !== "admin") document.body.append(footer);
+
+  // чтение публичных таблиц Supabase (курсы, аяты) без библиотеки
+  window.sbGet = path => fetch(`${S.supabaseUrl}/rest/v1/${path}`, { headers:{ apikey:S.supabaseKey } })
+    .then(r => r.ok ? r.json() : Promise.reject(r.status));
+  const phone = "+" + String(S.whatsapp || "").replace(/^(\d)(\d{3})(\d{3})(\d{4})$/, "$1 $2 $3 $4");
+
+  // курс валют (MiG, mig.kz) — обновляется в базе каждые 30 минут
+  let rates = null;
+  function loadRates(){
+    try { const c = JSON.parse(sessionStorage.getItem("ast_rates")); if(c && Date.now() - c.at < 15*60e3){ rates = c.rows; return Promise.resolve(); } } catch(e){}
+    return sbGet("rates?select=code,sell,updated_at&code=in.(USD,EUR,RUB)").then(rows => {
+      rates = rows; try { sessionStorage.setItem("ast_rates", JSON.stringify({ at:Date.now(), rows })); } catch(e){}
+    }).catch(() => {});
+  }
+  function renderTopbar(){
+    if(page === "admin") return;
+    const order = ["USD","EUR","RUB"];
+    const list = (rates || []).slice().sort((a,b) => order.indexOf(a.code) - order.indexOf(b.code));
+    const time = list[0] ? new Date(list[0].updated_at).toLocaleTimeString(I18N.locale, { hour:"2-digit", minute:"2-digit" }) : "";
+    const fx = list.length ? `<span class="fx" title="${esc(t("top.rates", { time }))}">${list.map(r =>
+      `<span><b>${r.code}</b> ${Number(r.sell).toLocaleString("ru-RU", { maximumFractionDigits:2 })}</span>`).join("")}<small>₸</small></span>` : `<span class="fx"></span>`;
+    topbar.innerHTML = `<div class="wrap">${fx}
+      <a class="promo" href="./#tours">${t("top.promo")} <span aria-hidden="true">→</span></a>
+      <a class="tel" href="${waLink("")}" target="_blank" rel="noopener" dir="ltr">${phone}</a></div>`;
+  }
 
   function chrome(){
     const link = (href, key, text) => `<a href="${href}"${page===key?' aria-current="page"':''}>${text}</a>`;
@@ -23,14 +51,33 @@
     header.innerHTML = `<div class="wrap">
       <a class="mark" href="./" aria-label="${esc(S.brand)} — ${t("nav.home")}"><span class="logo" role="img" aria-label="smart-travel.kz"><i></i><i></i></span></a>
       <a class="wordmark" href="./" tabindex="-1" aria-hidden="true"><span><i></i><i></i></span></a>
-      <nav class="main">${page==="admin" ? "" : link("./#tours","tours",t("nav.tours")) + link("visa.html","visa",t("nav.visa")) + link("cabinet.html","cabinet",t("nav.cabinet")) + `<a class="ig" href="${S.instagram}" target="_blank" rel="noopener">Instagram</a>`}</nav>
+      <nav class="main">${page==="admin" ? "" : link("./#tours","tours",t("nav.tours")) + link("visa.html","visa",t("nav.visa")) + link("guides.html","guides",t("nav.guides")) + link("about.html","about",t("nav.about")) + link("cabinet.html","cabinet",t("nav.cabinet"))}</nav>
       <div class="tools">${langs}
         <button class="theme-btn" id="themeBtn" type="button" aria-label="${t(dark ? "theme.light" : "theme.dark")}" title="${t(dark ? "theme.light" : "theme.dark")}">${dark ? icons.sun : icons.moon}</button>
       </div>
     </div>
     <div class="flight" aria-hidden="true"><i class="route"></i><i class="trail"></i>
       <svg class="plane" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></div>`;
-    footer.innerHTML = `<div class="wrap"><span>${esc(S.brand)}</span><span>${t("footer.note")} · <a href="admin.html" style="color:inherit">${t("footer.manager")}</a></span></div>`;
+    footer.innerHTML = `<div class="wrap">
+      <div class="foot-grid">
+        <div class="foot-brand">
+          <a class="foot-logo" href="./" aria-label="${esc(S.brand)}"><span><i></i><i></i></span></a>
+          <p>${t("foot.about")}</p>
+          <div class="social">
+            <a href="${S.instagram}" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+            <a href="${waLink("")}" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.4-.3Z"/></svg></a>
+          </div>
+        </div>
+        <div><h4>${t("foot.tours")}</h4><a href="./#tours">${t("foot.umrah")}</a><a href="./#tours">${t("foot.cruise")}</a><a href="./#tours">${t("foot.world")}</a><a href="visa.html">${t("home.getVisa")}</a></div>
+        <div><h4>${t("foot.company")}</h4><a href="about.html">${t("nav.about")}</a><a href="guides.html">${t("nav.guides")}</a><a href="./#faq">${t("faq.title")}</a><a href="cabinet.html">${t("nav.cabinet")}</a></div>
+        <div><h4>${t("foot.contact")}</h4>
+          <a class="ci" href="${waLink("")}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.8 2Z"/></svg><span dir="ltr">${phone}</span></a>
+          <a class="ci" href="${S.instagram}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg><span dir="ltr">@alina.smarttravel.kz</span></a>
+        </div>
+      </div>
+      <div class="foot-bottom"><span>© ${new Date().getFullYear()} ${esc(S.brand)} · ${t("foot.rights")}</span><span>${t("footer.note")}</span><a href="admin.html">${t("footer.manager")}</a></div>
+    </div>`;
+    renderTopbar();
   }
   header.addEventListener("change", e => { if(e.target.id === "langSel") I18N.setLang(e.target.value); });
   header.addEventListener("click", e => { if(e.target.closest("#themeBtn")) I18N.setTheme(I18N.theme() === "dark" ? "light" : "dark"); });
@@ -71,13 +118,14 @@
     const io = new IntersectionObserver(entries => entries.forEach(e => {
       if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
     }), { rootMargin:"0px 0px -8% 0px", threshold:0.08 });
-    document.querySelectorAll("main .hero > *, main .page-head, main .work-head, main .tour, main .panel, main .arch-col").forEach((el, i) => {
+    document.querySelectorAll("main .hero > *, main .page-head, main .work-head, main .tour, main .panel, main .arch-col, main .ayah figure, main .faq-head > *, main .values .card, main .steps-row > div, main .about-hero > div, main .cta-band, main .soon > div").forEach((el, i) => {
       if(el.getBoundingClientRect().top > innerHeight * 0.92){ el.classList.add("rv"); io.observe(el); }
       else { el.classList.add("rv", "rv-now"); el.style.setProperty("--rv-d", (i % 4) * 70 + "ms"); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("in"))); }
     });
   }
 
   chrome(); setPattern(); measure();
+  if(page !== "admin") loadRates().then(renderTopbar);
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", reveal); else reveal();
   document.addEventListener("langchange", chrome);
   document.addEventListener("themechange", () => { chrome(); setPattern(); });
