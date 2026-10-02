@@ -89,6 +89,12 @@
     document.documentElement.style.setProperty("--pattern", `url("data:image/svg+xml,${encodeURIComponent(svg)}")`);
   }
 
+  window.statsHTML = () => {
+    const st = S.stats || {};
+    return [st.years && `<div><b>${esc(st.years)}</b><span>${t("stat.years")}</span></div>`,
+            st.clients && `<div><b>${esc(st.clients)}</b><span>${t("stat.clients")}</span></div>`,
+            `<div><b>VIP</b><span>${t("stat.idea")}</span></div>`].filter(Boolean).join("");
+  };
   window.waLink = text => `https://wa.me/${S.whatsapp}?text=${encodeURIComponent(text)}`;
   window.esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   window.fmtDate = iso => { if(!iso) return ""; const [y,m,d] = String(iso).slice(0,10).split("-"); return d ? `${d}.${m}.${y}` : iso; };
@@ -118,7 +124,7 @@
     const io = new IntersectionObserver(entries => entries.forEach(e => {
       if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
     }), { rootMargin:"0px 0px -8% 0px", threshold:0.08 });
-    document.querySelectorAll("main .hero > *, main .page-head, main .work-head, main .tour, main .panel, main .arch-col, main .ayah figure, main .faq-head > *, main .values .card, main .steps-row > div, main .about-hero > div, main .cta-band, main .soon > div").forEach((el, i) => {
+    document.querySelectorAll("main .hero > *, main .page-head, main .work-head, main .tour, main .panel, main .arch-col, main .ayah figure, main .faq-head > *, main .values .card, main .steps-row > div, main .about-hero > div, main .cta-band, main .founder > *, main .member, main .story p, main .together, main .soon > div").forEach((el, i) => {
       if(el.getBoundingClientRect().top > innerHeight * 0.92){ el.classList.add("rv"); io.observe(el); }
       else { el.classList.add("rv", "rv-now"); el.style.setProperty("--rv-d", (i % 4) * 70 + "ms"); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("in"))); }
     });

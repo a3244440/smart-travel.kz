@@ -18,9 +18,9 @@
   <section class="wrap about-hero">
     <div>
       <span class="kicker" data-i18n="about.kicker">О компании</span>
-      <h1 data-i18n="about.h1">Путь к Священным местам — спокойно и с заботой</h1>
-      <p class="lead" data-i18n="about.lead"></p>
-      <div id="since"></div>
+      <h1 data-i18n="about.h1b">VIP-возможности по цене Standard</h1>
+      <p class="lead" data-i18n="about.mission"></p>
+      <div class="stats" id="stats"></div>
       <div style="display:flex;gap:12px;flex-wrap:wrap">
         <a class="btn" href="./#tours" data-i18n="home.choose">Выбрать тур</a>
         <a class="btn ghost" href="visa.html" data-i18n="home.getVisa">Оформить визу</a>
@@ -29,17 +29,46 @@
     <div class="arch-col"><div class="about-photo"><img src="assets/tours/umrah-vip.jpg" alt="" loading="eager"></div></div>
   </section>
 
-  <section class="wrap">
-    <h2 class="sec-title" data-i18n="about.valuesTitle">Наши принципы</h2>
-    <div class="values">
-      <div class="card"><span class="n">01</span><h3 data-i18n="about.v1t"></h3><p data-i18n="about.v1"></p></div>
-      <div class="card"><span class="n">02</span><h3 data-i18n="about.v2t"></h3><p data-i18n="about.v2"></p></div>
-      <div class="card"><span class="n">03</span><h3 data-i18n="about.v3t"></h3><p data-i18n="about.v3"></p></div>
-      <div class="card"><span class="n">04</span><h3 data-i18n="about.v4t"></h3><p data-i18n="about.v4"></p></div>
+  <section class="wrap founder">
+    <div class="founder-card">
+      <span class="mono-big" aria-hidden="true">A</span>
+      <b data-i18n="founder.name">Алина</b>
+      <span data-i18n="founder.role"></span>
+    </div>
+    <div>
+      <span class="kicker" data-i18n="founder.kicker">Основатель</span>
+      <h2 class="sec-title"><span data-i18n="founder.name">Алина</span> · <span dir="ltr">Travel &amp; Umrah</span></h2>
+      <ul class="founder-list">
+        <li data-i18n="founder.p1"></li><li data-i18n="founder.p2"></li><li data-i18n="founder.p3"></li><li data-i18n="founder.p4"></li>
+      </ul>
+      <blockquote class="founder-quote" data-i18n="founder.quote"></blockquote>
     </div>
   </section>
 
-  <section class="wrap" style="padding-top:32px">
+  <section class="wrap">
+    <h2 class="sec-title" data-i18n="pillars.title">Миссия и философия</h2>
+    <div class="values">
+      <div class="card"><span class="n">01</span><h3 data-i18n="pil.mission"></h3><p data-i18n="pil.missionT"></p></div>
+      <div class="card"><span class="n">02</span><h3 data-i18n="pil.philo"></h3><p data-i18n="pil.philoT"></p></div>
+      <div class="card"><span class="n">03</span><h3 data-i18n="pil.promise"></h3><p data-i18n="pil.promiseT"></p></div>
+      <div class="card"><span class="n">04</span><h3 data-i18n="pil.idea"></h3><p data-i18n="pil.ideaT"></p></div>
+    </div>
+  </section>
+
+  <section class="wrap story"><p data-i18n="story"></p></section>
+
+  <section class="wrap">
+    <h2 class="sec-title" data-i18n="team.title">Наша команда</h2>
+    <div class="team">
+      <div class="member"><span class="mono" aria-hidden="true">A</span><h3 dir="ltr">ALINA</h3><span class="role" dir="ltr">Travel &amp; Umrah Expert</span><p data-i18n="team.alina"></p></div>
+      <div class="member"><span class="mono" aria-hidden="true">A</span><h3 dir="ltr">ASSYLAIYM</h3><span class="role" dir="ltr">Visa &amp; Travel Manager</span><p data-i18n="team.assylaiym"></p></div>
+      <div class="member"><span class="mono" aria-hidden="true">A</span><h3 dir="ltr">AIDA</h3><span class="role" dir="ltr">HR &amp; Umrah Assistant</span><p data-i18n="team.aida"></p></div>
+      <a class="member soon-card" href="guides.html"><span class="mono" aria-hidden="true">+</span><h3 data-i18n="team.guides"></h3><span class="role">&nbsp;</span><p data-i18n="team.guidesT"></p></a>
+    </div>
+    <p class="together" data-i18n="team.together"></p>
+  </section>
+
+  <section class="wrap" style="padding-top:40px">
     <h2 class="sec-title" data-i18n="about.stepsTitle">Как проходит поездка</h2>
     <div class="steps-row">
       <div><h3 data-i18n="about.s1t"></h3><p data-i18n="about.s1"></p></div>
@@ -59,12 +88,9 @@
 <script src="assets/layout.js"></script>
 <script>
 (function(){
-  const since = () => {
-    const y = (window.SITE || {}).since;
-    document.getElementById("since").innerHTML = y ? `<span class="since">${esc(t("about.since", { year: y }))}</span>` : "";
-  };
+  const stats = () => { document.getElementById("stats").innerHTML = statsHTML(); };
   document.getElementById("aboutWa").href = waLink("");
-  since(); document.addEventListener("langchange", since);
+  stats(); document.addEventListener("langchange", stats);
 })();
 </script>
 </body>
