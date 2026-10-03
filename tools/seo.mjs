@@ -23,6 +23,32 @@ const strip = h => h.replace(/<br\s*\/?>/g, " ").replace(/<[^>]+>/g, "").replace
 const attr = s => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 const text = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
+const KW = {
+  // общие запросы: Умра, Мекка, Медина
+  home: [
+    "умра", "умра из Казахстана", "умра из Астаны", "умра из Алматы", "умра из Шымкента", "умра из Караганды", "умра из Актобе", "умра из Атырау", "умра из Актау",
+    "умра 2026", "умра 2027", "умра цена", "умра цена 2026", "стоимость умры", "сколько стоит умра", "умра недорого", "дешевая умра",
+    "тур на умру", "туры на умру из Казахстана", "умра тур Алматы", "умра тур Астана", "поездка на умру", "паломничество в Мекку", "хадж и умра",
+    "тур в Мекку", "тур в Мекку и Медину", "поездка в Мекку", "Мекка Медина тур", "Мекка из Казахстана", "Медина тур",
+    "умра VIP", "умра люкс", "умра стандарт", "умра эконом", "умра 5 звезд", "отели у Харама", "отель рядом с Каабой",
+    "умра в Рамадан", "умра на каникулы", "умра с детьми", "семейная умра", "умра для женщин", "умра без махрама", "умра групповой тур",
+    "круиз с умрой", "круиз Умра", "халяль туры", "халяль отдых", "туры для мусульман", "мусульманские туры",
+    "турагентство умра", "туроператор умра Казахстан", "организация умры",
+    "виза в Саудовскую Аравию", "виза на умру", "электронная виза Саудовская Аравия",
+    "Қазақстаннан Умра", "Умра сапары", "Умраға бару", "Умра бағасы", "Меккеге тур", "Мекке Медине сапары", "Алматыдан Умра", "Астанадан Умра",
+    "Umrah from Kazakhstan", "Umrah Almaty", "Umrah Astana", "Umrah packages"
+  ],
+  visa: [
+    "виза в Саудовскую Аравию", "виза в Саудовскую Аравию для казахстанцев", "виза в Саудовскую Аравию онлайн", "электронная виза Саудовская Аравия",
+    "виза на умру", "умра виза", "туристическая виза Саудовская Аравия", "виза в Саудию", "eVisa Saudi", "стоимость визы в Саудовскую Аравию",
+    "оформить визу в Саудовскую Аравию Алматы", "оформить визу в Саудовскую Аравию Астана", "Сауд Арабиясына виза", "Умра визасы"
+  ],
+  about: ["smart-travel.kz", "Алина smart travel", "организатор умры", "турагентство умра Казахстан", "туроператор Мекка Медина", "отзывы умра"],
+  guides: ["гид в Мекке", "гид в Медине", "гид на умру", "сопровождение умры", "русскоязычный гид Мекка", "казахоязычный гид Умра"]
+};
+const CITIES = ["Астана","Алматы","Шымкент","Караганда","Актобе","Атырау","Актау","Уральск","Павлодар","Усть-Каменогорск","Костанай","Тараз","Кызылорда","Туркестан","Петропавловск","Кокшетау","Семей","Талдыкорган"];
+const FAQ_COUNT = (() => { let n = 0; while (I18N.tIn("ru", `faq.q${n + 1}`) !== `faq.q${n + 1}`) n++; return n; })();
+
 const ORG = {
   "@type": "TravelAgency", "@id": SITE_URL + "/#org",
   name: SITE.brand, url: SITE_URL + "/",
@@ -30,9 +56,10 @@ const ORG = {
   description: "Умра из Казахстана под ключ: туры в Мекку и Медину, круиз с Умрой, халяль-туры и виза в Саудовскую Аравию.",
   telephone: "+" + SITE.whatsapp, sameAs: [SITE.instagram],
   address: { "@type": "PostalAddress", addressCountry: "KZ" },
-  areaServed: { "@type": "Country", name: "Kazakhstan" },
+  areaServed: [{ "@type": "Country", name: "Казахстан" }, ...CITIES.map(name => ({ "@type": "City", name }))],
   founder: { "@type": "Person", name: "Алина", jobTitle: "Основатель smart-travel.kz" },
   priceRange: "₸₸",
+  keywords: KW.home.join(", "),
   knowsLanguage: ["ru", "kk", "en", "ar"],
   contactPoint: { "@type": "ContactPoint", telephone: "+" + SITE.whatsapp, contactType: "customer service", availableLanguage: ["Russian", "Kazakh", "English", "Arabic"] }
 };
@@ -44,12 +71,11 @@ const VERIFY = {
   "google-site-verification": "XUpLZg0OK41c_UaEtTo_zrDsedYm_F2fpjHMLRf3msU"
 };
 
-const KEYWORDS = "умра, умра из Казахстана, умра 2026, умра цена, тур в Мекку, Мекка, Медина, поездка в Мекку и Медину, умра VIP, умра Standard, круиз с Умрой, виза в Саудовскую Аравию, электронная виза Умра, халяль туры, Қазақстаннан Умра, Меккеге сапар";
 
 const PAGES = {
   "index.html": {
-    path: "/", titleKey: "title.home", priority: "1.0",
-    description: "Умра из Казахстана под ключ: туры в Мекку и Медину VIP, Luxe и Standard, круиз с Умрой от 650 000 ₸, виза в Саудовскую Аравию по фото паспорта. Ответим в WhatsApp.",
+    path: "/", titleKey: "title.home", priority: "1.0", kw: KW.home,
+    description: "Умра из Казахстана, Астаны и Алматы под ключ: туры в Мекку и Медину VIP, Luxe и Standard, круиз с Умрой от 650 000 ₸, отели у Харама, виза в Саудовскую Аравию по фото паспорта. Пишите в WhatsApp.",
     schema: () => [
       ORG,
       { "@type": "WebSite", "@id": SITE_URL + "/#site", url: SITE_URL + "/", name: SITE.brand, inLanguage: ["ru", "kk", "en", "ar"], publisher: { "@id": SITE_URL + "/#org" } },
@@ -59,26 +85,26 @@ const PAGES = {
           image: SITE_URL + "/" + tr.photo, provider: { "@id": SITE_URL + "/#org" },
           ...(tr.price != null ? { offers: { "@type": "Offer", price: tr.price, priceCurrency: "KZT", availability: "https://schema.org/InStock", url: SITE_URL + "/#tours" } } : {})
         } })) },
-      { "@type": "FAQPage", mainEntity: Array.from({ length: 9 }, (_, i) => ({
+      { "@type": "FAQPage", mainEntity: Array.from({ length: FAQ_COUNT }, (_, i) => ({
         "@type": "Question", name: ru(`faq.q${i + 1}`),
         acceptedAnswer: { "@type": "Answer", text: ru(`faq.a${i + 1}`) } })) }
     ]
   },
   "visa.html": {
-    path: "/visa", titleKey: "title.visa", priority: "0.9",
-    description: "Электронная виза в Саудовскую Аравию для Умры и туризма: загрузите фото паспорта — анкета заполнится сама. Для граждан Казахстана и всей семьи, статус заявки онлайн.",
+    path: "/visa", titleKey: "title.visa", priority: "0.9", kw: KW.visa,
+    description: "Виза в Саудовскую Аравию для казахстанцев онлайн: электронная виза для Умры и туризма по фото паспорта — Астана, Алматы и вся страна. Анкета заполнится сама, статус заявки онлайн.",
     schema: () => [
       { "@type": "Service", name: "Виза в Саудовскую Аравию для Умры", serviceType: "Оформление визы", provider: { "@id": SITE_URL + "/#org" }, areaServed: { "@type": "Country", name: "Kazakhstan" }, url: SITE_URL + "/visa" },
       crumbs("Виза", "/visa")
     ]
   },
   "about.html": {
-    path: "/about", titleKey: "title.about", priority: "0.7",
+    path: "/about", titleKey: "title.about", priority: "0.7", kw: KW.about,
     description: "smart-travel.kz — команда Алины: 5 лет в туризме и 1000+ довольных клиентов. Организуем Умру, поездки в Мекку и Медину и халяль-отдых по миру — VIP-возможности по цене Standard.",
     schema: () => [{ "@type": "AboutPage", url: SITE_URL + "/about", about: ORG }, crumbs("О нас", "/about")]
   },
   "guides.html": {
-    path: "/guides", titleKey: "title.guides", priority: "0.5",
+    path: "/guides", titleKey: "title.guides", priority: "0.5", kw: KW.guides,
     description: "Проверенные гиды для Умры в Мекке и Медине: опыт, языки и отзывы паломников. Раздел готовится — нужен гид сейчас, напишите нам в WhatsApp.",
     schema: () => [crumbs("Гиды", "/guides")]
   },
@@ -101,7 +127,7 @@ function head(file, p) {
   // подтверждение владения сайтом (Google Search Console, Яндекс Вебмастер) — только на главной
   if (p.path === "/") for (const [name, code] of Object.entries(VERIFY)) L.push(`<meta name="${name}" content="${code}">`);
   if (!p.noindex) {
-    L.push(`<meta name="keywords" content="${attr(KEYWORDS)}">`);
+    if (p.kw) L.push(`<meta name="keywords" content="${attr(p.kw.join(", "))}">`);
     for (const l of ["ru", "kk", "en", "ar"]) L.push(`<link rel="alternate" hreflang="${l}" href="${url}${l === "ru" ? "" : "?lang=" + l}">`);
     L.push(`<link rel="alternate" hreflang="x-default" href="${url}">`);
     L.push(

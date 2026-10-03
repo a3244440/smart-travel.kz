@@ -432,3 +432,5 @@ nav.main a{white-space:nowrap}
 @media (max-width:900px){ .founder{grid-template-columns:1fr;gap:32px} .team{grid-template-columns:1fr 1fr} .founder-card{max-width:320px} }
 @media (max-width:520px){ .team{grid-template-columns:1fr} .stats{gap:12px 22px} .stats b{font-size:26px} }
 .seo-block .lead{max-width:860px;margin:0 0 8px}
+.seo-block .seo-sub{font-size:17px;margin:8px 0 8px}.seo-block .seo-cities{margin:0;color:var(--ink-2);font-size:14.5px;line-height:1.7;max-width:900px}
+.seo-block .seo-sub{font-size:17px;margin:8px 0 8px}.seo-block .seo-cities{margin:0;color:var(--ink-2);font-size:14.5px;line-height:1.7;max-width:900px}
