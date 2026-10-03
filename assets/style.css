@@ -434,3 +434,34 @@ nav.main a{white-space:nowrap}
 .seo-block .lead{max-width:860px;margin:0 0 8px}
 .seo-block .seo-sub{font-size:17px;margin:8px 0 8px}.seo-block .seo-cities{margin:0;color:var(--ink-2);font-size:14.5px;line-height:1.7;max-width:900px}
 .seo-block .seo-sub{font-size:17px;margin:8px 0 8px}.seo-block .seo-cities{margin:0;color:var(--ink-2);font-size:14.5px;line-height:1.7;max-width:900px}
+/* панель менеджера: сверка с фото паспорта */
+.ph-thumb{display:block;width:100%;margin-top:10px;padding:0;border:1px solid var(--line-2);border-radius:12px;background:var(--bg);overflow:hidden;cursor:zoom-in;min-height:64px;color:var(--ink-2);font:inherit;font-size:13px}
+.ph-thumb img{display:block;width:100%;max-height:220px;object-fit:contain;background:#111}
+.ph-thumb span{display:block;padding:20px 12px}
+.verify{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column}
+.verify[hidden]{display:none}
+.v-head{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 24px;border-bottom:1px solid var(--line-2)}
+.v-head h2{margin:0;font-size:18px;font-weight:600;font-family:var(--sans)}
+.v-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,1fr)}
+.v-photo{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line-2)}
+.v-tools{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px}
+.v-tools .btn{padding:8px 14px;min-width:44px}
+.v-canvas{flex:1;min-height:0;overflow:auto;background:#151515;display:flex;align-items:flex-start;justify-content:center;padding:16px}
+.v-canvas img{display:block;max-width:none;width:100%;height:auto;transition:transform .2s;transform-origin:center}
+.v-canvas .empty{color:#bbb;max-width:420px;text-align:center;margin:auto}
+.v-form{overflow:auto;padding:18px 24px 28px;display:flex;flex-direction:column;gap:16px}
+.v-form .sub{margin:0}
+.v-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+.v-fields .f{display:flex;flex-direction:column;gap:4px}
+.v-fields label{font-size:12.5px;color:var(--ink-2)}
+.v-fields input,.v-fields select{font:inherit;font-size:15px;padding:9px 11px;border:1px solid var(--line-2);border-radius:10px;background:var(--bg-2);color:var(--ink)}
+.v-was{font-size:12px;color:var(--ink-2)}
+.v-check{display:flex;gap:10px;align-items:center;font-weight:600;padding:12px 14px;border:1px solid var(--line-2);border-radius:12px;background:var(--bg-2)}
+.v-check input{width:20px;height:20px;accent-color:var(--brass)}
+@media (max-width:860px){
+  .v-body{grid-template-columns:1fr;grid-template-rows:minmax(260px,45vh) auto;overflow:auto}
+  .v-photo{border-right:0;border-bottom:1px solid var(--line-2)}
+  .v-fields{grid-template-columns:1fr}
+}
+.admin-grid{grid-template-columns:minmax(0,1fr) 360px}
+@media (max-width:900px){ .admin-grid{grid-template-columns:minmax(0,1fr)} }

@@ -28,6 +28,11 @@ window.Store = (function(){
       fail(error, "Не удалось проверить статус");
       return data || null;
     },
+    // фото паспорта для сверки менеджером: <номер заявки>/<номер путешественника>.jpg (закрытое хранилище)
+    async uploadPassport(id, index, blob){
+      const { error } = await db.storage.from("passports").upload(`${id}/${index}.jpg`, blob, { contentType: "image/jpeg", upsert: false });
+      fail(error, "Не удалось загрузить фото паспорта");
+    },
     mine,
     // менеджер
     async all(){
@@ -40,7 +45,12 @@ window.Store = (function(){
       fail(error, "Не удалось сохранить");
       return data;
     },
-    async remove(id){
+    async photoUrl(id, index){
+      const { data, error } = await db.storage.from("passports").createSignedUrl(`${id}/${index}.jpg`, 3600);
+      return error ? null : data.signedUrl;
+    },
+    async remove(id, count){
+      if(count) await db.storage.from("passports").remove(Array.from({ length: count }, (_, i) => `${id}/${i}.jpg`)).catch(() => {});
       const { error } = await db.from("applications").delete().eq("id", id);
       fail(error, "Не удалось удалить заявку");
     },

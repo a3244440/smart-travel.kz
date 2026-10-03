@@ -36,11 +36,12 @@
     <div class="actions" style="margin:0"><button class="btn ghost" id="reload">Обновить</button><button class="btn ghost" id="exportAll">Скачать всё в CSV</button><button class="btn ghost" id="logout">Выйти</button></div>
   </div>
   <div class="filter" id="sfilter"></div>
-  <div class="grid" style="grid-template-columns:minmax(0,1fr) 360px">
-    <div class="table-wrap"><table><thead><tr><th>Номер</th><th>Путешественники</th><th>Цель</th><th>Въезд</th><th>Телефон</th><th>Статус</th></tr></thead><tbody id="rows"></tbody></table></div>
+  <div class="grid admin-grid">
+    <div class="table-wrap"><table><thead><tr><th>Номер</th><th>Путешественники</th><th>Цель</th><th>Въезд</th><th>Телефон</th><th>Сверка</th><th>Статус</th></tr></thead><tbody id="rows"></tbody></table></div>
     <aside class="side" id="detail"><div class="panel empty">Выберите заявку в таблице.</div></aside>
   </div>
   </section>
+  <div id="verify" class="verify" hidden role="dialog" aria-modal="true" aria-labelledby="vTitle"></div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="assets/store.js"></script>
@@ -51,6 +52,15 @@
   const LABELS = {surname:"Фамилия",given_names:"Имя",sex:"Пол",date_of_birth:"Дата рождения",place_of_birth:"Место рождения",nationality:"Гражданство",passport_number:"Паспорт",personal_number:"ИИН",issue_date:"Выдан",expiry_date:"Действителен до",issuing_authority:"Кем выдан"};
   const $ = s => document.querySelector(s);
   let filter = "all", selected = null, apps = [];
+  const verifiedCount = a => a.travellers.filter(t => t.verified).length;
+  const checkPill = a => { const n = verifiedCount(a), all = a.travellers.length;
+    return `<span class="pill ${n===all?"ok":n?"warn":"idle"}">${n===all?"Сверено":n+" из "+all}</span>`; };
+  const photoCache = {};
+  async function photo(id, i){
+    const k = id + "/" + i;
+    if(!(k in photoCache)) photoCache[k] = await Store.photoUrl(id, i);
+    return photoCache[k];
+  }
   const names = a => a.travellers.map(t => [t.fields.surname, t.fields.given_names].filter(Boolean).join(" ")).filter(Boolean).join(", ") || "—";
   function renderFilter(all){
     const counts = {}; all.forEach(a => counts[a.status] = (counts[a.status]||0)+1);
@@ -65,15 +75,19 @@
     $("#rows").innerHTML = list.length ? list.map(a => `<tr data-id="${esc(a.id)}" class="${a.id===selected?"sel":""}">
       <td><b>${esc(a.id)}</b><br><small style="color:var(--ink-2)">${new Date(a.created).toLocaleDateString("ru-RU")}</small></td>
       <td>${esc(names(a))}</td><td>${esc(PURPOSE[a.trip.purpose]||"")}</td><td>${esc(fmtDate(a.trip.arrival))||"—"}</td>
-      <td>${esc(a.trip.phone||"—")}</td><td><span class="pill ${STATUSES[a.status].tone}">${STATUSES[a.status].label}</span></td></tr>`).join("")
-      : `<tr><td colspan="6" class="empty">Заявки появятся здесь, когда клиенты отправят их со страницы визы.</td></tr>`;
+      <td>${esc(a.trip.phone||"—")}</td><td>${checkPill(a)}</td><td><span class="pill ${STATUSES[a.status].tone}">${STATUSES[a.status].label}</span></td></tr>`).join("")
+      : `<tr><td colspan="7" class="empty">Заявки появятся здесь, когда клиенты отправят их со страницы визы.</td></tr>`;
     renderDetail();
   }
   function renderDetail(){
     const a = selected && apps.find(x => x.id===selected);
     if(!a){ $("#detail").innerHTML = '<div class="panel empty">Выберите заявку в таблице.</div>'; return; }
     const people = a.travellers.map((t,i) => `<div style="border-top:1px solid var(--line-2);padding-top:12px;margin-top:12px">
-      <b>Путешественник ${i+1}</b>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><b>Путешественник ${i+1}</b>
+        ${t.verified ? `<span class="pill ok" title="${esc(t.verified.by||"")}">Сверено ${esc(fmtDate(t.verified.at))}</span>` : `<span class="pill idle">Не сверено</span>`}</div>
+      <button class="ph-thumb" data-verify="${i}" aria-label="Сверить с фото паспорта"><img data-photo="${i}" alt="" hidden><span>Загрузка фото…</span></button>
+      <button class="btn ghost" data-verify="${i}" style="width:100%;margin-top:8px">Сверить с паспортом</button>
+      ${t.client_fields ? `<p style="font-size:12.5px;color:var(--ink-2);margin:8px 0 0">Данные исправлены менеджером</p>` : ""}
       <dl style="display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:8px 0 0;font-size:13.5px">${Object.entries(LABELS).map(([k,l]) => {
         let v = t.fields[k]||""; if(/date/.test(k)) v = fmtDate(v); if(k==="sex") v = v==="M"?"М":v==="F"?"Ж":"";
         return `<dt style="color:var(--ink-2)">${l}</dt><dd style="margin:0">${esc(v)||"—"}</dd>`; }).join("")}</dl></div>`).join("");
@@ -91,7 +105,90 @@
       ${people}
       <button class="btn ghost" id="del" style="margin-top:18px;color:var(--err);border-color:var(--err)">Удалить заявку</button>
     </div>`;
+    a.travellers.forEach(async (t, i) => {
+      const url = await photo(a.id, i), img = document.querySelector(`#detail img[data-photo="${i}"]`);
+      if(!img || selected !== a.id) return;
+      const cap = img.nextElementSibling;
+      if(url){ img.src = url; img.hidden = false; cap.remove(); } else cap.textContent = "Фото паспорта нет";
+    });
   }
+
+  // ---------- сверка с фото паспорта ----------
+  let vState = null;   // { id, i, zoom, rot }
+  function fieldInput(k, v){
+    if(k === "sex") return `<select id="vf_${k}"><option value=""></option><option value="M"${v==="M"?" selected":""}>Мужской</option><option value="F"${v==="F"?" selected":""}>Женский</option></select>`;
+    const type = /date/.test(k) ? "date" : "text";
+    return `<input id="vf_${k}" type="${type}" value="${esc(v||"")}" autocomplete="off" spellcheck="false">`;
+  }
+  async function openVerify(i){
+    const a = apps.find(x => x.id === selected); if(!a) return;
+    const t = a.travellers[i];
+    vState = { id: a.id, i, zoom: 1, rot: 0 };
+    const orig = t.client_fields || null;
+    $("#verify").innerHTML = `<div class="v-head">
+        <h2 id="vTitle">Сверка · ${esc(a.id)} · путешественник ${i+1} из ${a.travellers.length}</h2>
+        <button class="btn ghost" id="vClose">Закрыть</button></div>
+      <div class="v-body">
+        <div class="v-photo">
+          <div class="v-tools">
+            <button class="btn ghost" data-z="-1" aria-label="Уменьшить">−</button>
+            <button class="btn ghost" data-z="1" aria-label="Увеличить">+</button>
+            <button class="btn ghost" id="vRot">Повернуть</button>
+            <a class="btn ghost" id="vOpen" target="_blank" rel="noopener" hidden>Открыть оригинал</a>
+          </div>
+          <div class="v-canvas" id="vCanvas"><img id="vImg" alt="Фото паспорта" hidden><p id="vNo" class="empty">Загрузка фото…</p></div>
+        </div>
+        <form class="v-form" id="vForm" novalidate>
+          <p class="sub">Сравните каждое поле с фото паспорта и исправьте, если нужно.${orig ? " Серым — что ввёл клиент." : ""}</p>
+          <div class="v-fields">${Object.entries(LABELS).map(([k,l]) => `<div class="f"><label for="vf_${k}">${l}</label>${fieldInput(k, t.fields[k])}
+            ${orig && (orig[k]||"") !== (t.fields[k]||"") ? `<small class="v-was">было: ${esc(/date/.test(k) ? fmtDate(orig[k]) : orig[k]) || "—"}</small>` : ""}</div>`).join("")}</div>
+          <label class="v-check"><input type="checkbox" id="vOk"${t.verified ? " checked" : ""}> Все данные сверены с фото паспорта</label>
+          ${t.verified ? `<p class="sub" style="margin:0">Сверено: ${esc(t.verified.by||"")} · ${new Date(t.verified.at).toLocaleString("ru-RU")}</p>` : ""}
+          <div class="actions" style="margin:0">
+            <button class="btn" type="submit" id="vSave">Сохранить</button>
+            ${i + 1 < a.travellers.length ? `<button class="btn ghost" type="button" id="vNext">Сохранить и к следующему</button>` : ""}
+          </div>
+          <span class="toast" id="vMsg" role="status" aria-live="polite"></span>
+        </form>
+      </div>`;
+    $("#verify").hidden = false; document.body.style.overflow = "hidden";
+    const url = await photo(a.id, i);
+    if(!vState || vState.id !== a.id || vState.i !== i) return;
+    if(url){ $("#vImg").src = url; $("#vImg").hidden = false; $("#vNo").remove(); $("#vOpen").href = url; $("#vOpen").hidden = false; }
+    else $("#vNo").textContent = "Фото паспорта к этой заявке не загружено — сверьте данные по документу, который прислал клиент.";
+    applyView();
+  }
+  function applyView(){
+    const img = $("#vImg"); if(!img) return;
+    img.style.width = (vState.zoom * 100) + "%";
+    img.style.transform = `rotate(${vState.rot}deg)`;
+  }
+  function closeVerify(){ $("#verify").hidden = true; $("#verify").innerHTML = ""; document.body.style.overflow = ""; vState = null; }
+  async function saveVerify(next){
+    const a = apps.find(x => x.id === vState.id); if(!a) return;
+    const i = vState.i, t = a.travellers[i];
+    const fields = Object.assign({}, t.fields);
+    Object.keys(LABELS).forEach(k => {
+      let v = $("#vf_" + k).value.trim();
+      if(["surname","given_names","passport_number"].includes(k)) v = v.toUpperCase();
+      if(v) fields[k] = v; else delete fields[k];
+    });
+    const changed = Object.keys(LABELS).some(k => (fields[k]||"") !== (t.fields[k]||""));
+    const session = await Store.auth.session();
+    const nt = Object.assign({}, t, { fields });
+    if(changed && !t.client_fields) nt.client_fields = Object.assign({}, t.fields);   // что ввёл клиент — для истории
+    nt.verified = $("#vOk").checked ? { at: new Date().toISOString(), by: session && session.user ? session.user.email : "" } : null;
+    if(!nt.verified) delete nt.verified;
+    const travellers = a.travellers.map((x, j) => j === i ? nt : x);
+    $("#vMsg").textContent = "Сохраняю…";
+    try {
+      const rec = await Store.update(a.id, { travellers });
+      apps = apps.map(x => x.id === rec.id ? rec : x); render();
+      if(next) openVerify(i + 1); else { $("#vMsg").textContent = "Сохранено"; setTimeout(closeVerify, 500); }
+    } catch(err){ $("#vMsg").textContent = err.message; }
+  }
+  document.addEventListener("submit", e => { if(e.target.id === "vForm"){ e.preventDefault(); saveVerify(false); } });
+  document.addEventListener("keydown", e => { if(e.key === "Escape" && vState) closeVerify(); });
   function csv(){
     const keys = Object.keys(LABELS), q = v => `"${String(v??"").replace(/"/g,'""')}"`;
     const head = ["Номер","Создана","Статус",...Object.values(LABELS),"Цель","Въезд","Ночей","Контакт","Телефон","Email","Пожелания","Комментарий"];
@@ -122,6 +219,14 @@
     finally { btn.disabled = false; }
   });
   document.addEventListener("click", async e => {
+    if(vState){
+      if(e.target.closest("#vClose")){ closeVerify(); return; }
+      if(e.target.closest("#vNext")){ saveVerify(true); return; }
+      const z = e.target.closest("[data-z]"); if(z){ vState.zoom = Math.min(4, Math.max(1, vState.zoom + (+z.dataset.z) * .5)); applyView(); return; }
+      if(e.target.closest("#vRot")){ vState.rot = (vState.rot + 90) % 360; applyView(); return; }
+      return;
+    }
+    const v = e.target.closest("[data-verify]"); if(v){ openVerify(+v.dataset.verify); return; }
     const f = e.target.closest("[data-f]"); if(f){ filter = f.dataset.f; render(); return; }
     const r = e.target.closest("tr[data-id]"); if(r){ selected = r.dataset.id; render(); return; }
     if(e.target.closest("#saveSt")){
@@ -134,7 +239,7 @@
     }
     if(e.target.closest("#del")){
       if(!confirm("Удалить заявку " + selected + "? Это нельзя отменить.")) return;
-      try { await Store.remove(selected); apps = apps.filter(a => a.id !== selected); selected = null; render(); }
+      try { await Store.remove(selected, (apps.find(x => x.id === selected) || {travellers:[]}).travellers.length); apps = apps.filter(a => a.id !== selected); selected = null; render(); }
       catch(err){ alert(err.message); }
       return;
     }

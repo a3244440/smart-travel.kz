@@ -72,6 +72,14 @@
   function addMonths(d,n){ const x=new Date(d); x.setMonth(x.getMonth()+n); return x; }
 
   // ---------- file handling ----------
+  // фото для менеджера: JPEG не больше 2400 px по длинной стороне
+  async function toJpeg(blob){
+    const bmp = await createImageBitmap(blob);
+    const k = Math.min(1, 2400 / Math.max(bmp.width, bmp.height));
+    const cv = document.createElement('canvas'); cv.width = Math.round(bmp.width*k); cv.height = Math.round(bmp.height*k);
+    cv.getContext('2d').drawImage(bmp, 0, 0, cv.width, cv.height);
+    return await new Promise(r => cv.toBlob(r, 'image/jpeg', .9));
+  }
   async function pdfToBlob(file){
     if(!window.pdfjsLib) throw new Error('pdf');
     try{ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }catch(e){}
@@ -108,6 +116,7 @@
     }
     if(t.preview) URL.revokeObjectURL(t.preview);
     t.preview = URL.createObjectURL(blob);
+    t.blob = blob;
     render();
 
     await ready;
@@ -387,6 +396,8 @@ Reply with only this JSON object:
       try { rec = await Store.add({ trip: Object.assign({}, state.trip), travellers: state.travellers.map(t => ({ fields: Object.assign({}, t.fields) })) }); }
       catch(err){ toast(t('s.fail'), true); return; }
       finally { btn.disabled = false; }
+      // фото паспортов — менеджеру для ручной сверки (заявка уже принята, ошибка загрузки её не отменяет)
+      await Promise.all(state.travellers.map((tr, i) => tr.blob ? toJpeg(tr.blob).then(b => Store.uploadPassport(rec.id, i, b)).catch(err => console.warn(err)) : null));
       toast('');
       sent = { id: rec.id, text: buildText() };
       renderDone();
