@@ -40,6 +40,10 @@ const crumbs = (name, path) => ({ "@type": "BreadcrumbList", itemListElement: [
   { "@type": "ListItem", position: 1, name: "Главная", item: SITE_URL + "/" },
   { "@type": "ListItem", position: 2, name, item: SITE_URL + path }] });
 
+const VERIFY = {
+  "google-site-verification": "XUpLZg0OK41c_UaEtTo_zrDsedYm_F2fpjHMLRf3msU"
+};
+
 const KEYWORDS = "умра, умра из Казахстана, умра 2026, умра цена, тур в Мекку, Мекка, Медина, поездка в Мекку и Медину, умра VIP, умра Standard, круиз с Умрой, виза в Саудовскую Аравию, электронная виза Умра, халяль туры, Қазақстаннан Умра, Меккеге сапар";
 
 const PAGES = {
@@ -94,6 +98,8 @@ function head(file, p) {
     `<meta name="robots" content="${p.noindex ? (p.nofollow ? "noindex,nofollow" : "noindex,follow") : "index,follow,max-image-preview:large"}">`,
     `<link rel="canonical" href="${url}">`
   ];
+  // подтверждение владения сайтом (Google Search Console, Яндекс Вебмастер) — только на главной
+  if (p.path === "/") for (const [name, code] of Object.entries(VERIFY)) L.push(`<meta name="${name}" content="${code}">`);
   if (!p.noindex) {
     L.push(`<meta name="keywords" content="${attr(KEYWORDS)}">`);
     for (const l of ["ru", "kk", "en", "ar"]) L.push(`<link rel="alternate" hreflang="${l}" href="${url}${l === "ru" ? "" : "?lang=" + l}">`);
