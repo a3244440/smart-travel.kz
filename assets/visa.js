@@ -353,7 +353,7 @@ Reply with only this JSON object:
         <p style="margin:0 0 6px;color:var(--ink-2)">${t('s.sentText')}</p>
         <div class="code" dir="ltr">${esc(sent.id)}</div>
         <div class="actions"><a class="btn" href="${waLink(msg)}" target="_blank" rel="noopener">${t('s.sendWa')}</a>
-        <a class="btn ghost" href="cabinet.html?id=${encodeURIComponent(sent.id)}">${t('s.checkStatus')}</a></div></div>`;
+        <a class="btn ghost" href="/cabinet?id=${encodeURIComponent(sent.id)}">${t('s.checkStatus')}</a></div></div>`;
   }
   function toast(msg,bad){ const el=$('#toast'); el.textContent=msg; el.className='toast'+(bad?' bad':''); clearTimeout(toast.t); toast.t=setTimeout(()=>el.textContent='',4000); }
 

@@ -1,6 +1,10 @@
 // Языки и тема. Подключается в <head>, до отрисовки страницы.
 // Перевод: t("ключ", {переменные}). Порядок в словаре: ru, kk, en, ar.
 (function(){
+  // всегда https и без www: http://smart-travel.kz/visa → https://smart-travel.kz/visa
+  if(/(^|\.)smart-travel\.kz$/.test(location.hostname) && (location.protocol === "http:" || location.hostname !== "smart-travel.kz")){
+    location.replace("https://smart-travel.kz" + location.pathname + location.search + location.hash); return;
+  }
   const LANGS = [
     { code:"ru", short:"РУС",  name:"Русский",  locale:"ru-RU" },
     { code:"kk", short:"ҚАЗ",  name:"Қазақша",  locale:"kk-KZ" },
@@ -20,7 +24,7 @@
     "footer.manager":["Вход для менеджера","Менеджерге кіру","Manager login","دخول المدير"],
 
     // главная
-    "title.home":    ["{brand} — Умра, Мекка, Медина и туры по миру","{brand} — Умра, Мекке, Медине және әлем бойынша турлар","{brand} — Umrah, Makkah, Madinah and world tours","{brand} — العمرة ومكة والمدينة ورحلات حول العالم"],
+    "title.home":    ["Умра из Казахстана — туры в Мекку и Медину | {brand}","Қазақстаннан Умра — Мекке мен Медине турлары | {brand}","Umrah from Kazakhstan — tours to Makkah and Madinah | {brand}","العمرة من كازاخستان — رحلات إلى مكة والمدينة | {brand}"],
     "home.h1":       ["Умра, Мекка и Медина — с заботой о каждой детали","Умра, Мекке және Медине — әр егжей-тегжейге қамқорлықпен","Umrah, Makkah and Madinah — with care in every detail","العمرة ومكة والمدينة — بعناية في كل التفاصيل"],
     "home.lead":     ["Туры VIP, Luxe и Standard, круиз с Умрой и халяль-отдых по миру. Визу в Саудовскую Аравию оформим по фото паспорта.",
                       "VIP, Luxe және Standard турлары, Умрамен круиз және әлем бойынша халал демалыс. Сауд Арабиясына визаны паспорт фотосы бойынша рәсімдейміз.",
@@ -39,7 +43,7 @@
     "tour.ask":      ["Здравствуйте! Интересует тур «{title}». Подскажите даты и стоимость.","Сәлеметсіз бе! «{title}» туры қызықтырады. Күндері мен бағасын айтып жібересіз бе?","Hello! I'm interested in the “{title}” tour. Could you tell me the dates and price?","مرحبًا! أنا مهتم برحلة «{title}». هل يمكنكم إخباري بالمواعيد والسعر؟"],
 
     // виза: страница
-    "title.visa":    ["Виза в Саудовскую Аравию по фото паспорта — {brand}","Паспорт фотосы бойынша Сауд Арабиясына виза — {brand}","Saudi Arabia visa from a passport photo — {brand}","تأشيرة السعودية بصورة جواز السفر — {brand}"],
+    "title.visa":    ["Виза в Саудовскую Аравию для Умры онлайн | {brand}","Умраға Сауд Арабиясы визасы онлайн | {brand}","Saudi Arabia visa for Umrah online | {brand}","تأشيرة السعودية للعمرة عبر الإنترنت | {brand}"],
     "visa.h1":       ["Виза в Саудовскую Аравию по фото паспорта","Паспорт фотосы бойынша Сауд Арабиясына виза","Saudi Arabia visa from a passport photo","تأشيرة السعودية بصورة جواز السفر"],
     "visa.lead":     ["Сфотографируйте разворот паспорта — анкета заполнится сама. Вам останется проверить данные и отправить их менеджеру.",
                       "Паспорттың деректер бетін суретке түсіріңіз — сауалнама өзі толады. Сізге деректерді тексеріп, менеджерге жіберу ғана қалады.",
@@ -233,13 +237,13 @@
                       "افتح «طلباتي» وأدخل رقم الطلب والهاتف الذي استخدمته، وسترى كل مرحلة وتعليق المدير."],
 
     // гиды
-    "title.guides":  ["Гиды — {brand}","Гидтер — {brand}","Guides — {brand}","المرشدون — {brand}"],
+    "title.guides":  ["Гиды для Умры в Мекке и Медине | {brand}","Мекке мен Мединеде Умра гидтері | {brand}","Umrah guides in Makkah and Madinah | {brand}","مرشدو العمرة في مكة والمدينة | {brand}"],
     "guides.title":  ["Гиды скоро появятся","Гидтер жақында пайда болады","Guides are coming soon","المرشدون قريبًا"],
     "guides.text":   ["Раздел готовится — здесь появятся проверенные гиды для Умры: опыт, языки и отзывы паломников.","Бөлім дайындалуда — мұнда Умраға арналған тексерілген гидтер пайда болады: тәжірибесі, тілдері және қажылардың пікірлері.","This section is being prepared — verified Umrah guides will appear here with their experience, languages and pilgrims' reviews.","هذا القسم قيد الإعداد — سيظهر هنا مرشدون موثوقون للعمرة مع خبراتهم ولغاتهم وآراء المعتمرين."],
     "guides.ask":    ["Нужен гид уже сейчас? Напишите нам","Гид қазір керек пе? Бізге жазыңыз","Need a guide now? Message us","تحتاج مرشدًا الآن؟ راسلنا"],
 
     // о нас
-    "title.about":   ["О нас — {brand}","Біз туралы — {brand}","About us — {brand}","من نحن — {brand}"],
+    "title.about":   ["О нас — организатор Умры и туров | {brand}","Біз туралы — Умра мен турларды ұйымдастырушы | {brand}","About us — Umrah and tour organiser | {brand}","من نحن — منظمو العمرة والرحلات | {brand}"],
     "about.kicker":  ["О компании","Компания туралы","About the company","عن الشركة"],
     "about.h1":      ["Путь к Священным местам — спокойно и с заботой","Қасиетті жерлерге сапар — тыныш және қамқорлықпен","The journey to the Holy Places — calm and cared for","الطريق إلى الأماكن المقدسة — بطمأنينة وعناية"],
     "about.lead":    ["smart-travel.kz — команда Алины, которая организует Умру, поездки в Мекку и Медину и халяль-отдых по миру. Мы берём на себя визу, перелёт, отели и сопровождение, чтобы в поездке вы думали только о главном.",
@@ -304,6 +308,43 @@
     "team.guides":   ["Гиды","Гидтер","Guides","المرشدون"],
     "team.guidesT":  ["Пока ещё набираем — скоро здесь появятся наши гиды.","Әзірге жинап жатырмыз — жақында мұнда біздің гидтер пайда болады.","We're still recruiting — our guides will appear here soon.","ما زلنا نستقطبهم — سيظهر مرشدونا هنا قريبًا."],
     "team.together": ["Вместе мы создаём путешествия, где каждая деталь продумана заранее.","Бірге біз әр егжей-тегжейі алдын ала ойластырылған саяхаттар жасаймыз.","Together we create journeys where every detail is thought through in advance.","معًا نصنع رحلات تُدرس كل تفاصيلها مسبقًا."],
+    // главная: SEO-блок «Умра из Казахстана»
+    "seo.kicker":    ["Умра из Казахстана","Қазақстаннан Умра","Umrah from Kazakhstan","العمرة من كازاخستان"],
+    "seo.h2":        ["Поездка в Мекку и Медину под ключ","Мекке мен Мединеге сапар толық ұйымдастырумен","Your trip to Makkah and Madinah, fully arranged","رحلتك إلى مكة والمدينة بتنظيم متكامل"],
+    "seo.p":         ["smart-travel.kz организует Умру из Казахстана для семей, групп и индивидуальных паломников. Берём на себя визу в Саудовскую Аравию, перелёт, отели рядом с Харамом в Мекке и мечетью Пророка ﷺ в Медине, трансферы и сопровождение на обрядах.",
+                      "smart-travel.kz отбасыларға, топтарға және жеке қажыларға Қазақстаннан Умра ұйымдастырады. Сауд Арабиясына виза, ұшу, Меккедегі Харамға және Мединедегі Пайғамбар ﷺ мешітіне жақын қонақүйлер, трансферлер мен рәсімдерде сүйемелдеу — бәрін өзімізге аламыз.",
+                      "smart-travel.kz organises Umrah from Kazakhstan for families, groups and individual pilgrims. We handle the Saudi visa, flights, hotels near the Haram in Makkah and the Prophet's Mosque ﷺ in Madinah, transfers and guidance during the rites.",
+                      "تنظّم smart-travel.kz العمرة من كازاخستان للعائلات والمجموعات والمعتمرين الأفراد. نتولى تأشيرة السعودية والطيران والفنادق القريبة من الحرم في مكة ومن المسجد النبوي ﷺ في المدينة، والتنقلات والمرافقة أثناء المناسك."],
+    "seo.makkahT":   ["Мекка","Мекке","Makkah","مكة المكرمة"],
+    "seo.makkah":    ["Отели в шаговой доступности от Масджид аль-Харам и Каабы. Объясним порядок обрядов Умры — ихрам, таваф и саъй — и поможем спланировать дни.",
+                      "Әл-Харам мешіті мен Қағбаға жаяу жетуге болатын қонақүйлер. Умра рәсімдерінің тәртібін — ихрам, тауап және сағи — түсіндіріп, күндерді жоспарлауға көмектесеміз.",
+                      "Hotels within walking distance of Masjid al-Haram and the Kaaba. We explain the Umrah rites — ihram, tawaf and sa'i — and help you plan your days.",
+                      "فنادق على مسافة قريبة سيرًا من المسجد الحرام والكعبة. نشرح مناسك العمرة — الإحرام والطواف والسعي — ونساعدك في تنظيم أيامك."],
+    "seo.madinahT":  ["Медина","Медине","Madinah","المدينة المنورة"],
+    "seo.madinah":   ["Проживание рядом с Масджид ан-Набави, посещение мечети Куба и исторических мест. Переезд между Меккой и Мединой — скоростным поездом Харамейн или комфортным трансфером.",
+                      "Пайғамбар мешітіне (Мәсжид ән-Набауи) жақын тұру, Құба мешіті мен тарихи орындарға бару. Мекке мен Медине арасындағы жол — Харамейн жылдам пойызымен немесе жайлы трансфермен.",
+                      "Stay close to Al-Masjid an-Nabawi and visit Quba Mosque and historic sites. Travel between Makkah and Madinah by the Haramain high-speed train or a comfortable transfer.",
+                      "إقامة بالقرب من المسجد النبوي وزيارة مسجد قباء والمعالم التاريخية. التنقل بين مكة والمدينة بقطار الحرمين السريع أو بنقل مريح."],
+    "seo.pricesT":   ["Пакеты и цены","Пакеттер мен бағалар","Packages and prices","الباقات والأسعار"],
+    "seo.prices":    ["Умра Standard, Luxe и VIP, а также круиз с Умрой — от 650 000 ₸. Цена зависит от дат, отеля и состава группы: точную стоимость и ближайшие вылеты пришлём в WhatsApp.",
+                      "Умра Standard, Luxe және VIP, сондай-ақ Умрамен круиз — 650 000 ₸-ден. Баға күндерге, қонақүйге және топ құрамына байланысты: нақты құны мен жақын ұшуларды WhatsApp-қа жібереміз.",
+                      "Umrah Standard, Luxe and VIP, plus a cruise with Umrah from 650,000 ₸. The price depends on dates, hotel and group size — we'll send exact prices and upcoming departures on WhatsApp.",
+                      "عمرة Standard وLuxe وVIP، ورحلة بحرية مع العمرة ابتداءً من 650,000 تنغي. يعتمد السعر على التواريخ والفندق وحجم المجموعة، وسنرسل الأسعار الدقيقة وأقرب الرحلات عبر واتساب."],
+    "seo.visaT":     ["Виза в Саудовскую Аравию","Сауд Арабиясына виза","Saudi Arabia visa","تأشيرة السعودية"],
+    "seo.visa":      ["Электронную визу для Умры оформляем онлайн по фото паспорта — для граждан Казахстана и всей семьи. Статус заявки виден в личном кабинете.",
+                      "Умраға электронды визаны паспорт фотосы бойынша онлайн рәсімдейміз — Қазақстан азаматтарына және бүкіл отбасыға. Өтінім мәртебесі жеке кабинетте көрінеді.",
+                      "We arrange the electronic Umrah visa online from a passport photo — for citizens of Kazakhstan and the whole family. You can track the status in your account.",
+                      "نستخرج تأشيرة العمرة الإلكترونية عبر الإنترنت من صورة جواز السفر لمواطني كازاخستان وللعائلة كلها، ويمكنك متابعة حالة الطلب في حسابك."],
+    "faq.q8":        ["Сколько стоит Умра из Казахстана?","Қазақстаннан Умра қанша тұрады?","How much does Umrah from Kazakhstan cost?","كم تكلفة العمرة من كازاخستان؟"],
+    "faq.a8":        ["Цена зависит от пакета, дат и отеля. Standard — самый доступный вариант, Luxe и VIP — отели ближе к Хараму и индивидуальный сервис. Круиз с Умрой — от 650 000 ₸. Напишите в WhatsApp — пришлём подборку на ваши даты.",
+                      "Баға пакетке, күндерге және қонақүйге байланысты. Standard — ең қолжетімді нұсқа, Luxe пен VIP — Харамға жақын қонақүйлер және жеке сервис. Умрамен круиз — 650 000 ₸-ден. WhatsApp-қа жазыңыз — күндеріңізге қарай таңдау жібереміз.",
+                      "The price depends on the package, dates and hotel. Standard is the most affordable option; Luxe and VIP mean hotels closer to the Haram and personal service. The cruise with Umrah starts from 650,000 ₸. Message us on WhatsApp for options on your dates.",
+                      "يعتمد السعر على الباقة والتواريخ والفندق. باقة Standard هي الأوفر، أما Luxe وVIP ففنادق أقرب إلى الحرم وخدمة شخصية. الرحلة البحرية مع العمرة تبدأ من 650,000 تنغي. راسلنا عبر واتساب لنرسل لك خيارات تناسب تواريخك."],
+    "faq.q9":        ["Сколько дней длится поездка на Умру?","Умра сапары неше күнге созылады?","How many days does an Umrah trip take?","كم يومًا تستغرق رحلة العمرة؟"],
+    "faq.a9":        ["Сами обряды Умры занимают несколько часов, а поездка обычно длится от 7 до 14 дней: несколько ночей в Мекке и в Медине. Длительность подберём под ваш график.",
+                      "Умра рәсімдерінің өзі бірнеше сағат алады, ал сапар әдетте 7–14 күнге созылады: Меккеде және Мединеде бірнеше түн. Ұзақтығын кестеңізге қарай таңдаймыз.",
+                      "The Umrah rites themselves take a few hours; a trip usually lasts 7 to 14 days, with several nights in Makkah and in Madinah. We'll fit the length to your schedule.",
+                      "تستغرق مناسك العمرة نفسها بضع ساعات، أما الرحلة فتمتد عادة من 7 إلى 14 يومًا، مع عدة ليالٍ في مكة والمدينة. نحدد المدة بما يناسب جدولك."],
     "st.new":        ["Заявка получена","Өтінім қабылданды","Application received","تم استلام الطلب"],
     "st.review":     ["Проверяем документы","Құжаттарды тексеріп жатырмыз","Checking documents","نراجع المستندات"],
     "st.submitted":  ["Подана на визу","Визаға тапсырылды","Submitted for visa","قُدّم طلب التأشيرة"],
@@ -382,7 +423,12 @@
   if(darkMQ) try { darkMQ.addEventListener("change", () => { if(!root.dataset.theme) document.dispatchEvent(new CustomEvent("themechange")); }); } catch(e){}
 
   setRoot();
-  document.addEventListener("DOMContentLoaded", () => apply());
+  document.addEventListener("DOMContentLoaded", () => {
+    apply();
+    // ?lang=kk|en|ar — отдельная языковая версия для поисковиков: канонический адрес с параметром
+    const c = document.querySelector('link[rel="canonical"]');
+    if(c && lang !== "ru" && new URLSearchParams(location.search).get("lang") === lang) c.href = c.href.split("?")[0] + "?lang=" + lang;
+  });
 
   window.I18N = {
     LANGS, t, tIn, pick, apply, setLang, theme, setTheme,

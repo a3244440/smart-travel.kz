@@ -431,3 +431,4 @@ nav.main a{white-space:nowrap}
 .together{text-align:center;font-family:var(--serif);font-size:22px;margin:34px auto 0;max-width:36em}
 @media (max-width:900px){ .founder{grid-template-columns:1fr;gap:32px} .team{grid-template-columns:1fr 1fr} .founder-card{max-width:320px} }
 @media (max-width:520px){ .team{grid-template-columns:1fr} .stats{gap:12px 22px} .stats b{font-size:26px} }
+.seo-block .lead{max-width:860px;margin:0 0 8px}
