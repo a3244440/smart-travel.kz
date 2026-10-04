@@ -17,7 +17,8 @@ vm.createContext(ctx);
 vm.runInContext(read("assets/config.js"), ctx);
 vm.runInContext(read("assets/i18n.js"), ctx);
 vm.runInContext(read("assets/tours.js"), ctx);
-const { I18N, SITE, TOURS } = ctx;
+vm.runInContext(read("assets/guides.js"), ctx);
+const { I18N, SITE, TOURS, GUIDES } = ctx;
 const ru = (key, vars) => I18N.tIn("ru", key, { brand: SITE.brand, ...vars });
 const strip = h => h.replace(/<br\s*\/?>/g, " ").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 const attr = s => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
@@ -44,7 +45,7 @@ const KW = {
     "оформить визу в Саудовскую Аравию Алматы", "оформить визу в Саудовскую Аравию Астана", "Сауд Арабиясына виза", "Умра визасы"
   ],
   about: ["smart-travel.kz", "Алина smart travel", "организатор умры", "турагентство умра Казахстан", "туроператор Мекка Медина", "отзывы умра"],
-  guides: ["гид в Мекке", "гид в Медине", "гид на умру", "сопровождение умры", "русскоязычный гид Мекка", "казахоязычный гид Умра"]
+  guides: ["Руслан Есболат", "гид-устаз", "гид в Мекке", "гид в Медине", "гид на умру", "сопровождение умры", "русскоязычный гид Мекка", "казахоязычный гид Умра"]
 };
 const CITIES = ["Алматы","Астана"];
 const FAQ_COUNT = (() => { let n = 0; while (I18N.tIn("ru", `faq.q${n + 1}`) !== `faq.q${n + 1}`) n++; return n; })();
@@ -105,8 +106,11 @@ const PAGES = {
   },
   "guides.html": {
     path: "/guides", titleKey: "title.guides", priority: "0.5", kw: KW.guides,
-    description: "Проверенные гиды для Умры в Мекке и Медине: опыт, языки и отзывы паломников. Раздел готовится — нужен гид сейчас, напишите нам в WhatsApp.",
-    schema: () => [crumbs("Гиды", "/guides")]
+    description: "Гид-устаз для Умры в Мекке и Медине — Руслан Есболат: исламское образование, более 2 лет сопровождения паломников, зиярат к святым и историческим местам. Живёт в Мекке.",
+    schema: () => [crumbs("Гиды", "/guides"), ...GUIDES.map(g => ({
+      "@type": "Person", name: g.name.ru, alternateName: g.name.kk, jobTitle: g.role.ru, description: g.about.ru,
+      image: SITE_URL + "/" + g.photo, url: SITE_URL + "/guides#" + g.id, worksFor: { "@id": SITE_URL + "/#org" },
+      homeLocation: { "@type": "Place", name: "Мекка" } }))]
   },
   "cabinet.html": {
     path: "/cabinet", titleKey: "title.cabinet", noindex: true,

@@ -13,10 +13,10 @@
 <script src="assets/i18n.js"></script>
 <!-- SEO: генерируется tools/seo.mjs -->
 <title>Гиды для Умры в Мекке и Медине | smart-travel.kz</title>
-<meta name="description" content="Проверенные гиды для Умры в Мекке и Медине: опыт, языки и отзывы паломников. Раздел готовится — нужен гид сейчас, напишите нам в WhatsApp.">
+<meta name="description" content="Гид-устаз для Умры в Мекке и Медине — Руслан Есболат: исламское образование, более 2 лет сопровождения паломников, зиярат к святым и историческим местам. Живёт в Мекке.">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://smart-travel.kz/guides">
-<meta name="keywords" content="гид в Мекке, гид в Медине, гид на умру, сопровождение умры, русскоязычный гид Мекка, казахоязычный гид Умра">
+<meta name="keywords" content="Руслан Есболат, гид-устаз, гид в Мекке, гид в Медине, гид на умру, сопровождение умры, русскоязычный гид Мекка, казахоязычный гид Умра">
 <link rel="alternate" hreflang="ru" href="https://smart-travel.kz/guides">
 <link rel="alternate" hreflang="kk" href="https://smart-travel.kz/guides?lang=kk">
 <link rel="alternate" hreflang="en" href="https://smart-travel.kz/guides?lang=en">
@@ -30,25 +30,53 @@
 <meta property="og:locale:alternate" content="en_GB">
 <meta property="og:locale:alternate" content="ar_SA">
 <meta property="og:title" content="Гиды для Умры в Мекке и Медине | smart-travel.kz">
-<meta property="og:description" content="Проверенные гиды для Умры в Мекке и Медине: опыт, языки и отзывы паломников. Раздел готовится — нужен гид сейчас, напишите нам в WhatsApp.">
+<meta property="og:description" content="Гид-устаз для Умры в Мекке и Медине — Руслан Есболат: исламское образование, более 2 лет сопровождения паломников, зиярат к святым и историческим местам. Живёт в Мекке.">
 <meta property="og:url" content="https://smart-travel.kz/guides">
 <meta property="og:image" content="https://smart-travel.kz/assets/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Главная","item":"https://smart-travel.kz/"},{"@type":"ListItem","position":2,"name":"Гиды","item":"https://smart-travel.kz/guides"}]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Главная","item":"https://smart-travel.kz/"},{"@type":"ListItem","position":2,"name":"Гиды","item":"https://smart-travel.kz/guides"}]},{"@type":"Person","name":"Руслан Есболат","alternateName":"Руслан Есболат","jobTitle":"Гид-устаз · Мекка и Медина","description":"Гид-устаз с исламским образованием. Хорошо знает святые и исторические места Мекки и Медины.","image":"https://smart-travel.kz/assets/guides/ruslan-esbolat.jpg","url":"https://smart-travel.kz/guides#ruslan-esbolat","worksFor":{"@id":"https://smart-travel.kz/#org"},"homeLocation":{"@type":"Place","name":"Мекка"}}]}</script>
 <!-- /SEO -->
 </head>
 <body data-page="guides" data-title="title.guides">
-<main class="wrap soon">
-  <div>
-    <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="8" r="4"/><path d="M3 21a7 7 0 0 1 10.5-6"/><path d="m18 14 1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4Z"/></svg></div>
-    <h1 data-i18n="guides.title">Гиды скоро появятся</h1>
-    <p data-i18n="guides.text">Раздел готовится — здесь появятся проверенные гиды для Умры: опыт, языки и отзывы паломников.</p>
-    <a class="btn ghost" id="guideWa" href="#" target="_blank" rel="noopener" data-i18n="guides.ask">Нужен гид уже сейчас? Напишите нам</a>
+<main class="wrap guides-page">
+  <div class="page-head">
+    <h1 data-i18n="guides.title">Наши гиды</h1>
+    <p data-i18n="guides.text">Гиды-устазы, которые сопровождают паломников в Мекке и Медине: обряды Умры, зиярат и история святых мест.</p>
   </div>
+  <div id="guideList"></div>
+  <p class="guides-more"><span data-i18n="guide.more">Скоро здесь появятся и другие гиды.</span> <a id="guideWa" href="#" target="_blank" rel="noopener" data-i18n="guides.ask">Хотите поехать с гидом? Напишите нам</a></p>
 </main>
+<script src="assets/guides.js"></script>
 <script src="assets/layout.js"></script>
-<script>document.getElementById("guideWa").href = waLink("");</script>
+<script>
+(function(){
+  const P = v => I18N.pick(v);
+  function render(){
+    document.getElementById("guideList").innerHTML = GUIDES.map(g => {
+      const name = P(g.name);
+      const list = a => `<ul>${P(a).map(x => `<li>${esc(x)}</li>`).join("")}</ul>`;
+      return `<article class="guide" id="${esc(g.id)}">
+        <figure class="guide-ph"><img src="${esc(g.photo)}" alt="${esc(name)} — ${esc(P(g.role))}" loading="eager" decoding="async"></figure>
+        <div class="guide-body">
+          <span class="kicker">${esc(P(g.role))}</span>
+          <h2>${esc(name)}</h2>
+          <div class="guide-facts">${P(g.facts).map(f => `<span>${esc(f)}</span>`).join("")}</div>
+          <p class="lead">${esc(P(g.about))}</p>
+          <div class="guide-cols">
+            <div><h3>${t("guide.exp")}</h3>${list(g.experience)}</div>
+            <div><h3>${t("guide.edu")}</h3>${list(g.education)}</div>
+          </div>
+          <a class="btn" href="${waLink(t("guide.msg", { name }))}" target="_blank" rel="noopener">${t("guide.book")}</a>
+        </div>
+      </article>`;
+    }).join("");
+    document.getElementById("guideWa").href = waLink("");
+  }
+  render();
+  document.addEventListener("langchange", render);
+})();
+</script>
 </body>
 </html>
