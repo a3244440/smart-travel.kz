@@ -41,6 +41,13 @@
     <aside class="side" id="detail"><div class="panel empty">Выберите заявку в таблице.</div></aside>
   </div>
   </section>
+  <section id="botSection" hidden style="margin-top:48px">
+    <div class="page-head" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:16px">
+      <div><h2 style="font-family:var(--serif);font-weight:400;font-size:32px;margin:0">Заявки из Instagram-бота</h2><p id="botSummary"></p></div>
+      <div class="filter" id="botFilter" style="margin:0"></div>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>Когда</th><th>Клиент</th><th>Телефон</th><th>Интерес</th><th>Даты · людей · город</th><th>Последнее сообщение</th><th></th></tr></thead><tbody id="botRows"></tbody></table></div>
+  </section>
   <div id="verify" class="verify" hidden role="dialog" aria-modal="true" aria-labelledby="vTitle"></div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
@@ -198,6 +205,29 @@
       PURPOSE[a.trip.purpose], fmtDate(a.trip.arrival), a.trip.nights, a.trip.contact_name, a.trip.phone, a.trip.email, a.trip.comment, a.note].map(q).join(";"))));
     return "\uFEFF" + [head.map(q).join(";"), ...rows].join("\r\n");
   }
+  // ---------- заявки из Instagram-бота ----------
+  let bot = [], botFilter = "new";
+  function renderBot(){
+    const nNew = bot.filter(b => b.status === "new").length;
+    $("#botSummary").textContent = bot.length ? `${nNew} новых · всего ${bot.length}` : "Пока заявок из бота нет.";
+    $("#botFilter").innerHTML = [["new","Новые"],["done","Обработанные"],["all","Все"]].map(([k,l]) => `<button class="tab" data-bf="${k}" aria-selected="${botFilter===k}">${l}</button>`).join("");
+    const list = bot.filter(b => botFilter === "all" || b.status === botFilter);
+    const ig = b => b.username ? `<a href="https://instagram.com/${encodeURIComponent(b.username)}" target="_blank" rel="noopener">@${esc(b.username)}</a>` : "";
+    const wa = p => { const d = String(p||"").replace(/\D/g,""); return d ? `<a href="https://wa.me/${d}" target="_blank" rel="noopener">${esc(p)}</a>` : "—"; };
+    $("#botRows").innerHTML = list.length ? list.map(b => `<tr>
+      <td><small>${new Date(b.created_at).toLocaleString("ru-RU", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" })}</small>${b.kind === "manager" ? '<br><span class="pill warn">Просит менеджера</span>' : ""}</td>
+      <td>${esc(b.name) || "—"}<br><small>${ig(b)}</small></td>
+      <td>${wa(b.phone)}</td>
+      <td>${esc(b.interest) || "—"}</td>
+      <td>${[b.dates, b.people && (b.people + " чел."), b.city].filter(Boolean).map(esc).join(" · ") || "—"}</td>
+      <td style="max-width:280px"><small>${esc(b.last_message)}</small></td>
+      <td><button class="btn ghost" data-bl="${b.id}" data-to="${b.status === "new" ? "done" : "new"}" style="padding:6px 12px;font-size:13px">${b.status === "new" ? "Обработано" : "Вернуть"}</button></td></tr>`).join("")
+      : `<tr><td colspan="7" class="empty">${botFilter === "new" ? "Новых заявок нет." : "Пусто."}</td></tr>`;
+  }
+  async function loadBot(){
+    try { bot = await Store.botLeads(); $("#botSection").hidden = false; renderBot(); }
+    catch(err){ $("#botSection").hidden = true; }
+  }
   async function load(){
     try { apps = await Store.all(); $("#summary").textContent = ""; }
     catch(err){ $("#summary").textContent = "Не удалось загрузить заявки. Обновите страницу."; return; }
@@ -209,7 +239,7 @@
     if(session){ try { ok = await Store.auth.isManager(); } catch(e){} }
     $("#login").hidden = ok; $("#app").hidden = !ok;
     if(session && !ok) $("#loginErr").textContent = "У этой учётной записи нет доступа к заявкам.";
-    if(ok) load(); else { apps = []; selected = null; }
+    if(ok){ load(); loadBot(); } else { apps = []; selected = null; bot = []; $("#botSection").hidden = true; }
   }
   $("#loginForm").addEventListener("submit", async e => {
     e.preventDefault();
@@ -224,6 +254,13 @@
       if(e.target.closest("#vNext")){ saveVerify(true); return; }
       const z = e.target.closest("[data-z]"); if(z){ vState.zoom = Math.min(4, Math.max(1, vState.zoom + (+z.dataset.z) * .5)); applyView(); return; }
       if(e.target.closest("#vRot")){ vState.rot = (vState.rot + 90) % 360; applyView(); return; }
+      return;
+    }
+    const bf = e.target.closest("[data-bf]"); if(bf){ botFilter = bf.dataset.bf; renderBot(); return; }
+    const bl = e.target.closest("[data-bl]"); if(bl){
+      bl.disabled = true;
+      try { const rec = await Store.updateBotLead(+bl.dataset.bl, { status: bl.dataset.to }); bot = bot.map(x => x.id === rec.id ? rec : x); renderBot(); }
+      catch(err){ alert(err.message); bl.disabled = false; }
       return;
     }
     const v = e.target.closest("[data-verify]"); if(v){ openVerify(+v.dataset.verify); return; }
@@ -243,7 +280,7 @@
       catch(err){ alert(err.message); }
       return;
     }
-    if(e.target.closest("#reload")){ load(); return; }
+    if(e.target.closest("#reload")){ load(); loadBot(); return; }
     if(e.target.closest("#logout")){ await Store.auth.signOut(); $("#loginErr").textContent = ""; gate(); return; }
     if(e.target.closest("#exportAll")){
       const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv()],{type:"text/csv;charset=utf-8"}));

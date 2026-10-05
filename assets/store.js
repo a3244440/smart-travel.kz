@@ -40,6 +40,17 @@ window.Store = (function(){
       fail(error, "Не удалось загрузить заявки");
       return data;
     },
+    // заявки из Instagram-бота (n8n)
+    async botLeads(){
+      const { data, error } = await db.from("bot_leads").select("*").order("created_at", { ascending:false }).limit(300);
+      fail(error, "Не удалось загрузить заявки из бота");
+      return data;
+    },
+    async updateBotLead(id, patch){
+      const { data, error } = await db.from("bot_leads").update(patch).eq("id", id).select().single();
+      fail(error, "Не удалось сохранить");
+      return data;
+    },
     async update(id, patch){
       const { data, error } = await db.from("applications").update(patch).eq("id", id).select().single();
       fail(error, "Не удалось сохранить");
