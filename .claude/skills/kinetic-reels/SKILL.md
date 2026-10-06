@@ -26,7 +26,9 @@ description: Делает вертикальные ролики 9:16 для Reel
 1. Сценарий `*.script.json`: предложения → фразы `{id, say}`. В `say` — текст для синтеза; ударения чинить написанием (удвоенная гласная: «ихраам», «тавааф», «Сафаа»; «У́мру» с акутом работает только для первого слога). Проверка: `echo текст | piper ... --debug` показывает фонемы.
 2. Голос: `PIPER=... PIPER_VOICE=... python3 tools/kinetic/voice.py сценарий.json OUT` → `voice.wav` + `timing.json` (время каждой фразы).
    Piper и голос ru «irinia» качаются с GitHub-релизов rhasspy/piper (`2023.11.14-2/piper_linux_x86_64.tar.gz`, `v0.0.2/voice-ru-irinia-medium.tar.gz`).
-   Свой голос (ElevenLabs): положить `voice.wav` и вручную написать `timing.json` с теми же id.
+   Свой голос (ElevenLabs): `voice.wav` + `timing.json` с теми же id (пример: `umrah-demo.timing-ali.json`).
+   Тайминг находить по паузам (энергия ниже −35…−40 дБ, ≥0,06 с) и ядрам слогов (пики огибающей 300–2500 Гц), сверяя с числом слогов фраз.
+   Неверное ударение в чужой записи («умру́» вместо «У́мру») чинится через parselmouth (PSOLA): поднять тон и удлинить ударный слог, опустить/укоротить/приглушить безударный. Но лучше попросить перегенерировать фразу.
 3. Сцены: копия `umrah-demo.html`; `K.Scene(имя, начало, конец, {theme, enter, cam})`, элементы `sc.add(html, {x, y, at: ph("id") + сдвиг, anim})`. Факты проверять по сайту (`assets/i18n.js`, `assets/tours.js`).
 4. Превью: `node tools/kinetic/render.mjs сцена.html OUT snap 1.5 4 8` → проверить кадры глазами (переполнение по ширине, читаемость).
 5. Кадры: `node tools/kinetic/render.mjs сцена.html OUT` → `OUT/frames`, `OUT/cues.json`.
