@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<title>Kinetic — Умра (демо)</title>
+<style>
+@font-face{font-family:OS;font-weight:700;src:url(fonts/oswald-cyrillic-700-normal.woff2);unicode-range:U+0400-045F}
+@font-face{font-family:OS;font-weight:700;src:url(fonts/oswald-latin-700-normal.woff2);unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:OS;font-weight:500;src:url(fonts/oswald-cyrillic-500-normal.woff2);unicode-range:U+0400-045F}
+@font-face{font-family:OS;font-weight:500;src:url(fonts/oswald-latin-500-normal.woff2);unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:SC;src:url(fonts/marck-script-cyrillic-400-normal.woff2);unicode-range:U+0400-045F}
+@font-face{font-family:SC;src:url(fonts/marck-script-latin-400-normal.woff2);unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:MS;font-weight:900;src:url(fonts/montserrat-cyrillic-900-normal.woff2);unicode-range:U+0400-045F}
+@font-face{font-family:MS;font-weight:900;src:url(fonts/montserrat-latin-900-normal.woff2);unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:MS;font-weight:600;src:url(fonts/montserrat-cyrillic-600-normal.woff2);unicode-range:U+0400-045F}
+@font-face{font-family:MS;font-weight:600;src:url(fonts/montserrat-latin-600-normal.woff2);unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:MS;font-weight:400;src:url(fonts/montserrat-cyrillic-400-normal.woff2);unicode-range:U+0400-045F}
+@font-face{font-family:MS;font-weight:400;src:url(fonts/montserrat-latin-400-normal.woff2);unicode-range:U+0000-00FF,U+2000-206F}
+:root{--navy:#101A3A;--navy2:#1B2A5C;--gold:#D4AF6A;--gold2:#B8893A;--ivory:#F6F0E4;--ink:#141414}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000}
+#stage{position:absolute;inset:0;overflow:hidden}
+.scene{position:absolute;inset:0;overflow:hidden;transform-origin:50% 50%}
+.cam{position:absolute;inset:0;transform-origin:50% 45%}
+.night{background:radial-gradient(ellipse 120% 80% at 50% 30%,#22336E 0%,#101A3A 55%,#0A1028 100%);color:#fff}
+.light{background:radial-gradient(ellipse 110% 80% at 50% 35%,#FFFDF8 0%,#F6F0E4 60%,#EADFC9 100%);color:var(--navy)}
+.el{position:absolute;white-space:nowrap;text-align:center;will-change:transform,opacity}
+.oz{font-family:OS;font-weight:700;text-transform:uppercase;line-height:.95;letter-spacing:.01em}
+.sc{font-family:SC;line-height:1}
+.ms{font-family:MS}
+.sm{font-family:MS;font-weight:600;font-size:34px;letter-spacing:.18em;text-transform:uppercase}
+.gold{color:var(--gold)} .goldd{color:var(--gold2)} .navy{color:var(--navy)}
+.glow{text-shadow:0 0 40px rgba(212,175,106,.45)}
+.caret{color:var(--gold);font-weight:400}
+.glass{background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.35);border-radius:36px;backdrop-filter:blur(8px);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.light .glass{background:rgba(255,255,255,.7);border-color:rgba(184,137,58,.35);box-shadow:0 18px 50px rgba(16,26,58,.12)}
+.chip{font-family:MS;font-weight:600;font-size:30px;padding:16px 26px;border-radius:999px;background:var(--navy);color:#fff}
+.chip.g{background:var(--gold);color:var(--navy)}
+.circle{border-radius:50%;overflow:hidden;border:10px solid #fff;box-shadow:0 0 0 3px var(--gold),0 30px 70px rgba(16,26,58,.35)}
+.circle img,.arch img{width:100%;height:100%;object-fit:cover;display:block}
+.arch{overflow:hidden;border-radius:300px 300px 30px 30px;border:8px solid #fff;box-shadow:0 0 0 3px var(--gold),0 30px 70px rgba(16,26,58,.3)}
+.card{display:flex;align-items:center;gap:30px;padding:26px 34px;border-radius:30px;background:#fff;box-shadow:0 18px 50px rgba(16,26,58,.16);text-align:left}
+.night .card{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.25);box-shadow:none}
+.num{font-family:OS;font-weight:700;font-size:96px;color:var(--gold);width:70px;text-align:center;line-height:1}
+.card .t{font-family:OS;font-weight:700;font-size:64px;text-transform:uppercase;line-height:1}
+.card .d{font-family:MS;font-weight:400;font-size:26px;opacity:.75;margin-top:6px}
+.ico{width:110px;height:110px;flex:none}
+.cursor{width:64px;height:64px}
+.bubble{position:absolute;border:2px solid rgba(255,255,255,.55);border-radius:50%}
+.light .bubble{border-color:rgba(184,137,58,.45)}
+#grain{position:absolute;inset:0;opacity:.06;mix-blend-mode:overlay;pointer-events:none;z-index:100}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse 85% 75% at 50% 48%,transparent 60%,rgba(0,0,0,.28) 100%);pointer-events:none;z-index:99}
+</style></head>
+<body>
+<div id="stage"></div><div id="vig"></div><canvas id="grain" width="540" height="960"></canvas>
+<script src="engine.js"></script>
+<script>
+const T = __TIMING__;             // время фраз из voice.py
+const ph = id => T.phrases[id];
+const END = T.voice_end + 2.2;
+const S = n => T.sentences.find(s => s.scene === n).start;
+
+// ---------- SVG-графика ----------
+const mosque = (c, op = 1) => `<svg width="1240" height="520" viewBox="0 0 1240 520" style="opacity:${op}"><g fill="${c}">
+  <rect x="0" y="420" width="1240" height="100"/>
+  <path d="M140 420 V250 h18 V200 l12-30 12 30 v50 h18 v170z"/><path d="M1060 420 V250 h18 V200 l12-30 12 30 v50 h18 v170z"/>
+  <path d="M330 420 V320 a110 110 0 0 1 220 0 V420z"/><path d="M690 420 V320 a110 110 0 0 1 220 0 V420z"/>
+  <path d="M440 420 V260 a180 170 0 0 1 360 0 V420z"/><circle cx="620" cy="80" r="10"/><path d="M616 90 h8 v40 h-8z"/>
+  <path d="M245 420 V300 h14 V260 l9-22 9 22 v40 h14 v120z"/><path d="M965 420 V300 h14 V260 l9-22 9 22 v40 h14 v120z"/>
+</g></svg>`;
+const crescent = (c, s = 120) => `<svg width="${s}" height="${s}" viewBox="0 0 40 40"><path d="M18.82 9.06A12 12 0 1 0 31.47 24.52A10 10 0 0 1 18.82 9.06Z" fill="${c}"/></svg>`;
+const archLine = c => `<svg width="760" height="420" viewBox="0 0 760 420"><path id="al" d="M20 410 V250 C20 150 160 130 230 90 C300 50 330 20 380 10 C430 20 460 50 530 90 C600 130 740 150 740 250 V410" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round"/></svg>`;
+const cursor = `<svg class="cursor" viewBox="0 0 24 24"><path d="M5 3l14 8-6 1.5L10 19z" fill="#fff" stroke="#101A3A" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+const ICON = {
+  ihram: `<svg class="ico" viewBox="0 0 64 64" fill="none" stroke="#D4AF6A" stroke-width="3" stroke-linejoin="round"><path d="M14 10h22l14 12-8 6-6-5v31H14z"/><path d="M36 10l-8 14"/></svg>`,
+  tawaf: `<svg class="ico" viewBox="0 0 64 64" fill="none" stroke="#D4AF6A" stroke-width="3" stroke-linecap="round"><rect x="23" y="23" width="18" height="20" rx="1" fill="#D4AF6A" stroke="none"/><path d="M23 28h18" stroke="#101A3A" stroke-width="2"/><path d="M10 34a22 14 0 0 0 44 0"/><path d="M54 30a22 14 0 0 0-44 0"/><path d="M50 22l4 8-8 1"/></svg>`,
+  sai:   `<svg class="ico" viewBox="0 0 64 64" fill="none" stroke="#D4AF6A" stroke-width="3" stroke-linecap="round"><path d="M4 50c6-14 10-14 16 0M44 50c6-14 10-14 16 0"/><path d="M20 30h24M38 24l6 6-6 6M26 36l-6-6 6-6"/></svg>`,
+  hair:  `<svg class="ico" viewBox="0 0 64 64" fill="none" stroke="#D4AF6A" stroke-width="3" stroke-linecap="round"><circle cx="16" cy="46" r="7"/><circle cx="34" cy="50" r="7"/><path d="M21 41l29-29M38 44L22 14"/></svg>`,
+  visa:  `<svg class="ico" viewBox="0 0 64 64" fill="none" stroke="#101A3A" stroke-width="3"><rect x="14" y="8" width="36" height="48" rx="4"/><circle cx="32" cy="28" r="8"/><path d="M22 44h20"/></svg>`,
+  plane: `<svg class="ico" viewBox="0 0 64 64" fill="#101A3A"><path d="M60 30c0-2-2-3-4-3H40L26 6h-6l7 21H14l-5-6H4l3 11-3 11h5l5-6h13l-7 21h6l14-21h16c2 0 4-1 4-3z"/></svg>`,
+  hotel: `<svg class="ico" viewBox="0 0 64 64" fill="none" stroke="#101A3A" stroke-width="3"><path d="M12 58V10h28v48M40 24h12v34M6 58h52"/><path d="M20 18h4M28 18h4M20 28h4M28 28h4M20 38h4M28 38h4" stroke-linecap="round"/></svg>`
+};
+const check = `<svg width="54" height="54" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#2E9E6A"/><path d="M7 12.5l3.2 3L17 9" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`;
+
+// пузырьки, как в референсе
+function bubbles(sc, n, seed){
+  let s = seed;
+  const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < n; i++) {
+    const size = 14 + r() * 46, x = r() * 1080, sp = 60 + r() * 120, ph0 = r() * 20, d = document.createElement("div");
+    d.className = "bubble"; d.style.width = d.style.height = size + "px"; sc.cam.appendChild(d);
+    sc.items.push({ d, at: sc.start, anim: "fade", tick: (el, t) => { const y = 1980 - ((t + ph0) * sp) % 2100; el.style.transform = `translate(${x}px,${y}px)`; el.style.opacity = .7; } });
+  }
+}
+// линия, которая «рисуется»
+function drawLine(sc, html, o, at, dur = 1.1){
+  const it = sc.add(html, Object.assign({ at, anim: "fade", dur: .2, sfx: "swish" }, o));
+  const path = it.d.querySelector("path"), L = path.getTotalLength();
+  path.style.strokeDasharray = L;
+  it.tick = (el, t) => { path.style.strokeDashoffset = L * (1 - K.E.inOut(K.P(t, at, dur))); };
+  return it;
+}
+// курсор: подлетает к точке и кликает
+function clickAt(sc, x, y, at, from = [900, 1700]){
+  const it = sc.add(cursor, { x, y, at: at - .45, anim: "fade", dur: .15, sfx: null, z: 20, out: at + .5 });
+  sc.cue(at, "click");
+  it.tick = (el, t) => {
+    const q = K.E.inOut(K.P(t, at - .45, .45)), pr = K.P(t, at, .18);
+    const dx = K.lerp(from[0] - x, 0, q), dy = K.lerp(from[1] - y, 0, q), s = 1 - .25 * Math.sin(Math.PI * pr);
+    el.style.transform = `translate(-10%,-10%) translate(${dx}px,${dy}px) scale(${s})`;
+  };
+}
+
+// ---------- 1. Крючок ----------
+let sc = K.Scene("hook", 0, S("what"), { theme: "night", cam: { s: [1.08, 1], y: [0, 0] } });
+bubbles(sc, 10, 7);
+sc.add(mosque("#0A1028"), { x: 540, y: 1700, anim: "rise", at: .05, sfx: null });
+sc.add(crescent("#D4AF6A", 150), { x: 860, y: 330, anim: "pop", at: .25, float: 8, sfx: "ding" });
+drawLine(sc, archLine("rgba(212,175,106,.75)"), { x: 540, y: 860 }, .1, 1.4);
+sc.add(`<span data-type class="sc gold" style="font-size:150px">Почему</span>`, { x: 540, y: 640, at: ph("why"), anim: "fade", dur: .1, sfx: null, type: true, cps: 14 });
+sc.add(`<div class="oz glow" style="font-size:300px">УМРУ</div>`, { x: 540, y: 880, at: ph("why") + .38, anim: "zoom" });
+sc.add(`<div class="sm" style="color:#C9D1F2">называют</div>`, { x: 540, y: 1080, at: ph("minor"), anim: "track" });
+sc.add(`<div class="oz gold" style="font-size:118px">малым хаджем?</div>`, { x: 540, y: 1200, at: ph("minor") + .35, anim: "rise" });
+
+// ---------- 2. Что это ----------
+sc = K.Scene("what", S("what"), S("four"), { theme: "light", enter: "up", cam: { s: [1, 1.06], y: [60, -40] } });
+bubbles(sc, 8, 11);
+sc.add(`<div class="circle" style="width:620px;height:620px"><img src="media/kaaba-night.jpg"></div>`, { x: 540, y: 700, at: ph("pilg"), anim: "pop", float: 6 });
+sc.add(`<div class="oz navy" style="font-size:120px">паломничество</div>`, { x: 540, y: 1110, at: ph("pilg") + .25, anim: "rise" });
+sc.add(`<div class="sc goldd" style="font-size:110px">в Мекку</div>`, { x: 700, y: 1225, at: ph("pilg") + .75, anim: "right" });
+sc.add(`<div class="glass ms" style="font-weight:600;font-size:40px;padding:22px 40px">можно совершить</div>`, { x: 540, y: 1400, at: ph("can"), anim: "glass" });
+const months = ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"];
+months.forEach((m, i) => {
+  const a = -Math.PI * .9 + (i / 11) * Math.PI * .8, R = 470;
+  sc.add(`<span class="chip${i % 3 === 0 ? " g" : ""}">${m}</span>`, { x: 540 + Math.cos(a) * R, y: 700 + Math.sin(a) * R * .95, at: ph("year") + i * .055, anim: "pop", sfxOpts: { v: .35 } });
+});
+sc.add(`<div class="oz navy" style="font-size:96px">в любое время года</div>`, { x: 540, y: 1560, at: ph("year") + .2, anim: "mask" });
+sc.add(`<div class="ms" style="font-size:26px;opacity:.55">кроме дней Хаджа</div>`, { x: 540, y: 1650, at: ph("year") + .9, anim: "fade" });
+
+// ---------- 3. Четыре обряда ----------
+sc = K.Scene("four", S("four"), S("rites"), { theme: "night", enter: "circle", cam: { s: [1.12, 1], y: [0, 0] } });
+sc.add(crescent("rgba(212,175,106,.12)", 1100), { x: 620, y: 900, anim: "fade", at: S("four"), sfx: null });
+sc.add(`<div class="sm" style="color:#C9D1F2">всего</div>`, { x: 540, y: 560, at: ph("only"), anim: "track" });
+sc.add(`<div class="oz gold glow" style="font-size:720px;line-height:.8"><span data-count>0</span></div>`, { x: 540, y: 930, at: ph("four"), anim: "slam", count: [1, 4, .45] });
+sc.add(`<div class="oz" style="font-size:150px">обряда</div>`, { x: 540, y: 1390, at: ph("four") + .3, anim: "rise" });
+
+// ---------- 4. Обряды по очереди ----------
+const RT = ["ihram", "tawaf", "sai", "hair"];
+const rites = [["ihram","Ихрам","особое состояние и одежда"],["tawaf","Таваф","7 кругов вокруг Каабы"],["sai","Саъй","между холмами Сафа и Марва"],["hair","Стрижка","бритьё или укорачивание волос"]];
+const camY = t => { // камера следует за активной карточкой
+  let y = 0; RT.forEach((id, i) => { y = K.lerp(y, -i * 120, K.E.inOut(K.P(t, ph(id), .5))); }); return y + 180; };
+sc = K.Scene("rites", S("rites"), S("focus"), { theme: "light", enter: "left", cam: { s: [1, 1.03], y: camY } });
+bubbles(sc, 6, 23);
+sc.add(`<div class="sm goldd">4 обряда Умры</div>`, { x: 540, y: 330, at: S("rites") + .1, anim: "track", sfx: null });
+rites.forEach(([k, t, d], i) => {
+  const y = 520 + i * 300;
+  sc.add(`<div class="card" style="width:820px"><div class="num">${i + 1}</div>${ICON[k]}<div><div class="t">${t}</div><div class="d ms">${d}</div></div></div>`, { x: 540, y, at: ph(RT[i]), anim: i % 2 ? "right" : "left", sfx: "pop" });
+  sc.add(check, { x: 900, y: y - 70, at: ph(RT[i]) + .45, anim: "pop", z: 5, sfxOpts: { v: .5, pitch: 1.3 } });
+});
+clickAt(sc, 860, 520 + 300 + 20, ph("tawaf") + .3);
+
+// ---------- 5. Главное ----------
+sc = K.Scene("focus", S("focus"), S("service"), { theme: "light", enter: "zoom", cam: { s: [1, 1.08], y: [0, 0] } });
+sc.add(`<div class="arch" style="width:640px;height:820px"><img src="media/medina-dome.jpg"></div>`, { x: 540, y: 1180, at: ph("so"), anim: "rise", float: 5 });
+sc.add(`<div class="sm" style="color:#5B6278">а чтобы ничего</div>`, { x: 540, y: 330, at: ph("so"), anim: "track" });
+sc.add(`<div class="oz navy" style="font-size:118px">не отвлекало</div>`, { x: 540, y: 470, at: ph("main"), anim: "zoom" });
+sc.add(`<div class="sc goldd" style="font-size:130px">от главного</div>`, { x: 560, y: 610, at: ph("main") + .5, anim: "right" });
+
+// ---------- 6. Сервис ----------
+sc = K.Scene("service", S("service"), S("cta"), { theme: "night", enter: "up", cam: { s: [1.04, 1], y: [0, 0] } });
+bubbles(sc, 10, 31);
+sc.add(`<div style="position:relative;width:600px"><img src="../../assets/logo-ink.png" style="width:100%;display:block;filter:brightness(0) invert(1)"><img src="../../assets/logo-gold.png" style="position:absolute;left:0;top:0;width:100%"></div>`, { x: 540, y: 420, at: ph("brand"), anim: "zoom", sfx: "ding" });
+sc.add(`<div class="oz" style="font-size:96px">берёт на себя</div>`, { x: 540, y: 600, at: ph("brand") + .6, anim: "rise" });
+[["visa","Визу","visa"],["plane","Перелёт","flight"],["hotel","Отели","hotel"]].forEach(([ic, t, id], i) => {
+  const y = 860 + i * 250;
+  sc.add(`<div class="card" style="width:640px;background:#F6F0E4;color:#101A3A">${ICON[ic]}<div class="t" style="font-family:OS;font-weight:700;font-size:72px;text-transform:uppercase">${t}</div></div>`, { x: 540, y, at: ph(id), anim: i % 2 ? "right" : "left", sfx: "pop" });
+  sc.add(check, { x: 790, y, at: ph(id) + .35, anim: "pop", z: 5, sfxOpts: { v: .5, pitch: 1.3 } });
+});
+clickAt(sc, 790, 860 + 2 * 250, ph("hotel") + .25, [300, 1750]);
+
+// ---------- 7. Призыв ----------
+sc = K.Scene("cta", S("cta"), END, { theme: "light", enter: "circle", cam: { s: [1, 1.05], y: [0, 0] } });
+sc.add(mosque("#E5D6B8"), { x: 540, y: 1720, anim: "rise", at: S("cta") + .1, sfx: null });
+sc.add(`<div class="oz navy" style="font-size:170px">пишите нам</div>`, { x: 540, y: 520, at: ph("write"), anim: "zoom" });
+sc.add(`<div class="chip g" style="font-size:44px;padding:22px 40px">WhatsApp +7 771 666 6669</div>`, { x: 540, y: 690, at: ph("write") + .45, anim: "pop" });
+sc.add(`<div class="sc goldd" style="font-size:110px">и начните свой путь</div>`, { x: 540, y: 900, at: ph("path"), anim: "right" });
+sc.add(`<div class="oz navy" style="font-size:140px">к Умре</div>`, { x: 540, y: 1040, at: ph("path") + .7, anim: "rise" });
+sc.add(`<img src="../../assets/logo.png" style="width:560px">`, { x: 540, y: 1330, at: ph("path") + 1.2, anim: "pop", sfx: "ding" });
+
+K.finalize();
+window.DURATION = END;
+
+// плёночное зерно
+const g = document.getElementById("grain").getContext("2d"), gd = g.createImageData(540, 960);
+window.grain = n => { let s = n * 9301 + 49297; const d = gd.data; for (let i = 0; i < d.length; i += 4) { s = (s * 16807) % 2147483647; d[i] = d[i+1] = d[i+2] = s & 255; d[i+3] = 255; } g.putImageData(gd, 0, 0); };
+window.ready = Promise.all([document.fonts.ready, ...[...document.images].map(i => i.decode().catch(() => {}))]).then(() => true);
+</script>
+</body></html>

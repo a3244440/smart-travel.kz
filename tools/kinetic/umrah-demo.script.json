@@ -1,0 +1,13 @@
+{
+  "title": "Почему Умру называют малым Хаджем",
+  "gap_sentence": 0.32,
+  "sentences": [
+    { "scene": "hook",    "phrases": [ { "id": "why",     "say": "Почему У́мру" }, { "id": "minor", "say": "называют малым Хаджем?" } ] },
+    { "scene": "what",    "phrases": [ { "id": "pilg",    "say": "Это паломничество в Мекку," }, { "id": "can", "say": "которое можно совершить" }, { "id": "year", "say": "в любое время года." } ] },
+    { "scene": "four",    "phrases": [ { "id": "only",    "say": "Всего" }, { "id": "four", "say": "четыре обряда:" } ] },
+    { "scene": "rites",   "phrases": [ { "id": "ihram",   "say": "ихраам," }, { "id": "tawaf", "say": "тавааф вокруг Каабы," }, { "id": "sai", "say": "саъй между холмами Сафаа и Марва" }, { "id": "hair", "say": "и стрижка волоос." } ] },
+    { "scene": "focus",   "phrases": [ { "id": "so",      "say": "А чтобы ничего" }, { "id": "main", "say": "не отвлекало от главного," } ] },
+    { "scene": "service", "phrases": [ { "id": "brand",   "say": "Смарт Трэвел берёт на себя" }, { "id": "visa", "say": "визу," }, { "id": "flight", "say": "перелёт" }, { "id": "hotel", "say": "и отели." } ] },
+    { "scene": "cta",     "phrases": [ { "id": "write",   "say": "Пишите нам" }, { "id": "path", "say": "и начните свой путь к У́мре." } ] }
+  ]
+}
