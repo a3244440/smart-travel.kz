@@ -69,7 +69,8 @@ const crumbs = (name, path) => ({ "@type": "BreadcrumbList", itemListElement: [
   { "@type": "ListItem", position: 2, name, item: SITE_URL + path }] });
 
 const VERIFY = {
-  "google-site-verification": "XUpLZg0OK41c_UaEtTo_zrDsedYm_F2fpjHMLRf3msU"
+  "google-site-verification": "XUpLZg0OK41c_UaEtTo_zrDsedYm_F2fpjHMLRf3msU",
+  "msvalidate.01": "36BB16E19D0081905987D5816AE70E80"
 };
 
 
