@@ -90,9 +90,9 @@ voice = np.zeros(N); voice[:min(N, len(v))] = v[:N]
 env = lp(np.abs(voice), 5); env /= env.max() + 1e-9
 duck = lp(1 - .6 * np.clip(env * 5, 0, 1), 3)                  # музыка тише под голосом
 rms = lambda x: np.sqrt(np.mean(x ** 2)) + 1e-12
-music = music / rms(music) * 10 ** (-27 / 20) * duck
+music = music / rms(music) * 10 ** (-24 / 20) * duck
 voice = voice / np.abs(voice).max() * 10 ** (-2.5 / 20)
-mix = np.vstack([voice + music, voice + music]) + sfx * 10 ** (-9 / 20) / max(1e-9, np.abs(sfx).max()) * 1.0
+mix = np.vstack([voice + music, voice + music]) + sfx * 10 ** (-3 / 20) / max(1e-9, np.abs(sfx).max())   # эффекты хорошо слышны, как в референсе
 mix *= 10 ** (-1 / 20) / np.abs(mix).max()
 wavfile.write(f"{D}/mix.wav", SR, (mix.T * 32767).astype(np.int16))
 m = mix.mean(0)
