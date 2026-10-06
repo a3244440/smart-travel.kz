@@ -93,7 +93,7 @@
     const st = S.stats || {};
     return [st.years && `<div><b>${esc(st.years)}</b><span>${t("stat.years")}</span></div>`,
             st.clients && `<div><b>${esc(st.clients)}</b><span>${t("stat.clients")}</span></div>`,
-            `<div><b>VIP</b><span>${t("stat.idea")}</span></div>`].filter(Boolean).join("");
+            `<div><b>3</b><span>${t("stat.idea")}</span></div>`].filter(Boolean).join("");
   };
   window.waLink = text => `https://wa.me/${S.whatsapp}?text=${encodeURIComponent(text)}`;
   window.esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));

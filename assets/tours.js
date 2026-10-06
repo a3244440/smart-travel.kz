@@ -1,65 +1,34 @@
-// Каталог туров. price: null — показывается «Цена по запросу».
-// photo: фото тура (горизонтальное, ~1600 px по ширине). Нынешние — с Pexels, бесплатная лицензия, см. assets/tours/CREDITS.md
-// Тексты на четырёх языках: { ru, kk, en, ar }.
+// Форматы Умры. price: null — «Цена по запросу». Тексты на четырёх языках: { ru, kk, en, ar }.
+// Идея: группа собирается из людей одного ритма жизни — молодёжь отдельно, семьи и старшее поколение отдельно, VIP отдельно.
 (function(){
-  const onRequest = { ru:"по запросу", kk:"сұраныс бойынша", en:"on request", ar:"عند الطلب" };
+  const onRequest = { ru:"даты по запросу", kk:"күндері сұраныс бойынша", en:"dates on request", ar:"المواعيد عند الطلب" };
   window.TOURS = [
-    { id:"cruise-umrah", photo:"assets/tours/cruise-umrah.jpg", group:"umrah", price:650000, oldPrice:1200000, visa:true,
-      title:{ ru:"Круиз + Умра", kk:"Круиз + Умра", en:"Cruise + Umrah", ar:"رحلة بحرية + عمرة" },
-      tier:{ ru:"Ультра премиум", kk:"Ультра премиум", en:"Ultra premium", ar:"ألترا بريميوم" },
-      duration:{ ru:"14 дней / 13 ночей", kk:"14 күн / 13 түн", en:"14 days / 13 nights", ar:"14 يومًا / 13 ليلة" },
+    { id:"umra-youth", photo:"assets/tours/umrah-luxe.jpg", group:"umrah", price:null, visa:true, featured:true,
+      title:{ ru:"Umra Youth", kk:"Umra Youth", en:"Umra Youth", ar:"Umra Youth" },
+      tier:{ ru:"Только молодёжная группа", kk:"Тек жастар тобы", en:"Youth-only group", ar:"مجموعة للشباب فقط" },
+      duration:{ ru:"Набор в UMRA YOUTH | 01", kk:"UMRA YOUTH | 01 тобына қабылдау", en:"Now forming: UMRA YOUTH | 01", ar:"التسجيل في UMRA YOUTH | 01" },
       points:{
-        ru:["Саудовская Аравия, Египет, Турция","9 ночей круиза, All Inclusive","4 ночи — Мекка и Медина, отели первой линии","Умра в составе путешествия"],
-        kk:["Сауд Арабиясы, Египет, Түркия","9 түн круиз, All Inclusive","4 түн — Мекке мен Медине, бірінші желідегі қонақүйлер","Саяхат құрамында Умра"],
-        en:["Saudi Arabia, Egypt, Turkey","9 nights cruising, all inclusive","4 nights in Makkah and Madinah, front-line hotels","Umrah as part of the journey"],
-        ar:["السعودية ومصر وتركيا","9 ليالٍ في رحلة بحرية شاملة كليًا","4 ليالٍ في مكة والمدينة في فنادق الصف الأول","العمرة ضمن الرحلة"] } },
-    { id:"umrah-vip", photo:"assets/tours/umrah-vip.jpg", group:"umrah", price:null, visa:true,
-      title:{ ru:"Умра VIP", kk:"Умра VIP", en:"Umrah VIP", ar:"عمرة VIP" },
-      tier:"VIP", duration:onRequest,
+        ru:["Группа из ровесников — без разрыва по возрасту","Поклонение, знания и братство вместе со своим поколением","Гид-устаз рядом на обрядах и зиярате","Сообщество после возвращения домой"],
+        kk:["Құрдастар тобы — жас айырмашылығынсыз","Ғибадат, білім және бауырластық өз буыныңмен бірге","Рәсімдер мен зияратта гид-ұстаз қасыңда","Үйге оралғаннан кейін де қауымдастық"],
+        en:["A group of peers — no age gap","Worship, knowledge and brotherhood with your generation","A guide and teacher beside you during the rites and ziyarat","A community that continues after you return home"],
+        ar:["مجموعة من الأقران — بلا فجوة عمرية","عبادة وعلم وأخوّة مع جيلك","مرشد ومعلّم بجانبك في المناسك والزيارة","مجتمع يستمر بعد العودة إلى الوطن"] } },
+    { id:"umra-family", photo:"assets/tours/umrah-standard.jpg", group:"umrah", price:null, visa:true,
+      title:{ ru:"Umra Family", kk:"Umra Family", en:"Umra Family", ar:"Umra Family" },
+      tier:{ ru:"Для семей и старшего поколения", kk:"Отбасылар мен аға буынға", en:"For families and elders", ar:"للعائلات وكبار السن" },
+      duration:onRequest,
       points:{
-        ru:["Отели с видом на Каабу","Индивидуальный трансфер","Сопровождение на всех обрядах"],
-        kk:["Қағбаға қарайтын қонақүйлер","Жеке трансфер","Барлық рәсімдерде сүйемелдеу"],
-        en:["Hotels overlooking the Kaaba","Private transfer","Guidance through every rite"],
-        ar:["فنادق مطلة على الكعبة","نقل خاص","مرافقة في جميع المناسك"] } },
-    { id:"umrah-luxe", photo:"assets/tours/umrah-luxe.jpg", group:"umrah", price:null, visa:true,
-      title:{ ru:"Умра Luxe", kk:"Умра Luxe", en:"Umrah Luxe", ar:"عمرة Luxe" },
-      tier:"Luxe", duration:onRequest,
+        ru:["Спокойный темп для родителей и старших","Поездка с детьми — программа под семью","Отели рядом с Харамом, меньше ходьбы","Сопровождение и помощь на каждом этапе"],
+        kk:["Ата-ана мен үлкендерге арналған байсалды қарқын","Балалармен сапар — отбасыға лайық бағдарлама","Харамға жақын қонақүйлер, жаяу жүру аз","Әр кезеңде сүйемелдеу мен көмек"],
+        en:["A calm pace for parents and elders","Travelling with children — a family-friendly programme","Hotels close to the Haram, less walking","Support and help at every step"],
+        ar:["إيقاع هادئ للوالدين وكبار السن","السفر مع الأطفال — برنامج يناسب العائلة","فنادق قريبة من الحرم ومشي أقل","مرافقة ومساعدة في كل مرحلة"] } },
+    { id:"umra-signature", photo:"assets/tours/umrah-vip.jpg", group:"umrah", price:null, visa:true,
+      title:{ ru:"Umra Signature", kk:"Umra Signature", en:"Umra Signature", ar:"Umra Signature" },
+      tier:{ ru:"VIP · индивидуально", kk:"VIP · жеке", en:"VIP · private", ar:"VIP · خاص" },
+      duration:onRequest,
       points:{
-        ru:["Отели 5★ рядом с харамом","Групповой трансфер","Халяль-питание"],
-        kk:["Харамға жақын 5★ қонақүйлер","Топтық трансфер","Халал тамақ"],
-        en:["5★ hotels near the Haram","Group transfer","Halal meals"],
-        ar:["فنادق 5★ قرب الحرم","نقل جماعي","وجبات حلال"] } },
-    { id:"umrah-standard", photo:"assets/tours/umrah-standard.jpg", group:"umrah", price:null, visa:true,
-      title:{ ru:"Умра Standard", kk:"Умра Standard", en:"Umrah Standard", ar:"عمرة Standard" },
-      tier:"Standard", duration:onRequest,
-      points:{
-        ru:["Отели 4★ в Мекке и Медине","Перелёт и трансферы","Групповой гид"],
-        kk:["Мекке мен Мединедегі 4★ қонақүйлер","Ұшу және трансферлер","Топтық гид"],
-        en:["4★ hotels in Makkah and Madinah","Flights and transfers","Group guide"],
-        ar:["فنادق 4★ في مكة والمدينة","الطيران والتنقلات","مرشد للمجموعة"] } },
-    { id:"dubai", photo:"assets/tours/dubai.jpg", group:"world", price:null, visa:false,
-      title:{ ru:"Дубай", kk:"Дубай", en:"Dubai", ar:"دبي" },
-      tier:{ ru:"Халяль-отели", kk:"Халал қонақүйлер", en:"Halal hotels", ar:"فنادق حلال" }, duration:onRequest,
-      points:{
-        ru:["Халяль-отели","Экскурсии по городу","Пляжный отдых"],
-        kk:["Халал қонақүйлер","Қала бойынша экскурсиялар","Жағажай демалысы"],
-        en:["Halal hotels","City tours","Beach holiday"],
-        ar:["فنادق حلال","جولات في المدينة","عطلة شاطئية"] } },
-    { id:"saadiyat", photo:"assets/tours/saadiyat.jpg", group:"world", price:null, visa:false,
-      title:{ ru:"Саадият, Абу-Даби", kk:"Саадият, Әбу-Даби", en:"Saadiyat, Abu Dhabi", ar:"السعديات، أبوظبي" },
-      tier:{ ru:"Курорт", kk:"Курорт", en:"Resort", ar:"منتجع" }, duration:onRequest,
-      points:{
-        ru:["Пляжи острова Саадият","Лувр Абу-Даби","Мечеть шейха Зайда"],
-        kk:["Саадият аралының жағажайлары","Лувр Әбу-Даби","Шейх Заид мешіті"],
-        en:["Saadiyat Island beaches","Louvre Abu Dhabi","Sheikh Zayed Grand Mosque"],
-        ar:["شواطئ جزيرة السعديات","متحف اللوفر أبوظبي","جامع الشيخ زايد الكبير"] } },
-    { id:"turkey", photo:"assets/tours/turkey.jpg", group:"world", price:null, visa:false,
-      title:{ ru:"Турция", kk:"Түркия", en:"Turkey", ar:"تركيا" },
-      tier:{ ru:"Горящие туры", kk:"Ыстық турлар", en:"Last-minute deals", ar:"عروض اللحظة الأخيرة" }, duration:onRequest,
-      points:{
-        ru:["Халяль-отели All Inclusive","Стамбул и побережье","Вылеты из Астаны и Алматы"],
-        kk:["All Inclusive халал қонақүйлері","Стамбул және жағалау","Астана мен Алматыдан ұшу"],
-        en:["All-inclusive halal hotels","Istanbul and the coast","Departures from Astana and Almaty"],
-        ar:["فنادق حلال شاملة كليًا","إسطنبول والساحل","رحلات من أستانا وألماتي"] } }
+        ru:["Отели с видом на Каабу","Индивидуальный трансфер","Персональное сопровождение на всех обрядах","Даты и программа под вас"],
+        kk:["Қағбаға қарайтын қонақүйлер","Жеке трансфер","Барлық рәсімдерде жеке сүйемелдеу","Күндері мен бағдарламасы сізге лайықталады"],
+        en:["Hotels overlooking the Kaaba","Private transfers","Personal guidance through all the rites","Dates and programme tailored to you"],
+        ar:["فنادق مطلة على الكعبة","تنقلات خاصة","مرافقة شخصية في جميع المناسك","مواعيد وبرنامج حسب رغبتك"] } }
   ];
 })();

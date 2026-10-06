@@ -27,13 +27,14 @@ const text = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 const KW = {
   // общие запросы: Умра, Мекка, Медина
   home: [
+    "UMRA YOUTH", "Umra Youth Kazakhstan", "молодёжная умра", "умра для молодёжи", "умра для молодых", "умра с ровесниками", "молодёжная группа умра", "Umra Family", "семейная умра", "умра для пожилых", "Umra Signature", "VIP умра",
     "умра", "умра из Казахстана", "умра из Астаны", "умра из Алматы", "умра из Алматы цена", "умра из Астаны цена", "вылет на умру из Алматы", "вылет на умру из Астаны", 
     "умра 2026", "умра 2027", "умра цена", "умра цена 2026", "стоимость умры", "сколько стоит умра", "умра недорого", "дешевая умра",
     "тур на умру", "туры на умру из Казахстана", "умра тур Алматы", "умра тур Астана", "поездка на умру", "паломничество в Мекку", "хадж и умра",
     "тур в Мекку", "тур в Мекку и Медину", "поездка в Мекку", "Мекка Медина тур", "Мекка из Казахстана", "Медина тур",
-    "умра VIP", "умра люкс", "умра стандарт", "умра эконом", "умра 5 звезд", "отели у Харама", "отель рядом с Каабой",
+    "умра VIP", "умра 5 звезд", "отели у Харама", "отель рядом с Каабой",
     "умра в Рамадан", "умра на каникулы", "умра с детьми", "семейная умра", "умра для женщин", "умра без махрама", "умра групповой тур",
-    "круиз с умрой", "круиз Умра", "халяль туры", "халяль отдых", "туры для мусульман", "мусульманские туры",
+    "халяль туры", "халяль отдых", "туры для мусульман", "мусульманские туры",
     "турагентство умра", "туроператор умра Казахстан", "организация умры",
     "виза в Саудовскую Аравию", "виза на умру", "электронная виза Саудовская Аравия",
     "Қазақстаннан Умра", "Умра сапары", "Умраға бару", "Умра бағасы", "Меккеге тур", "Мекке Медине сапары", "Алматыдан Умра", "Астанадан Умра",
@@ -54,7 +55,9 @@ const ORG = {
   "@type": "TravelAgency", "@id": SITE_URL + "/#org",
   name: SITE.brand, url: SITE_URL + "/",
   logo: SITE_URL + "/assets/logo.png", image: SITE_URL + "/assets/og.jpg",
-  description: "Умра из Казахстана под ключ: туры в Мекку и Медину, круиз с Умрой, халяль-туры и виза в Саудовскую Аравию.",
+  description: "UMRA YOUTH Kazakhstan — молодёжный проект Умры от smart-travel.kz. Три формата: Umra Youth (только молодёжная группа), Umra Family (семьи и старшее поколение), Umra Signature (VIP). Вылеты из Алматы и Астаны, виза в Саудовскую Аравию онлайн.",
+  alternateName: ["UMRA YOUTH", "UMRA YOUTH Kazakhstan", "Smart Travel"],
+  slogan: "Не ждать, пока станешь лучше, чтобы прийти к Аллаху. Приходить к Аллаху — чтобы становиться лучше.",
   telephone: "+" + SITE.whatsapp, sameAs: [SITE.instagram],
   address: { "@type": "PostalAddress", addressCountry: "KZ" },
   areaServed: [{ "@type": "Country", name: "Казахстан" }, ...CITIES.map(name => ({ "@type": "City", name }))],
@@ -82,12 +85,12 @@ function cityPage(key, name, from) {
   return {
     path, priority: "0.9",
     title: `Умра ${from} — туры в Мекку и Медину, цены | ${SITE.brand}`, nolang: true,
-    kw: [`умра ${from}`, `умра ${from} цена`, `тур на умру ${from}`, `вылет на умру ${from}`, `умра ${from} 2026`, `паломничество ${from}`, `Мекка ${from}`, `тур в Мекку и Медину ${from}`, `турагентство умра ${name}`, `${name === "Алматы" ? "Алматыдан" : "Астанадан"} Умра`, `Umrah from ${key === "almaty" ? "Almaty" : "Astana"}`],
-    description: `Умра ${from} под ключ: виза в Саудовскую Аравию, перелёт, отели у Харама, трансферы и сопровождение. Круиз с Умрой от 650 000 ₸, пакеты Standard, Luxe, VIP. WhatsApp +7 771 666 6669.`,
+    kw: [`умра ${from}`, `умра ${from} цена`, `тур на умру ${from}`, `вылет на умру ${from}`, `умра ${from} 2026`, `паломничество ${from}`, `Мекка ${from}`, `тур в Мекку и Медину ${from}`, `молодёжная умра ${from}`, `Umra Youth ${from}`, `турагентство умра ${name}`, `${name === "Алматы" ? "Алматыдан" : "Астанадан"} Умра`, `Umrah from ${key === "almaty" ? "Almaty" : "Astana"}`],
+    description: `Умра ${from} в трёх форматах: Umra Youth — только молодёжная группа, Umra Family — семьи и старшее поколение, Umra Signature — VIP. Виза, перелёт, отели у Харама, сопровождение. WhatsApp +7 771 666 6669.`,
     schema: () => [
       { "@type": "Service", name: `Умра ${from}`, serviceType: "Организация паломничества (Умра)", provider: { "@id": SITE_URL + "/#org" },
         areaServed: { "@type": "City", name }, url: SITE_URL + path,
-        offers: { "@type": "Offer", name: "Круиз + Умра, 14 дней", price: 650000, priceCurrency: "KZT", url: SITE_URL + path } },
+        hasOfferCatalog: { "@type": "OfferCatalog", name: "Форматы Умры", itemListElement: ["Umra Youth", "Umra Family", "Umra Signature"].map(n => ({ "@type": "Offer", itemOffered: { "@type": "Service", name: `${n} ${from}` } })) } },
       { "@type": "FAQPage", mainEntity: CITY_FAQ[key].map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) },
       crumbs(`Умра ${from}`, path)
     ]
@@ -97,11 +100,11 @@ function cityPage(key, name, from) {
 const PAGES = {
   "index.html": {
     path: "/", titleKey: "title.home", priority: "1.0", kw: KW.home,
-    description: "Умра из Казахстана, Астаны и Алматы под ключ: туры в Мекку и Медину VIP, Luxe и Standard, круиз с Умрой от 650 000 ₸, отели у Харама, виза в Саудовскую Аравию по фото паспорта. Пишите в WhatsApp.",
+    description: "UMRA YOUTH — молодёжная Умра из Казахстана: группа только из ровесников, поклонение, знания и братство. Также Umra Family для семей и старшего поколения и Umra Signature (VIP). Вылеты из Алматы и Астаны.",
     schema: () => [
       ORG,
       { "@type": "WebSite", "@id": SITE_URL + "/#site", url: SITE_URL + "/", name: SITE.brand, inLanguage: ["ru", "kk", "en", "ar"], publisher: { "@id": SITE_URL + "/#org" } },
-      { "@type": "ItemList", name: "Туры: Умра, Мекка, Медина и путешествия", itemListElement: TOURS.map((tr, i) => ({
+      { "@type": "ItemList", name: "Форматы Умры: Umra Youth, Umra Family, Umra Signature", itemListElement: TOURS.map((tr, i) => ({
         "@type": "ListItem", position: i + 1, item: {
           "@type": "TouristTrip", name: tr.title.ru, description: tr.points.ru.join(". "),
           image: SITE_URL + "/" + tr.photo, provider: { "@id": SITE_URL + "/#org" },
