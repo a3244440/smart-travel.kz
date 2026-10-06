@@ -483,3 +483,15 @@ nav.main a{white-space:nowrap}
 .guides-more a{color:var(--brass)}
 .member .ava{width:52px;height:52px;border-radius:50%;object-fit:cover;display:block;margin-bottom:18px;border:1px solid var(--line-2)}
 @media (max-width:820px){ .guide{grid-template-columns:1fr;gap:18px;padding:16px} .guide-ph{max-width:420px} .guide-cols{grid-template-columns:1fr} }
+/* страницы «Умра из города» */
+.city-hero{padding-top:56px;padding-bottom:24px}
+.city-hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(34px,5vw,58px);line-height:1.08;margin:0 0 18px;max-width:18em}
+.city-answer{max-width:46em;margin:0 0 24px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin:0 0 24px}
+.facts>div{background:var(--bg-2);border:1px solid var(--line-2);border-radius:16px;padding:16px 18px}
+.facts dt{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);font-weight:600;margin-bottom:6px}
+.facts dd{margin:0;line-height:1.5}
+.city-kk{padding-bottom:64px}
+.city-kk p{max-width:46em;color:var(--ink-2)}
+.city-other a,.city-links a{color:var(--brass)}
+.city-links{display:flex;gap:18px;flex-wrap:wrap;margin:14px 0 0;font-weight:600}

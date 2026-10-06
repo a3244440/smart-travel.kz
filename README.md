@@ -70,3 +70,9 @@ Settings → Pages → Source: `Deploy from a branch` → `main` / `root`. Са�
 - Адреса страниц без `.html`: `/visa`, `/about`, `/guides`, `/cabinet`, `/admin` (старые ссылки с `.html` тоже работают).
 - Заголовки, описания, Open Graph, hreflang, разметка schema.org, русский текст в HTML и `sitemap.xml` генерирует `node tools/seo.mjs` — запускайте после правок текстов в `assets/i18n.js` или туров в `assets/tours.js`.
 - `robots.txt` указывает на `sitemap.xml`; картинка для превью ссылок — `assets/og.jpg`.
+
+## GEO (ИИ-поиск)
+- `llms.txt` — краткая справка о компании для ИИ-ассистентов (ChatGPT, Claude, Perplexity, Gemini, Алиса).
+- `robots.txt` — явно разрешены ИИ-поисковые роботы.
+- Страницы `/umrah-almaty` и `/umrah-astana` — генерирует `python3 tools/city_pages.py`, затем `node tools/seo.mjs`.
+- IndexNow (мгновенное уведомление Bing/Яндекс): ключ `4a7222683ce51d76095c103252e1d5f3.txt` в корне.

@@ -73,6 +73,26 @@ const VERIFY = {
 };
 
 
+
+// страницы «Умра из <города>» (tools/city_pages.py)
+const CITY_FAQ = JSON.parse(read("tools/city_faq.json"));
+function cityPage(key, name, from) {
+  const path = "/umrah-" + key;
+  return {
+    path, priority: "0.9",
+    title: `Умра ${from} — туры в Мекку и Медину, цены | ${SITE.brand}`, nolang: true,
+    kw: [`умра ${from}`, `умра ${from} цена`, `тур на умру ${from}`, `вылет на умру ${from}`, `умра ${from} 2026`, `паломничество ${from}`, `Мекка ${from}`, `тур в Мекку и Медину ${from}`, `турагентство умра ${name}`, `${name === "Алматы" ? "Алматыдан" : "Астанадан"} Умра`, `Umrah from ${key === "almaty" ? "Almaty" : "Astana"}`],
+    description: `Умра ${from} под ключ: виза в Саудовскую Аравию, перелёт, отели у Харама, трансферы и сопровождение. Круиз с Умрой от 650 000 ₸, пакеты Standard, Luxe, VIP. WhatsApp +7 771 666 6669.`,
+    schema: () => [
+      { "@type": "Service", name: `Умра ${from}`, serviceType: "Организация паломничества (Умра)", provider: { "@id": SITE_URL + "/#org" },
+        areaServed: { "@type": "City", name }, url: SITE_URL + path,
+        offers: { "@type": "Offer", name: "Круиз + Умра, 14 дней", price: 650000, priceCurrency: "KZT", url: SITE_URL + path } },
+      { "@type": "FAQPage", mainEntity: CITY_FAQ[key].map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) },
+      crumbs(`Умра ${from}`, path)
+    ]
+  };
+}
+
 const PAGES = {
   "index.html": {
     path: "/", titleKey: "title.home", priority: "1.0", kw: KW.home,
@@ -112,6 +132,8 @@ const PAGES = {
       image: SITE_URL + "/" + g.photo, url: SITE_URL + "/guides#" + g.id, worksFor: { "@id": SITE_URL + "/#org" },
       homeLocation: { "@type": "Place", name: "Мекка" } }))]
   },
+  "umrah-almaty.html": cityPage("almaty", "Алматы", "из Алматы"),
+  "umrah-astana.html": cityPage("astana", "Астана", "из Астаны"),
   "cabinet.html": {
     path: "/cabinet", titleKey: "title.cabinet", noindex: true,
     description: "Статус заявки на визу в Саудовскую Аравию: введите номер заявки и телефон."
@@ -132,8 +154,10 @@ function head(file, p) {
   if (p.path === "/") for (const [name, code] of Object.entries(VERIFY)) L.push(`<meta name="${name}" content="${code}">`);
   if (!p.noindex) {
     if (p.kw) L.push(`<meta name="keywords" content="${attr(p.kw.join(", "))}">`);
-    for (const l of ["ru", "kk", "en", "ar"]) L.push(`<link rel="alternate" hreflang="${l}" href="${url}${l === "ru" ? "" : "?lang=" + l}">`);
-    L.push(`<link rel="alternate" hreflang="x-default" href="${url}">`);
+    if (!p.nolang) {   // у страниц только на русском языковых версий нет
+      for (const l of ["ru", "kk", "en", "ar"]) L.push(`<link rel="alternate" hreflang="${l}" href="${url}${l === "ru" ? "" : "?lang=" + l}">`);
+      L.push(`<link rel="alternate" hreflang="x-default" href="${url}">`);
+    }
     L.push(
       `<meta name="geo.region" content="KZ">`,
       `<meta property="og:type" content="website">`,
@@ -177,8 +201,8 @@ for (const [file, p] of Object.entries(PAGES)) {
 const today = new Date().toISOString().slice(0, 10);
 const urls = Object.values(PAGES).filter(p => !p.noindex).map(p => {
   const u = SITE_URL + p.path;
-  const alt = ["ru", "kk", "en", "ar"].map(l => `    <xhtml:link rel="alternate" hreflang="${l}" href="${u}${l === "ru" ? "" : "?lang=" + l}"/>`).join("\n");
-  return `  <url>\n    <loc>${u}</loc>\n    <lastmod>${today}</lastmod>\n    <priority>${p.priority}</priority>\n${alt}\n  </url>`;
+  const alt = p.nolang ? "" : ["ru", "kk", "en", "ar"].map(l => `    <xhtml:link rel="alternate" hreflang="${l}" href="${u}${l === "ru" ? "" : "?lang=" + l}"/>`).join("\n");
+  return `  <url>\n    <loc>${u}</loc>\n    <lastmod>${today}</lastmod>\n    <priority>${p.priority}</priority>\n${alt ? alt + "\n" : ""}  </url>`;
 });
 fs.writeFileSync(ROOT + "sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls.join("\n")}\n</urlset>\n`);
 console.log("SEO обновлено:", Object.keys(PAGES).join(", "), "+ sitemap.xml");
