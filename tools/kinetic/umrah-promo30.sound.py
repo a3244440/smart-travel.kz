@@ -92,7 +92,7 @@ rms = lambda x: np.sqrt(np.mean(x ** 2)) + 1e-12
 bed = bed / rms(bed) * 10 ** (-23 / 20)
 lead = lead / rms(lead) * 10 ** (-24 / 20)
 beat = beat / rms(beat) * 10 ** (-31 / 20)
-music = bed + lead + beat
+music = bed + beat                                                 # без мелодии (по просьбе)
 t = np.arange(N) / SR
 music *= np.clip(t / .25, 0, 1) * np.clip((DUR - t) / .3, 0, 1)
 

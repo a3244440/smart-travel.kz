@@ -67,10 +67,10 @@ svg{overflow:visible}
 <script>
 window.TIMING = __TIMING__;
 const W = 1080, H = 1920;
-const T = window.TIMING, ph = id => T.phrases[id];          // время фраз голоса (timing.json)
+const T = window.TIMING, ph = id => T.phrases[id], pw = (id, d) => T.phrases[id] ?? d;   // pw — слово внутри фразы (если размечено)          // время фраз голоса (timing.json)
 const DURATION = Math.max(30, T.voice_end + 1.6);
 const HK = ph("hook"), L = ph("later"), K = ph("turnkey"), F = ph("format"), J = ph("journey"), G = ph("gen"), B = ph("brand");
-const PUSH1 = L - .3, CUT2 = K - .1, WHIP = ph("values") - .35, CLR4 = F - .4, PUSH5 = J - .3, CLR6 = G - .35, G0 = G - .1;
+const PUSH1 = L - .2, CUT2 = K - .1, WHIP = ph("values") - .35, CLR4 = F - .3, PUSH5 = J - .3, CLR6 = G - .25, G0 = G - .1;
 const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
 const lerp = (a, b, t) => a + (b - a) * t;
 const P = (t, a, d) => clamp((t - a) / d);
@@ -136,7 +136,7 @@ const S1 = scene("#FFFDF8", false);
 const cardG = el(S1, "left:0;top:0;width:1080px;height:1920px");
 const card = el(cardG, `left:110px;bottom:${1920 - 1080}px;width:14px;height:0;border-radius:7px;overflow:hidden;background:linear-gradient(160deg,#16735C,#0F5C4A 55%,#0C4E3F);box-shadow:0 26px 50px rgba(15,70,55,.28),inset 0 2px 0 rgba(255,255,255,.18)`);
 const hook1 = line(card, { x: 52, y: 52, size: 94, font: "GR", weight: 900, color: "#FFFFFF", from: "#CFC9BE", shadow: "none", words: [["Мечтаешь", HK]] });
-const hook2 = line(card, { x: 52, y: 160, size: 94, font: "GR", weight: 900, color: "#FFFFFF", from: "#CFC9BE", shadow: "none", words: [["об", HK + .45], ["Умре?", HK + .68]] });
+const hook2 = line(card, { x: 52, y: 160, size: 94, font: "GR", weight: 900, color: "#FFFFFF", from: "#CFC9BE", shadow: "none", words: [["об", pw("hook2", HK + .45)], ["Умре?", pw("hook3", HK + .68)]] });
 const sph = el(cardG, "left:0;top:0;width:120px;height:120px", sphereSVG(120));
 cue(HK + .1, "pop", { v: .6, pitch: 1.2 });
 cue(PUSH1, "whoosh");
@@ -159,19 +159,19 @@ const rib = s2svg.querySelector("#rib"), ribL = 2600;
 rib.style.strokeDasharray = ribL;
 const b1 = s2svg.querySelector("#b1"), b2 = s2svg.querySelector("#b2");
 line(S2, { x: 110, y: 690, size: 140, font: "GR", weight: 900, color: EM, words: [["но", L]] });
-line(S2, { x: 110, y: 860, size: 108, font: "PF", style: "italic", weight: 900, cond: .8, words: [["всё", L + .3], ["откладываешь", L + .5]] });
-const later = line(S2, { x: 985, y: 1000, size: 170, font: "PF", style: "italic", weight: 900, cond: .86, align: "right", words: [["на", L + 1.2], ["потом?", L + 1.42]] });
+line(S2, { x: 110, y: 860, size: 108, font: "PF", style: "italic", weight: 900, cond: .8, words: [["всё", pw("later2", L + .3)], ["откладываешь", pw("later3", L + .5)]] });
+const later = line(S2, { x: 985, y: 1000, size: 170, font: "PF", style: "italic", weight: 900, cond: .86, align: "right", words: [["на", pw("later4", L + 1.2)], ["потом?", pw("later5", L + 1.42)]] });
 on(t => {
   rib.style.strokeDashoffset = ribL * (1 - E.out(P(t, PUSH1, .9)));
   b1.setAttribute("d", blob(60, 260, 230, t * 3)); b2.setAttribute("d", blob(1030, 1700, 260, t * 3 + 2));
-  const p = P(t, L + 1.46, .3);
-  later.inner.style.transform = `scaleX(.86) rotate(${(t < L + 1.46 ? 0 : 7 * Math.exp(-5 * p) * Math.sin(p * 22)).toFixed(2)}deg)`;
+  const p = P(t, pw("later5", L + 1.42) + .04, .3);
+  later.inner.style.transform = `scaleX(.86) rotate(${(t < pw("later5", L + 1.42) + .04 ? 0 : 7 * Math.exp(-5 * p) * Math.sin(p * 22)).toFixed(2)}deg)`;
 });
 
 // ===================== 1.4–3.4 «Умра под ключ», куб, счётчик, состав =====================
 const S3 = scene("#F3EDE2", true);
 const head3a = line(S3, { y: 210, size: 104, font: "GR", weight: 900, align: "center", words: [["Умра", K]] });
-const head3b = line(S3, { y: 326, size: 112, font: "PF", style: "italic", weight: 700, align: "center", words: [["под", K + .35], ["ключ", K + .55]] });
+const head3b = line(S3, { y: 326, size: 112, font: "PF", style: "italic", weight: 700, align: "center", words: [["под", pw("turnkey2", K + .35)], ["ключ", pw("turnkey3", K + .55)]] });
 const grp = el(S3, "left:0;top:0;width:1080px;height:1920px");
 const C = 2 * Math.PI * 255;
 const ring = el(grp, "left:265px;top:545px", `<svg width="550" height="550" viewBox="0 0 550 550"><defs><mask id="mRing" maskUnits="userSpaceOnUse" x="0" y="0" width="550" height="550"><circle id="rm" cx="275" cy="275" r="255" fill="none" stroke="#fff" stroke-width="30" stroke-dasharray="${C}" transform="rotate(-90 275 275)"/></mask></defs><circle cx="275" cy="275" r="255" fill="none" stroke="#C9A15A" stroke-width="7" stroke-linecap="round" stroke-dasharray="0.1 21" mask="url(#mRing)"/></svg>`);
@@ -337,13 +337,13 @@ const arcs = el(S6, "left:0;top:0", `<svg width="1080" height="1920"><g fill="no
 const a1 = arcs.querySelector("#a1"), a2 = arcs.querySelector("#a2");
 const mkStar = (x, y) => { const g = el(S6, `left:${x - 270}px;top:${y - 270}px;width:540px;height:540px`); const ghosts = [.12, .22, 1].map(o => el(g, `left:0;top:0;opacity:${o}`, starSVG(270, "gEmStar"))); return { g, ghosts }; };
 const st1 = mkStar(70, 230), st2 = mkStar(1010, 1700);
-line(S6, { x: 90, y: 830, size: 88, font: "PF", style: "italic", weight: 700, cond: .9, words: [["Умра", J], ["—", J + .2, { silent: 1 }], ["это", J + .45], ["не", J + .65], ["просто", J + .85]] }).id = "l6a";
+line(S6, { x: 90, y: 830, size: 88, font: "PF", style: "italic", weight: 700, cond: .9, words: [["Умра", J], ["—", J + .2, { silent: 1 }], ["это", pw("journey2", J + .45)], ["не", pw("journey3", J + .65)], ["просто", pw("journey4", J + .85)]] }).id = "l6a";
 line(S6, { x: 90, y: 950, size: 176, font: "PF", style: "italic", weight: 900, cond: .9, words: [["поездка", ph("trip"), { f: (t, at) => { const p = P(t, at, .28); return { s: lerp(1.45, 1, E.back(p, 2.6)), y: -50 * (1 - E.out(p)), r: -5 * (1 - E.out(p)), blur: 18 * (1 - E.out(p)), o: t < at ? 0 : clamp(p * 4) }; } }]] }).id = "l6b";
 const l6 = [document.getElementById("l6a"), document.getElementById("l6b")];
 on(t => {
   a1.setAttribute("transform", `translate(${(t - PUSH5) * 60},${(t - PUSH5) * 20})`);
   a2.setAttribute("transform", `translate(${-(t - PUSH5) * 60},${-(t - PUSH5) * 25})`);
-  const clr = E.inOut(P(t, CLR6, .22));
+  const clr = E.inOut(P(t, CLR6, .15));
   arcs.style.opacity = 1 - clr;
   [st1, st2].forEach((s, k) => {
     const base = (k ? -1 : 1) * (t - PUSH5) * 140;
@@ -357,9 +357,9 @@ on(t => {
 
 // ===================== 8.4–10.0 финал =====================
 const S7 = scene("#F3EDE2", true);
-line(S7, { y: 400, size: 98, font: "PF", style: "italic", weight: 700, align: "center", words: [["это", G], ["твоё", G + .25]] });
-line(S7, { y: 512, size: 128, font: "PF", style: "italic", weight: 900, align: "center", words: [["поколение", G + .5]] });
-line(S7, { y: 700, size: 104, font: "GR", weight: 900, align: "center", ls: .04, color: EM, words: [["SMART", B], ["TRAVEL", B + .3]] });
+line(S7, { y: 400, size: 98, font: "PF", style: "italic", weight: 700, align: "center", words: [["это", G], ["твоё", pw("gen2", G + .25)]] });
+line(S7, { y: 512, size: 128, font: "PF", style: "italic", weight: 900, align: "center", words: [["поколение", pw("gen3", G + .5)]] });
+line(S7, { y: 700, size: 104, font: "GR", weight: 900, align: "center", ls: .04, color: EM, words: [["SMART", B], ["TRAVEL", pw("brand2", B + .3)]] });
 const PIN_X = 540, PIN_Y = 1290;
 const pinSh = el(S7, `left:${PIN_X - 120}px;top:${PIN_Y - 22}px;width:240px;height:44px`, `<svg width="240" height="44"><ellipse cx="120" cy="22" rx="115" ry="18" fill="url(#gShadow)"/></svg>`);
 const pin = el(S7, `left:${PIN_X - 130}px;top:${PIN_Y - 310}px;width:260px;height:330px;transform-origin:130px 310px`, `<svg width="260" height="330" viewBox="-130 -310 260 330"><g filter="url(#soft)">

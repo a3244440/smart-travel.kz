@@ -1,0 +1,9 @@
+{"phrases": {"hook": 0.05, "hook2": 0.6, "hook3": 0.76,
+  "later": 1.42, "later2": 1.72, "later3": 1.98, "later4": 2.48, "later5": 2.62,
+  "turnkey": 3.46, "turnkey2": 3.86, "turnkey3": 4.12, "days": 4.36, "days14": 5.56,
+  "mecca": 6.92, "medina": 7.55, "visa": 8.16, "hotels": 8.6, "flight": 9.32, "incl": 10.19,
+  "values": 11.49, "v1": 12.84, "v2": 13.62, "v3": 14.44, "v4": 15.31,
+  "format": 16.37, "youth": 17.95, "family": 20.11, "signature": 22.66,
+  "journey": 25.1, "journey2": 25.79, "journey3": 26.22, "journey4": 26.4, "trip": 26.68,
+  "gen": 27.42, "gen2": 27.8, "gen3": 28.08, "brand": 29.12, "brand2": 29.55},
+ "voice_end": 30.04}
