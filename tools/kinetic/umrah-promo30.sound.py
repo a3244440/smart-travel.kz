@@ -93,6 +93,7 @@ bed = bed / rms(bed) * 10 ** (-23 / 20)
 lead = lead / rms(lead) * 10 ** (-24 / 20)
 beat = beat / rms(beat) * 10 ** (-31 / 20)
 music = bed + beat                                                 # без мелодии (по просьбе)
+if os.environ.get("BED", "0") != "1": music *= 0                       # по умолчанию без подложки: только голос и эффекты (BED=1 — вернуть)
 t = np.arange(N) / SR
 music *= np.clip(t / .25, 0, 1) * np.clip((DUR - t) / .3, 0, 1)
 
