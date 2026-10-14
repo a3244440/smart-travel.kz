@@ -13,6 +13,10 @@
   const header = document.createElement("header");
   const footer = document.createElement("footer");
   topbar.className = "topbar";
+  // мобильное меню (полноэкранное)
+  const menu = document.createElement("div");
+  menu.className = "site-menu"; menu.id = "siteMenu"; menu.setAttribute("aria-hidden", "true");
+  if(page !== "admin") document.body.append(menu);
   document.body.prepend(header);
   if(page !== "admin") document.body.prepend(topbar);
   if(page !== "admin") document.body.append(footer);
@@ -54,10 +58,16 @@
       <nav class="main">${page==="admin" ? "" : link("/#tours","tours",t("nav.tours")) + link("/visa","visa",t("nav.visa")) + link("/guides","guides",t("nav.guides")) + link("/about","about",t("nav.about")) + link("/cabinet","cabinet",t("nav.cabinet"))}</nav>
       <div class="tools">${langs}
         <button class="theme-btn" id="themeBtn" type="button" aria-label="${t(dark ? "theme.light" : "theme.dark")}" title="${t(dark ? "theme.light" : "theme.dark")}">${dark ? icons.sun : icons.moon}</button>
+        ${page==="admin" ? "" : `<button class="burger" id="burgerBtn" type="button" aria-expanded="false" aria-controls="siteMenu" aria-label="${t("nav.menu")}"><i></i><i></i></button>`}
       </div>
-    </div>
-    <div class="flight" aria-hidden="true"><i class="route"></i><i class="trail"></i>
-      <svg class="plane" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></div>`;
+      <div class="flight" aria-hidden="true"><i class="route"></i><i class="trail"></i>
+        <svg class="plane" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></div>
+    </div>`;
+    if(page !== "admin") menu.innerHTML = `<nav class="menu-links">${[["/#tours","nav.tours"],["/visa","nav.visa"],["/guides","nav.guides"],["/about","nav.about"],["/cabinet","nav.cabinet"],["/#faq","nav.faq"]]
+        .map(([h,k],i) => `<a href="${h}" style="--i:${i}">${t(k)}</a>`).join("")}</nav>
+      <div class="menu-foot"><a class="btn" href="${waLink("")}" target="_blank" rel="noopener">${t("foot.wa")}</a>
+        <a class="menu-tel" href="${waLink("")}" target="_blank" rel="noopener" dir="ltr">${phone}</a>
+        <a class="menu-tel" href="${S.instagram}" target="_blank" rel="noopener" dir="ltr">@alina.smarttravel.kz</a></div>`;
     footer.innerHTML = `<div class="wrap">
       <div class="foot-grid">
         <div class="foot-brand">
@@ -80,7 +90,20 @@
     renderTopbar();
   }
   header.addEventListener("change", e => { if(e.target.id === "langSel") I18N.setLang(e.target.value); });
-  header.addEventListener("click", e => { if(e.target.closest("#themeBtn")) I18N.setTheme(I18N.theme() === "dark" ? "light" : "dark"); });
+  header.addEventListener("click", e => {
+    if(e.target.closest("#themeBtn")) I18N.setTheme(I18N.theme() === "dark" ? "light" : "dark");
+    if(e.target.closest("#burgerBtn")) setMenu(!document.documentElement.classList.contains("menu-open"));
+  });
+  function setMenu(open){
+    document.documentElement.classList.toggle("menu-open", open);
+    menu.setAttribute("aria-hidden", open ? "false" : "true");
+    const b = document.getElementById("burgerBtn");
+    if(b){ b.setAttribute("aria-expanded", open); b.setAttribute("aria-label", t(open ? "nav.close" : "nav.menu")); }
+    if(window.lenis) open ? lenis.stop() : lenis.start();
+  }
+  menu.addEventListener("click", e => { if(e.target.closest("a")) setMenu(false); });
+  addEventListener("keydown", e => { if(e.key === "Escape") setMenu(false); });
+  matchMedia("(min-width:861px)").addEventListener("change", e => { if(e.matches) setMenu(false); });
 
   // узор из полумесяцев для карточки-арки
   function setPattern(){
@@ -104,6 +127,9 @@
   let fly = 0, target = 0, raf = 0;
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
   function measure(){
+    header.classList.toggle("scrolled", scrollY > 8);
+    const hero = document.querySelector(".xh");
+    header.classList.toggle("on-hero", !!hero && hero.getBoundingClientRect().bottom > 90);
     const max = document.documentElement.scrollHeight - innerHeight;
     target = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
     if(!raf) raf = requestAnimationFrame(step);
@@ -112,7 +138,8 @@
     fly = still ? target : fly + (target - fly) * 0.14;
     if(Math.abs(target - fly) < 0.0005) fly = target;
     header.style.setProperty("--fly", fly.toFixed(4));
-    header.style.setProperty("--fly-x", (fly * (header.clientWidth - 20)).toFixed(1) + "px");
+    const fl = header.querySelector(".flight");
+    header.style.setProperty("--fly-x", (fly * ((fl ? fl.clientWidth : header.clientWidth) - 20)).toFixed(1) + "px");
     raf = fly === target ? 0 : requestAnimationFrame(step);
   }
   addEventListener("scroll", measure, { passive:true });
@@ -124,13 +151,27 @@
     const io = new IntersectionObserver(entries => entries.forEach(e => {
       if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
     }), { rootMargin:"0px 0px -8% 0px", threshold:0.08 });
-    document.querySelectorAll("main .hero > *, main .page-head, main .work-head, main .tour, main .panel, main .arch-col, main .ayah figure, main .faq-head > *, main .values .card, main .steps-row > div, main .about-hero > div, main .cta-band, main .founder > *, main .member, main .story p, main .together, main .soon > div").forEach((el, i) => {
+    document.querySelectorAll("main .hero > *, main .page-head, main .work-head, main .tour, main .panel, main .arch-col, main .ayah figure, main .faq-head > *, main .values .card, main .steps-row > div, main .about-hero > div, main .cta-band, main .founder > *, main .member, main .story p, main .together, main .soon > div, main .xtour, main [data-rv]").forEach((el, i) => {
       if(el.getBoundingClientRect().top > innerHeight * 0.92){ el.classList.add("rv"); io.observe(el); }
       else { el.classList.add("rv", "rv-now"); el.style.setProperty("--rv-d", (i % 4) * 70 + "ms"); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("in"))); }
     });
   }
 
-  chrome(); setPattern(); measure();
+  function smooth(){
+    if(still || page === "admin" || matchMedia("(pointer:coarse)").matches) return;
+    const sc = document.createElement("script");
+    sc.src = "/assets/vendor/lenis.min.js";
+    sc.onload = () => {
+      if(!window.Lenis) return;
+      window.lenis = new Lenis({ duration:1.15, easing:x => 1 - Math.pow(1 - x, 4), anchors:{ offset:-96 } });
+      lenis.on("scroll", () => { measure(); document.dispatchEvent(new Event("smoothscroll")); });
+      const raf = time => { lenis.raf(time); requestAnimationFrame(raf); };
+      requestAnimationFrame(raf);
+    };
+    document.head.append(sc);
+  }
+
+  chrome(); setPattern(); measure(); smooth();
   if(page !== "admin") loadRates().then(renderTopbar);
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", reveal); else reveal();
   document.addEventListener("langchange", chrome);

@@ -7,9 +7,10 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Forum&family=Manrope:wght@400;500;600;700&family=Amiri:wght@400;700&family=Playfair+Display:ital@1&family=Cormorant+Garamond:wght@500&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Forum&family=Manrope:wght@400;500;600;700;800&family=Amiri:wght@400;700&family=Playfair+Display:ital@1&family=Cormorant+Garamond:wght@500&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preload" href="assets/fonts/amiri-quran-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/v2.css">
 <script src="assets/config.js"></script>
 <script src="assets/i18n.js"></script>
 <!-- SEO: генерируется tools/seo.mjs -->
@@ -44,67 +45,74 @@
 </head>
 <body data-page="home" data-title="title.home">
 <main>
-  <section class="wrap hero uy-hero">
-    <div>
-      <span class="kicker" data-i18n="uy.kicker">Молодёжный проект Умры · Казахстан</span>
-      <div class="uy-mark" aria-label="UMRA YOUTH Kazakhstan"><b>UMRA</b><b>YOUTH</b><small>Kazakhstan</small></div>
+  <section class="xh" id="top">
+    <div class="xh-media" aria-hidden="true">
+      <img class="xh-bg" src="assets/hero-bg.webp" alt="" fetchpriority="high" decoding="async">
+      <div class="xh-word"><span>UMRA</span> <span>YOUTH</span></div>
+      <img class="xh-fg" src="assets/hero-fg.webp" alt="" decoding="async">
+      <div class="xh-shade"></div>
+    </div>
+    <div class="wrap xh-head">
+      <span class="xh-kicker" data-i18n="uy.kicker">Молодёжный проект Умры · Казахстан</span>
       <h1 data-i18n="home.h1">Умра со своим поколением</h1>
-      <p class="lead uy-philo" data-i18n="home.lead">Не ждать, пока станешь лучше, чтобы прийти к Аллаху. Приходить к Аллаху — чтобы становиться лучше.</p>
-      <div class="row" style="display:flex;gap:12px;flex-wrap:wrap">
-        <a class="btn" id="joinBtn" href="#" target="_blank" rel="noopener" data-i18n="uy.join">Хочу в UMRA YOUTH | 01</a>
-        <a class="btn ghost" href="#tours" data-i18n="home.choose">Выбрать формат</a>
+    </div>
+    <div class="wrap xh-foot">
+      <p class="xh-lead" data-i18n="home.lead">Не ждать, пока станешь лучше, чтобы прийти к Аллаху. Приходить к Аллаху — чтобы становиться лучше.</p>
+      <div class="xh-btns">
+        <a class="btn gold" id="joinBtn" href="#" target="_blank" rel="noopener" data-i18n="uy.join">Хочу в UMRA YOUTH | 01</a>
+        <a class="btn glass" href="#tours" data-i18n="home.choose">Выбрать формат</a>
       </div>
-      <div class="stats" id="stats"></div>
     </div>
-    <div class="arch-col">
-      <div class="uy-arch"><img src="assets/tours/umrah-luxe.jpg" alt="Масджид аль-Харам, Мекка" loading="eager"><span class="uy-badge">UMRA YOUTH | 01</span></div>
+    <a class="xh-scroll" href="#why" aria-label="Листайте вниз" data-i18n-aria="nav.scroll"><i></i></a>
+  </section>
+  <div class="wrap xh-stats-wrap"><div class="stats xh-stats" id="stats"></div></div>
+  <div class="marquee" aria-hidden="true"><div class="marquee-track"><span>FAITH</span><i>✦</i><span>YOUTH</span><i>✦</i><span>TOGETHER</span><i>✦</i><span dir="ltr">UMRA YOUTH | 01</span><i>✦</i><span>FAITH</span><i>✦</i><span>YOUTH</span><i>✦</i><span>TOGETHER</span><i>✦</i><span dir="ltr">UMRA YOUTH | 01</span><i>✦</i></div></div>
+  <section class="wrap uy-problem xs" id="why">
+    <div class="xs-side">
+      <span class="kicker" data-i18n="uy.probKicker">Почему мы это делаем</span>
+      <h2 class="sec-title" data-i18n="uy.probTitle">Умра в группе, где всем неудобно</h2>
+    </div>
+    <div class="xs-cards">
+      <div class="xcard" data-rv><span class="n">01</span><h3 data-i18n="uy.prob1t">Один темп на всех</h3><p data-i18n="uy.prob1">В обычной группе вместе едут пожилые люди, семьи с детьми и молодёжь. Темп, режим и ожидания у всех разные — и это мешает каждому.</p></div>
+      <div class="xcard" data-rv><span class="n">02</span><h3 data-i18n="uy.prob2t">Молодые откладывают</h3><p data-i18n="uy.prob2">Многие думают: «поеду потом, когда стану лучше» — и не находят группу, где было бы комфортно со своим поколением.</p></div>
+      <div class="xcard" data-rv><span class="n">03</span><h3 data-i18n="uy.prob3t">После поездки — снова один</h3><p data-i18n="uy.prob3">Умра заканчивается, а окружения, которое помогает держаться и расти дальше, нет.</p></div>
     </div>
   </section>
-
-  <section class="wrap uy-problem" id="why">
-    <span class="kicker" data-i18n="uy.probKicker">Почему мы это делаем</span>
-    <h2 class="sec-title" data-i18n="uy.probTitle">Умра в группе, где всем неудобно</h2>
-    <div class="values">
-      <div class="card"><span class="n">01</span><h3 data-i18n="uy.prob1t">Один темп на всех</h3><p data-i18n="uy.prob1">В обычной группе вместе едут пожилые люди, семьи с детьми и молодёжь. Темп, режим и ожидания у всех разные — и это мешает каждому.</p></div>
-      <div class="card"><span class="n">02</span><h3 data-i18n="uy.prob2t">Молодые откладывают</h3><p data-i18n="uy.prob2">Многие думают: «поеду потом, когда стану лучше» — и не находят группу, где было бы комфортно со своим поколением.</p></div>
-      <div class="card"><span class="n">03</span><h3 data-i18n="uy.prob3t">После поездки — снова один</h3><p data-i18n="uy.prob3">Умра заканчивается, а окружения, которое помогает держаться и расти дальше, нет.</p></div>
+  <section class="wrap xt" id="tours">
+    <div class="xt-head" data-rv>
+      <div><span class="kicker" data-i18n="uy.solKicker">Наше решение</span>
+      <h2 class="sec-title" data-i18n="uy.solTitle">Группы по ритму жизни — три формата</h2></div>
+      <p class="lead uy-sol" data-i18n="uy.solText">Каждый едет со своими: молодёжь — с ровесниками, семьи и старшее поколение — в спокойном темпе, а тем, кто хочет индивидуально, — Signature.</p>
     </div>
+    <div class="xt-list" id="tourList"></div>
   </section>
-
-  <section class="wrap" id="tours">
-    <span class="kicker" data-i18n="uy.solKicker">Наше решение</span>
-    <h2 class="sec-title" data-i18n="uy.solTitle">Группы по ритму жизни — три формата</h2>
-    <p class="lead uy-sol" data-i18n="uy.solText">Каждый едет со своими: молодёжь — с ровесниками, семьи и старшее поколение — в спокойном темпе, а тем, кто хочет индивидуально, — Signature.</p>
-    <div class="tours" id="tourList"></div>
-  </section>
-
-  <section class="wrap uy-mission" id="mission">
-    <div class="uy-mission-card">
+  <section class="xm" id="mission">
+    <div class="wrap">
       <span class="kicker" data-i18n="uy.missionKicker">Миссия UMRA YOUTH</span>
-      <p class="uy-mission-text" data-i18n="uy.mission">Создавать пространство, в котором молодые мусульмане могут прийти к Умре не в одиночку, а вместе со своим поколением — через поклонение, знания, сильное окружение и живое братство.</p>
-      <div class="uy-pillars">
-        <div><h3 data-i18n="uy.p1t">Поклонение</h3><p data-i18n="uy.p1">Умра в центре — всё остальное помогает совершить её осознанно.</p></div>
-        <div><h3 data-i18n="uy.p2t">Знания</h3><p data-i18n="uy.p2">Гид-устаз объясняет обряды и историю святых мест Мекки и Медины.</p></div>
-        <div><h3 data-i18n="uy.p3t">Окружение</h3><p data-i18n="uy.p3">Легче становиться лучше, когда рядом люди, которые тоже к этому стремятся.</p></div>
-        <div><h3 data-i18n="uy.p4t">Братство</h3><p data-i18n="uy.p4">Дружба, которая остаётся после поездки: встречи, общение, новые цели.</p></div>
+      <p class="xm-text" id="missionText" data-i18n="uy.mission">Создавать пространство, в котором молодые мусульмане могут прийти к Умре не в одиночку, а вместе со своим поколением — через поклонение, знания, сильное окружение и живое братство.</p>
+      <div class="xm-pillars">
+        <div data-rv><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M23 9a12 12 0 1 0 9 19A10 10 0 0 1 23 9Z"/></svg><h3 data-i18n="uy.p1t">Поклонение</h3><p data-i18n="uy.p1">Умра в центре — всё остальное помогает совершить её осознанно.</p></div>
+        <div data-rv><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 11c5-2 10-2 14 1 4-3 9-3 14-1v19c-5-2-10-2-14 1-4-3-9-3-14-1Z M20 12v19"/></svg><h3 data-i18n="uy.p2t">Знания</h3><p data-i18n="uy.p2">Гид-устаз объясняет обряды и историю святых мест Мекки и Медины.</p></div>
+        <div data-rv><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="14" cy="14" r="5"/><circle cx="27" cy="15" r="4"/><path d="M5 32c1-6 5-9 9-9s8 3 9 9M22 25c1.5-2 3.2-3 5-3 3.5 0 6.5 3 7 8"/></svg><h3 data-i18n="uy.p3t">Окружение</h3><p data-i18n="uy.p3">Легче становиться лучше, когда рядом люди, которые тоже к этому стремятся.</p></div>
+        <div data-rv><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 33S6 25 6 15a7 7 0 0 1 14-2 7 7 0 0 1 14 2c0 10-14 18-14 18Z"/></svg><h3 data-i18n="uy.p4t">Братство</h3><p data-i18n="uy.p4">Дружба, которая остаётся после поездки: встречи, общение, новые цели.</p></div>
       </div>
     </div>
   </section>
-
-  <section class="wrap uy-quote"><p data-i18n="uy.quote">Ты можешь быть молодым. Амбициозным. Современным. И одновременно стремиться к Аллаху.</p></section>
-
-  <section class="wrap uy-road" id="roadmap">
-    <span class="kicker" data-i18n="uy.roadKicker">Больше, чем поездка</span>
-    <h2 class="sec-title" data-i18n="uy.roadTitle">Что дальше</h2>
-    <ol class="uy-steps">
-      <li class="on"><b>UMRA YOUTH | 01</b><span data-i18n="uy.r1">Первая молодёжная группа — открыт набор</span><em data-i18n="uy.now">набор</em></li>
-      <li><b>UMRA YOUTH | 02</b><span data-i18n="uy.r2">Следующий поток</span><em data-i18n="uy.soon">скоро</em></li>
-      <li><b>UMRA YOUTH COMMUNITY</b><span data-i18n="uy.r3">Сообщество участников после поездки</span><em data-i18n="uy.soon">скоро</em></li>
-      <li><b>UMRA YOUTH MEETUP</b><span data-i18n="uy.r4">Встречи и живое общение</span><em data-i18n="uy.soon">скоро</em></li>
-      <li><b>UMRA YOUTH ACADEMY</b><span data-i18n="uy.r5">Знания и развитие: обучение для молодых мусульман</span><em data-i18n="uy.soon">скоро</em></li>
+  <section class="xq">
+    <img class="xq-bg" src="assets/tours/umrah-vip.jpg" alt="" loading="lazy" decoding="async" aria-hidden="true">
+    <div class="wrap"><p class="xq-text" data-i18n="uy.quote">Ты можешь быть молодым. Амбициозным. Современным. И одновременно стремиться к Аллаху.</p></div>
+  </section>
+  <section class="wrap xr" id="roadmap">
+    <div class="xt-head" data-rv><div><span class="kicker" data-i18n="uy.roadKicker">Больше, чем поездка</span>
+    <h2 class="sec-title" data-i18n="uy.roadTitle">Что дальше</h2></div></div>
+    <ol class="xr-steps" id="roadSteps">
+      <li class="on" data-rv><i></i><b>UMRA YOUTH | 01</b><span data-i18n="uy.r1">Первая молодёжная группа — открыт набор</span><em data-i18n="uy.now">набор</em></li>
+      <li data-rv><i></i><b>UMRA YOUTH | 02</b><span data-i18n="uy.r2">Следующий поток</span><em data-i18n="uy.soon">скоро</em></li>
+      <li data-rv><i></i><b>UMRA YOUTH COMMUNITY</b><span data-i18n="uy.r3">Сообщество участников после поездки</span><em data-i18n="uy.soon">скоро</em></li>
+      <li data-rv><i></i><b>UMRA YOUTH MEETUP</b><span data-i18n="uy.r4">Встречи и живое общение</span><em data-i18n="uy.soon">скоро</em></li>
+      <li data-rv><i></i><b>UMRA YOUTH ACADEMY</b><span data-i18n="uy.r5">Знания и развитие: обучение для молодых мусульман</span><em data-i18n="uy.soon">скоро</em></li>
     </ol>
   </section>
-
   <section class="wrap ayah" id="ayah" hidden aria-live="polite">
     <figure>
       <div class="orn" aria-hidden="true"><svg viewBox="0 0 40 40" fill="currentColor"><path d="M18.82 9.06A12 12 0 1 0 31.47 24.52A10 10 0 0 1 18.82 9.06Z"/></svg></div>
@@ -116,7 +124,7 @@
     </figure>
   </section>
 
-  <section class="wrap seo-block" id="umrah">
+  <section class="wrap seo-block xseo" id="umrah">
     <span class="kicker" data-i18n="seo.kicker">Умра из Казахстана, Астаны и Алматы</span>
     <h2 class="sec-title" data-i18n="seo.h2">Поездка в Мекку и Медину под ключ</h2>
     <p class="lead" data-i18n="seo.p">smart-travel.kz организует Умру из Казахстана с вылетом из Алматы и Астаны в трёх форматах: Umra Youth для молодёжи, Umra Family для семей и старшего поколения, Umra Signature — VIP. Берём на себя визу в Саудовскую Аравию, перелёт в Джидду или Медину, отели рядом с Харамом и мечетью Пророка ﷺ, трансферы и сопровождение на обрядах.</p>
@@ -131,13 +139,17 @@
     <p class="city-links"><a href="/umrah-almaty" data-i18n="seo.linkAlmaty">Умра из Алматы →</a><a href="/umrah-astana" data-i18n="seo.linkAstana">Умра из Астаны →</a></p>
   </section>
 
-  <section class="wrap uy-cta">
-    <div class="cta-band">
-      <div><h2 data-i18n="uy.ctaTitle">Приходи к Умре вместе со своим поколением</h2><p data-i18n="uy.ctaText">Напиши нам — расскажем о датах UMRA YOUTH | 01 и ответим на вопросы. Для семей и VIP — Umra Family и Umra Signature.</p></div>
-      <a class="btn" id="joinBtn2" href="#" target="_blank" rel="noopener" data-i18n="uy.join">Хочу в UMRA YOUTH | 01</a>
+  <section class="wrap xcta">
+    <div class="xcta-band" data-rv>
+      <figure class="xcta-ph"><img src="assets/tours/umrah-luxe.jpg" alt="" loading="lazy" decoding="async"></figure>
+      <div class="xcta-body">
+        <span class="kicker">UMRA YOUTH | 01</span>
+        <h2 data-i18n="uy.ctaTitle">Приходи к Умре вместе со своим поколением</h2>
+        <p data-i18n="uy.ctaText">Напиши нам — расскажем о датах UMRA YOUTH | 01 и ответим на вопросы. Для семей и VIP — Umra Family и Umra Signature.</p>
+        <a class="btn gold" id="joinBtn2" href="#" target="_blank" rel="noopener" data-i18n="uy.join">Хочу в UMRA YOUTH | 01</a>
+      </div>
     </div>
   </section>
-
   <section class="wrap faq" id="faq">
     <div class="faq-head">
       <div>
@@ -164,6 +176,7 @@
 </main>
 <script src="assets/tours.js"></script>
 <script src="assets/layout.js"></script>
+<script src="assets/home.js" defer></script>
 <script>
 (function(){
   let group = "all";
@@ -172,16 +185,15 @@
     const title = P(tour.title);
     const price = tour.price != null
       ? `<div class="price"><b>${money(tour.price)}</b>${tour.oldPrice?`<s>${money(tour.oldPrice)}</s>`:""}</div>`
-      : `<div class="price"><span style="color:var(--ink-2)">${t("tour.onRequest")}</span></div>`;
+      : `<div class="price"><span>${t("tour.onRequest")}</span></div>`;
     const ask = waLink(t("tour.ask", { title }));
-    const btns = `<div class="row"><a class="btn" href="${ask}" target="_blank" rel="noopener">${t("tour.more")}</a>${tour.visa?`<a class="btn ghost" href="/visa">${t("home.getVisa")}</a>`:''}</div>`;
-    const photo = tour.photo
-      ? `<figure class="ph"><img src="${esc(tour.photo)}" alt="${esc(title)}" loading="lazy" decoding="async" onerror="this.parentNode.remove()"></figure>` : "";
-    const head = `<span class="tier">${esc(P(tour.tier))}</span><h3>${esc(title)}</h3><span class="dur">${esc(P(tour.duration))}</span>`;
-    const list = `<ul>${P(tour.points).map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`;
-    return feature
-      ? `<article class="tour feature">${photo}<div style="display:flex;flex-direction:column;gap:14px">${head}${list}</div><div style="display:flex;flex-direction:column;gap:18px;justify-content:flex-end">${price}${btns}</div></article>`
-      : `<article class="tour">${photo}${head}${list}${price}${btns}</article>`;
+    const btns = `<div class="row"><a class="btn${feature?" gold":""}" href="${ask}" target="_blank" rel="noopener">${t("tour.more")}</a>${tour.visa?`<a class="btn ghost" href="/visa">${t("home.getVisa")}</a>`:''}</div>`;
+    const photo = tour.photo ? `<img src="${esc(tour.photo)}" alt="${esc(title)}" loading="lazy" decoding="async">` : "";
+    return `<article class="xtour${feature?" feature":""}">
+      <figure class="xtour-ph">${photo}<span class="xtour-tier">${esc(P(tour.tier))}</span>${feature?`<span class="xtour-badge">UMRA YOUTH | 01</span>`:""}
+        <figcaption><h3>${esc(title)}</h3><span class="dur">${esc(P(tour.duration))}</span></figcaption></figure>
+      <div class="xtour-body"><ul>${P(tour.points).map(p=>`<li>${esc(p)}</li>`).join("")}</ul>${price}${btns}</div>
+    </article>`;
   }
   function render(){
     document.getElementById("tourList").innerHTML = TOURS.map(t => card(t, !!t.featured)).join("");
