@@ -1,0 +1,409 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:M;font-weight:400;src:url(f/manrope-latin-400-normal.woff2)}
+@font-face{font-family:M;font-weight:600;src:url(f/manrope-latin-600-normal.woff2)}
+@font-face{font-family:M;font-weight:800;src:url(f/manrope-latin-800-normal.woff2)}
+@font-face{font-family:C;font-style:italic;font-weight:500;src:url(f/cormorant-garamond-latin-500-italic.woff2)}
+:root{--navy:#0E1636;--navy2:#16224F;--gold:#D9B26A;--gold2:#F0D193;--ivory:#FFF8EC;--sun:#E8935A}
+*{box-sizing:border-box}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:var(--navy);font-family:M,sans-serif;-webkit-font-smoothing:antialiased}
+.L{position:absolute;inset:0;overflow:hidden;visibility:hidden}
+.abs{position:absolute}
+img{display:block}
+/* HUD */
+#hud{position:absolute;inset:0;z-index:50;pointer-events:none;color:#fff;mix-blend-mode:difference;font:600 15px/1 M;letter-spacing:.18em;text-transform:uppercase}
+#hud .tl{left:64px;top:52px}#hud .tr{right:64px;top:52px;font-variant-numeric:tabular-nums}
+#hud .bl{left:64px;bottom:52px;overflow:hidden;height:18px}#hud .br{right:64px;bottom:58px;width:260px;height:2px;background:rgba(255,255,255,.25)}
+#hud .br i{position:absolute;left:0;top:0;bottom:0;background:#fff}
+#hud .cm{position:absolute;width:22px;height:22px;border:solid #fff;opacity:.8}
+#sec{display:block;will-change:transform}
+/* S1 */
+#s1svg{position:absolute;left:0;top:0}
+/* S2 */
+#s2clip{position:absolute;inset:0}
+#s2clip img{position:absolute;left:0;top:0;width:1920px;height:1080px;object-fit:cover;object-position:50% 70%}
+#word2{position:absolute;left:0;right:0;top:300px;text-align:center;white-space:nowrap;font:800 246px/1 M;letter-spacing:-.045em;color:var(--ivory);text-shadow:0 14px 60px rgba(120,60,10,.3)}
+#word2 span{display:inline-block}
+#tag2{position:absolute;left:0;right:0;top:220px;text-align:center;font:italic 500 46px/1 C;color:#fff;letter-spacing:.01em}
+/* S3 */
+.bigw{position:absolute;left:0;right:0;top:50%;text-align:center;white-space:nowrap;font:800 360px/1 M;letter-spacing:-.05em;transform:translateY(-54%)}
+.bigw span{display:inline-block;will-change:transform}
+.mask{display:inline-block;overflow:hidden;padding:0 .02em;vertical-align:top}
+#stack div{font:800 210px/.9 M;letter-spacing:-.045em;text-align:center}
+/* S4 */
+#map{position:absolute;inset:0}
+.lab{position:absolute;font:600 15px/1 M;letter-spacing:.2em;color:var(--ivory);white-space:nowrap}
+.lab b{display:block;font:800 30px/1 M;letter-spacing:-.01em;margin-top:6px;color:#fff}
+.lab.g b{color:var(--gold)}
+#km{position:absolute;left:120px;top:150px;color:#fff}
+#km .n{font:800 150px/1 M;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+#km .n small{font-size:60px;letter-spacing:0;margin-left:14px;color:var(--gold)}
+#km .s{font:600 17px/1 M;letter-spacing:.24em;color:rgba(255,248,236,.7);margin-top:14px}
+/* S5 */
+.card{position:absolute;width:420px;height:580px;border-radius:30px;background:#fff;overflow:hidden;box-shadow:0 40px 80px -30px rgba(14,22,54,.45);transform-origin:50% 100%}
+.card .ph{position:absolute;left:0;right:0;top:0;height:360px;overflow:hidden}
+.card .ph img{width:100%;height:100%;object-fit:cover}
+.card .ph:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,22,54,.1),rgba(14,22,54,0) 35%,rgba(14,22,54,.8))}
+.card .chip{position:absolute;left:20px;top:20px;z-index:2;background:rgba(255,255,255,.92);color:var(--navy);font:800 13px/1 M;letter-spacing:.08em;padding:9px 13px;border-radius:99px}
+.card h3{position:absolute;left:26px;top:290px;z-index:2;margin:0;font:800 40px/1 M;letter-spacing:-.03em;color:#fff}
+.card .ln{position:absolute;left:26px;height:12px;border-radius:6px;background:#EFE8DA}
+.card .bt{position:absolute;left:26px;right:26px;bottom:24px;height:54px;border-radius:99px;background:var(--navy);color:#fff;font:800 16px/54px M;text-align:center;letter-spacing:.02em}
+.card.y{box-shadow:0 0 0 2px var(--gold),0 40px 80px -30px rgba(14,22,54,.45)}
+.card.y .bt{background:var(--gold);color:var(--navy)}
+#cursor{position:absolute;width:44px;height:44px;z-index:9}
+#ripple{position:absolute;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:3px solid var(--gold);z-index:8}
+#s5title{position:absolute;left:0;right:0;top:110px;text-align:center;font:800 64px/1 M;letter-spacing:-.04em;color:var(--navy)}
+#s5title em{font:italic 500 70px/1 C;letter-spacing:0;color:#9C7224}
+/* S6 */
+#s6bg{position:absolute;inset:-5%;width:110%;height:110%;object-fit:cover}
+#s6sh{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 55%,rgba(14,22,54,.62),rgba(14,22,54,.92))}
+.gauge{position:absolute;top:290px;width:420px;height:420px}
+.gauge svg{position:absolute;inset:0;overflow:visible}
+.gauge .num{position:absolute;left:0;right:0;top:132px;text-align:center;color:#fff;font:800 120px/1 M;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.gauge .num small{font-size:70px;color:var(--gold);letter-spacing:0}
+.gauge .cap{position:absolute;left:0;right:0;top:270px;text-align:center;font:600 16px/1.4 M;letter-spacing:.24em;color:rgba(255,248,236,.75)}
+/* S7 */
+.tile{position:absolute;width:476px;height:356px;overflow:hidden;border-radius:4px;backface-visibility:hidden}
+.tile img{width:100%;height:100%;object-fit:cover}
+#zero1{position:absolute;left:0;right:0;top:50%;text-align:center;font:800 760px/1 M;letter-spacing:-.07em;color:transparent;-webkit-background-clip:text;background-clip:text;background-size:2400px auto;background-repeat:no-repeat;transform:translateY(-52%)}
+#s7cap{position:absolute;left:0;right:0;top:850px;text-align:center;font:600 22px/1 M;letter-spacing:.42em;color:var(--ivory)}
+/* S8 */
+#pc{position:absolute;inset:0}
+#lock{position:absolute;left:0;right:0;top:330px;text-align:center}
+#lockW{font:800 200px/1 M;letter-spacing:-.045em;color:var(--ivory);white-space:nowrap;position:relative;display:inline-block}
+#lockW .sh{position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.95) 48%,transparent 66%);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:300% 100%}
+#lockL{width:0;height:3px;background:var(--gold);margin:34px auto 0}
+#lockT{font:600 22px/1 M;letter-spacing:.5em;color:var(--gold);margin-top:34px;white-space:nowrap}
+#lockT span{display:inline-block}
+#logo8{position:absolute;left:50%;top:790px;width:390px;height:70px;margin-left:-195px}
+#logo8 i{position:absolute;inset:0;-webkit-mask:url(m/logo-ink.png) center/contain no-repeat;mask:url(m/logo-ink.png) center/contain no-repeat;background:#fff}
+#logo8 i+i{-webkit-mask-image:url(m/logo-gold.png);mask-image:url(m/logo-gold.png);background:var(--gold)}
+#url8{position:absolute;left:0;right:0;top:900px;text-align:center;font:600 20px/1 M;letter-spacing:.32em;color:rgba(255,248,236,.7)}
+#flash{position:absolute;inset:0;z-index:40;background:#fff;opacity:0;pointer-events:none}
+#grain{position:absolute;inset:-50%;z-index:45;opacity:.05;pointer-events:none;mix-blend-mode:overlay}
+#vig{position:absolute;inset:0;z-index:44;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(0,0,0,.35))}
+</style></head><body>
+
+<!-- S1 форма -->
+<div class="L" id="S1" style="background:var(--navy)">
+  <svg id="s1svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+    <g id="s1star" transform="translate(960 560)" fill="none" stroke="#D9B26A" stroke-width="1.2"></g>
+    <g id="s1arches" fill="none" stroke="#D9B26A" stroke-linecap="round"></g>
+    <rect id="s1line" fill="#D9B26A"/>
+    <circle id="s1dot" fill="#D9B26A"/>
+  </svg>
+  <div id="s1parts"></div>
+</div>
+
+<!-- S2 глубина -->
+<div class="L" id="S2" style="background:var(--navy)">
+  <div id="s2clip">
+    <img id="s2bg" src="m/hero-bg.webp">
+    <div id="tag2">the call of the two holy mosques</div>
+    <div id="word2"></div>
+    <img id="s2fg" src="m/hero-fg.webp">
+  </div>
+</div>
+
+<!-- S3 типографика -->
+<div class="L" id="S3">
+  <div class="bigw" id="w1"></div><div class="bigw" id="w2" style="perspective:1200px"></div><div class="bigw" id="w3"></div>
+  <div id="stack" class="abs" style="left:0;right:0;top:50%"></div>
+</div>
+
+<!-- S4 карта -->
+<div class="L" id="S4" style="background:var(--navy)">
+  <canvas id="map" width="1920" height="1080"></canvas>
+  <div id="labs"></div>
+  <div id="km"><div class="n"><span id="kmn">0</span><small>KM</small></div><div class="s">ALMATY · ASTANA → MAKKAH · MADINAH</div></div>
+</div>
+
+<!-- S5 интерфейс -->
+<div class="L" id="S5" style="background:#F4EEE2">
+  <div id="s5title">Choose your <em>rhythm</em></div>
+  <div id="cards"></div>
+  <svg id="cursor" viewBox="0 0 24 24"><path d="M4 2l15 9-6.5 1.6L16 20l-3 1.4-3.4-7.3L4 18Z" fill="#0E1636" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg>
+  <div id="ripple"></div>
+</div>
+
+<!-- S6 цифры -->
+<div class="L" id="S6" style="background:var(--navy)">
+  <img id="s6bg" src="m/kaaba-crowd.jpg"><div id="s6sh"></div>
+  <div id="gauges"></div>
+</div>
+
+<!-- S7 маски и сетка -->
+<div class="L" id="S7" style="background:var(--navy);perspective:1600px">
+  <div id="tiles"></div>
+  <div id="zero1">01</div>
+  <div id="s7cap">UMRA YOUTH · NOW ENROLLING</div>
+</div>
+
+<!-- S8 логотип -->
+<div class="L" id="S8" style="background:radial-gradient(ellipse at 50% 45%,#1B2A60,#0E1636 70%)">
+  <canvas id="pc" width="1920" height="1080"></canvas>
+  <div id="lock"><div id="lockW">UMRA YOUTH<span class="sh">UMRA YOUTH</span></div><div id="lockL"></div><div id="lockT"></div></div>
+  <div id="logo8"><i></i><i></i></div>
+  <div id="url8">SMART-TRAVEL.KZ</div>
+</div>
+
+<div id="flash"></div><canvas id="grain" width="512" height="512"></canvas><div id="vig"></div>
+<div id="hud">
+  <div class="abs tl">smart-travel.kz <span style="opacity:.5">/</span> motion reel 2026</div>
+  <div class="abs tr" id="tc">00:00</div>
+  <div class="abs bl"><span id="sec"></span></div>
+  <div class="abs br"><i id="prog"></i></div>
+  <i class="cm" style="left:30px;top:30px;border-width:2px 0 0 2px"></i><i class="cm" style="right:30px;top:30px;border-width:2px 2px 0 0"></i>
+  <i class="cm" style="left:30px;bottom:30px;border-width:0 0 2px 2px"></i><i class="cm" style="right:30px;bottom:30px;border-width:0 2px 2px 0"></i>
+</div>
+
+<script>
+const W=1920,H=1080,DUR=15;
+const $=s=>document.querySelector(s);
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const k=(t,a,b)=>clamp((t-a)/(b-a));
+const lerp=(a,b,x)=>a+(b-a)*x;
+const E={
+  outExpo:x=>x>=1?1:1-Math.pow(2,-10*x), inExpo:x=>x<=0?0:Math.pow(2,10*x-10),
+  ioExpo:x=>x<=0?0:x>=1?1:x<.5?Math.pow(2,20*x-10)/2:(2-Math.pow(2,-20*x+10))/2,
+  outCubic:x=>1-Math.pow(1-x,3), inCubic:x=>x*x*x, ioCubic:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,
+  outBack:(x,s=1.9)=>1+(s+1)*Math.pow(x-1,3)+s*Math.pow(x-1,2),
+  spring:x=>x>=1?1:1-Math.exp(-7*x)*Math.cos(14*x), outQuint:x=>1-Math.pow(1-x,5)
+};
+let seed=1;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const show=(id,on)=>{$(id).style.visibility=on?'visible':'hidden'};
+const css=(el,o)=>{for(const p in o)el.style[p]=o[p]};
+
+/* ---------- HUD ---------- */
+const SECS=[[0,'01 — Shape'],[1.5,'02 — Depth & parallax'],[3.5,'03 — Kinetic type'],[5.5,'04 — Data map'],[8,'05 — UI motion'],[10,'06 — Infographics'],[11.5,'07 — Masks & grids'],[13,'08 — Logo resolve']];
+function hud(t){
+  const s=Math.floor(t),f=Math.floor((t-s)*60);
+  $('#tc').textContent=`00:${String(s).padStart(2,'0')}:${String(f).padStart(2,'0')}`;
+  $('#prog').style.width=(t/DUR*100)+'%';
+  let i=0;SECS.forEach((x,j)=>{if(t>=x[0])i=j});
+  const el=$('#sec');el.textContent=SECS[i][1];
+  const p=E.outExpo(k(t,SECS[i][0],SECS[i][0]+.45));el.style.transform=`translateY(${(1-p)*100}%)`;
+}
+
+/* ---------- S1: точка → линия → арки ---------- */
+const AR=(cx,cy,w,h)=>{const x0=cx-w/2,x1=cx+w/2,y0=cy-h/2,y1=cy+h/2,s=y0+h*.43;
+  return `M${x0} ${y1}L${x0} ${s}Q${x0} ${y0+h*.11} ${cx} ${y0}Q${x1} ${y0+h*.11} ${x1} ${s}L${x1} ${y1}`};
+const archEls=[];
+[[400,560,4],[470,640,1.6],[540,720,1]].forEach(([w,h,sw],i)=>{const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+  p.setAttribute('d',AR(960,560,w,h));p.setAttribute('stroke-width',sw);$('#s1arches').append(p);archEls.push(p)});
+const archLen=archEls.map(p=>p.getTotalLength());
+// восьмиконечная звезда (рисунок исламского орнамента)
+(function(){const g=$('#s1star');for(let r of [120,180,240]){const sq=(a)=>{const p=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  p.setAttribute('x',-r/2);p.setAttribute('y',-r/2);p.setAttribute('width',r);p.setAttribute('height',r);p.setAttribute('transform',`rotate(${a})`);g.append(p)};sq(0);sq(45)}})();
+const parts=[];seed=7;for(let i=0;i<46;i++){const d=document.createElement('i');css(d,{position:'absolute',width:'5px',height:'5px',borderRadius:'50%',background:'#D9B26A'});$('#s1parts').append(d);
+  parts.push({el:d,a:rnd()*Math.PI*2,r:180+rnd()*520,s:.4+rnd()*1.2,d:rnd()*.3})}
+function S1(t){
+  const dot=$('#s1dot'),line=$('#s1line');
+  const pop=E.outBack(k(t,0,.28),2.6);
+  const st=E.ioExpo(k(t,.3,.72));
+  const w=lerp(28,400,st)*(st>0?1:pop), h=lerp(28,4,st)*(st>0?1:pop);
+  const drop=E.ioExpo(k(t,.72,1.0));
+  if(t<.3){dot.setAttribute('cx',960);dot.setAttribute('cy',560);dot.setAttribute('r',14*pop);line.setAttribute('width',0)}
+  else{dot.setAttribute('r',0);line.setAttribute('x',960-w/2);line.setAttribute('y',lerp(560,840,drop)-h/2);line.setAttribute('width',w*(1-k(t,.95,1.05)));line.setAttribute('height',h);line.setAttribute('rx',h/2)}
+  archEls.forEach((p,i)=>{const d=E.ioCubic(k(t,.78+i*.08,1.32+i*.06));p.style.strokeDasharray=archLen[i];p.style.strokeDashoffset=archLen[i]*(1-d);p.style.opacity=i?.55:1});
+  const sg=$('#s1star');sg.setAttribute('transform',`translate(960 560) rotate(${t*40}) scale(${E.outExpo(k(t,.9,1.4))})`);sg.style.opacity=.35*k(t,.9,1.2);
+  parts.forEach(p=>{const q=k(t,.95+p.d,1.5);const r=p.r*E.outExpo(q);css(p.el,{left:960+Math.cos(p.a)*r+'px',top:560+Math.sin(p.a)*r*.8+'px',opacity:q>0?(1-q):0,transform:`scale(${p.s})`})});
+}
+
+/* ---------- S2: арка-окно → минареты, надпись между слоями ---------- */
+const w2=$('#word2');'UMRA YOUTH'.split('').forEach(c=>{const s=document.createElement('span');s.textContent=c===' '?' ':c;w2.append(s)});
+function S2(t){
+  // окно-арка раскрывается на весь экран
+  const g=E.ioExpo(k(t,1.42,2.25)), s=lerp(1,7.5,g);
+  const cy=lerp(560,700,g);
+  $('#s2clip').style.clipPath=`path('${AR(960,cy,400*s,560*s)}Z')`;
+  const cam=E.outCubic(k(t,1.5,3.1));
+  $('#s2bg').style.transform=`scale(${lerp(1.55,1.12,cam)}) translateY(${lerp(40,0,cam)}px)`;
+  $('#s2fg').style.transform=`scale(${lerp(1.62,1.12,cam)}) translateY(${lerp(70,0,cam)}px)`;
+  $('#s2bg').style.transformOrigin=$('#s2fg').style.transformOrigin='50% 75%';
+  [...w2.children].forEach((sp,i)=>{const q=k(t,2.02+i*.035,2.5+i*.035);const e=E.outBack(q,1.6);
+    css(sp,{transform:`translateY(${(1-e)*-420}px) scale(${lerp(1.4,1,E.outExpo(q))})`,opacity:q>0?1:0,filter:`blur(${(1-E.outExpo(q))*10}px)`})});
+  css(w2,{transform:`scale(${lerp(.92,1.02,cam)}) translateY(${lerp(30,0,cam)}px)`});
+  const tq=E.outExpo(k(t,2.55,3.0));css($('#tag2'),{opacity:tq,transform:`translateY(${(1-tq)*20}px)`,letterSpacing:lerp(.3,.01,tq)+'em'});
+  // резкая панорама вбок
+  const wp=E.inExpo(k(t,3.08,3.5));$('#S2').style.transform=`translateX(${-wp*2300}px)`;
+}
+
+/* ---------- S3: кинетическая типографика ---------- */
+const mk=(id,txt,wrap)=>{const el=$(id);txt.split('').forEach(c=>{const s=document.createElement('span');s.textContent=c;if(wrap){const m=document.createElement('span');m.className='mask';m.append(s);el.append(m)}else el.append(s)});return [...el.querySelectorAll(wrap?'.mask>span':'span')]};
+const L1=mk('#w1','FAITH',true),L2=mk('#w2','YOUTH',false),L3=mk('#w3','TOGETHER',false);
+seed=3;const R3=L3.map(()=>({x:(rnd()-.5)*1600,y:(rnd()-.5)*900,r:(rnd()-.5)*160}));
+$('#stack').innerHTML='<div>FAITH</div><div>YOUTH</div><div>TOGETHER</div>';
+function S3(t){
+  const S=$('#S3');
+  const bg=t<4?'#0E1636':t<4.5?'#D9B26A':t<5?'#FFF8EC':'#0E1636';S.style.background=bg;
+  // въезд с панорамой
+  const win=1-E.inExpo(k(t,3.08,3.5));S.style.transform=`translateX(${win*2300}px)`;
+  show('#w1',t<4);show('#w2',t>=4&&t<4.5);show('#w3',t>=4.5&&t<5);show('#stack',t>=5);
+  $('#w1').style.color='#D9B26A';
+  L1.forEach((s,i)=>{const q=E.outExpo(k(t,3.5+i*.04,3.82+i*.04)),o=E.inExpo(k(t,3.86+i*.02,3.99+i*.02));s.style.transform=`translateY(${(1-q)*110-o*110}%)`});
+  $('#w1').style.transform=`translateY(-54%) scale(${lerp(1.08,1,E.outCubic(k(t,3.45,4)))})`;
+  $('#w2').style.color='#0E1636';
+  L2.forEach((s,i)=>{const q=k(t,4.0+i*.045,4.32+i*.045);s.style.transform=`rotateX(${(1-E.outBack(q,1.4))*-100}deg) translateZ(0)`;s.style.opacity=q>0?1:0;s.style.transformOrigin='50% 100% -80px'});
+  $('#w2').style.transform=`translateY(-54%) scale(${lerp(.96,1.04,k(t,4,4.5))})`;
+  $('#w3').style.color='#0E1636';$('#w3').style.fontSize='300px';
+  L3.forEach((s,i)=>{const q=E.outExpo(k(t,4.5+i*.012,4.86+i*.012));const r=R3[i];s.style.transform=`translate(${r.x*(1-q)}px,${r.y*(1-q)}px) rotate(${r.r*(1-q)}deg) scale(${lerp(2.2,1,q)})`;s.style.opacity=clamp(q*3)});
+  // стопка из трёх слов
+  const st=$('#stack');const q=E.outExpo(k(t,5,5.3));
+  css(st,{transform:`translateY(-50%) scaleY(${lerp(.2,1,q)}) scaleX(${lerp(1.6,1,q)})`});
+  [...st.children].forEach((d,i)=>{d.style.color=i==1?'#D9B26A':'transparent';d.style.webkitTextStroke=i==1?'0':'2px #FFF8EC';d.style.transform=`translateX(${(i-1)*lerp(240,0,E.outExpo(k(t,5,5.35)))}px)`});
+}
+
+/* ---------- S4: карта из точек ---------- */
+let DOTS=[];
+const P=(lon,lat)=>[960+(lon-57.5)*26.5,560-(lat-35)*30.5];  // равнопромежуточная проекция, растянутая по широте
+const CITY={almaty:[76.95,43.24],astana:[71.43,51.13],jeddah:[39.17,21.54],makkah:[39.83,21.42],madinah:[39.61,24.47]};
+function hav(a,b){const R=6371,r=x=>x*Math.PI/180;const dl=r(b[1]-a[1]),dn=r(b[0]-a[0]);const h=Math.sin(dl/2)**2+Math.cos(r(a[1]))*Math.cos(r(b[1]))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+const KM=Math.round(hav(CITY.almaty,CITY.makkah)/10)*10;
+const routes=[[CITY.almaty,CITY.makkah,5.95,-1],[CITY.astana,CITY.madinah,6.1,1]];
+const labs=[['almaty','ALMATY','KAZAKHSTAN',1,[22,-70]],['astana','ASTANA','KAZAKHSTAN',1,[22,-70]],['makkah','MAKKAH','AL-MASJID AL-HARAM',0,[-250,30]],['madinah','MADINAH','AN-NABAWI',0,[-230,-70]]];
+labs.forEach(([key,name,sub,g])=>{const d=document.createElement('div');d.className='lab'+(g?' g':'');d.dataset.k=key;d.innerHTML=`${sub}<b>${name}</b>`;$('#labs').append(d)});
+function bez(a,b,c,u){return[(1-u)*(1-u)*a[0]+2*(1-u)*u*b[0]+u*u*c[0],(1-u)*(1-u)*a[1]+2*(1-u)*u*b[1]+u*u*c[1]]}
+function ctrl(a,b,side){const m=[(a[0]+b[0])/2,(a[1]+b[1])/2],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);return [m[0]-dy/L*L*.28*side,m[1]+dx/L*L*.28*side]}
+const PLANE=new Path2D('M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z');
+function S4(t){
+  const cv=$('#map'),c=cv.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,W,H);
+  // камера: медленный наезд, в конце — нырок в Мекку
+  const mk=P(...CITY.makkah);
+  const z0=lerp(1.18,1.0,E.outCubic(k(t,5.5,7.6))), dive=E.inExpo(k(t,7.55,8.0));
+  const z=z0*lerp(1,9,dive);
+  const fx=lerp(960,mk[0],dive*0+E.ioCubic(k(t,7.4,8))), fy=lerp(560,mk[1],E.ioCubic(k(t,7.4,8)));
+  const tf=(x,y)=>[(x-fx)*z+960+(1-E.outCubic(k(t,5.5,7.6)))*-60,(y-fy)*z+540];
+  const ori=P(...CITY.almaty);
+  for(const d of DOTS){const [x,y]=d.p;const dist=Math.hypot(x-ori[0],y-ori[1]);const q=k(t,5.5+dist*.00055,5.85+dist*.00055);if(q<=0)continue;
+    const [X,Y]=tf(x,y);if(X<-20||X>W+20||Y<-20||Y>H+20)continue;
+    const hl=d.c==1?k(t,5.75,6.1):d.c==2?k(t,6.6,7.0):0;
+    c.fillStyle=d.c==1?`rgba(217,178,106,${.22+.7*hl})`:d.c==2?`rgba(255,248,236,${.22+.55*hl})`:'rgba(255,248,236,.2)';
+    const r=(d.c?3.4:2.7)*E.outBack(q,2.2)*Math.min(z,2.4);c.beginPath();c.arc(X,Y,r,0,6.283);c.fill()}
+  // маршруты
+  routes.forEach(([a0,b0,st,side],ri)=>{const a=P(...a0),b=P(...b0),m=ctrl(a,b,side);const q=E.ioCubic(k(t,st,st+1.25));if(q<=0)return;
+    c.lineWidth=3;c.lineCap='round';const N=90;
+    for(let i=0;i<N*q;i++){const u0=i/N,u1=Math.min(q,(i+1)/N);const p0=tf(...bez(a,m,b,u0)),p1=tf(...bez(a,m,b,u1));
+      const al=.25+.75*(u1/q);c.strokeStyle=`rgba(240,209,147,${al})`;c.beginPath();c.moveTo(...p0);c.lineTo(...p1);c.stroke()}
+    // самолёт
+    if(q<1||t<st+1.6){const u=q,p=tf(...bez(a,m,b,u)),p2=tf(...bez(a,m,b,Math.min(1,u+.01)));const ang=Math.atan2(p2[1]-p[1],p2[0]-p[0]);
+      c.save();c.translate(...p);c.rotate(ang+Math.PI/2);c.scale(1.6,1.6);c.translate(-12,-12);c.shadowColor='rgba(240,209,147,.9)';c.shadowBlur=14;c.fillStyle='#fff';c.fill(PLANE);c.restore()}
+  });
+  // пульс городов
+  Object.entries(CITY).forEach(([key,ll],i)=>{if(key==='jeddah')return;const [X,Y]=tf(...P(...ll));const on=key=='almaty'||key=='astana'?k(t,5.8,6):k(t,7.0,7.2);if(on<=0)return;
+    for(let j=0;j<2;j++){const ph=((t*1.2+j*.5+i*.13)%1);c.strokeStyle=`rgba(217,178,106,${(1-ph)*.8*on})`;c.lineWidth=2;c.beginPath();c.arc(X,Y,8+ph*38,0,6.283);c.stroke()}
+    c.fillStyle='#F0D193';c.beginPath();c.arc(X,Y,7*E.outBack(on),0,6.283);c.fill()});
+  // подписи
+  document.querySelectorAll('.lab').forEach((el,i)=>{const L=labs[i];const [X,Y]=tf(...P(...CITY[L[0]]));const on=L[3]?k(t,5.85+i*.08,6.25+i*.08):k(t,7.0+(i-2)*.1,7.4+(i-2)*.1);
+    const e=E.outExpo(on);css(el,{left:X+L[4][0]+'px',top:Y+L[4][1]+'px',opacity:on*(1-dive*3),transform:`translateY(${(1-e)*24}px)`,clipPath:`inset(0 ${(1-e)*100}% 0 0)`})});
+  const kq=E.ioCubic(k(t,5.95,7.2));$('#kmn').textContent=Math.round(KM*kq).toLocaleString('en-US').replace(/,/g,' ');
+  const ke=E.outExpo(k(t,5.7,6.1));css($('#km'),{opacity:ke*(1-dive*3),transform:`translateY(${(1-ke)*40}px)`});
+  $('#S4').style.clipPath=`circle(${E.ioExpo(k(t,5.2,5.62))*1200}px at 960px 540px)`;
+}
+
+/* ---------- S5: карточки форматов ---------- */
+const CARDS=[['YOUTH ONLY','Umra Youth','m/kaaba-crowd.jpg','y'],['FAMILY','Umra Family','m/hero-bg.webp',''],['VIP','Umra Signature','m/domes.jpg','']];
+const cardEls=CARDS.map(([chip,ti,img,cl])=>{const d=document.createElement('div');d.className='card '+cl;
+  d.innerHTML=`<div class="ph"><img src="${img}"></div><span class="chip">${chip}</span><h3>${ti}</h3><i class="ln" style="top:392px;width:300px"></i><i class="ln" style="top:418px;width:240px"></i><i class="ln" style="top:444px;width:270px"></i><div class="bt">Join the group</div>`;$('#cards').append(d);return d});
+function S5(t){
+  const S=$('#S5');S.style.perspective='1800px';
+  const ti=E.outExpo(k(t,8.05,8.45));css($('#s5title'),{opacity:ti*(1-k(t,9.45,9.65)),transform:`translateY(${(1-ti)*-30}px)`});
+  const order=[1,0,2];// Youth в центре
+  cardEls.forEach((el,i)=>{const pos=order[i];const q=k(t,8.0+pos*.07,8.55+pos*.07);const e=E.outExpo(q);
+    const fan=E.outBack(k(t,8.55,9.0),1.5);
+    const baseX=960-210+(pos-1)*lerp(0,470,fan), rot=(pos-1)*lerp(0,7,fan);
+    let x=baseX,y=lerp(1300,300,e)+Math.abs(pos-1)*lerp(0,34,fan),sc=1,rz=rot,rx=lerp(70,0,e),z=pos==1?3:1,rad=30;
+    let w=420,h=580;
+    const lift=E.outBack(k(t,9.05,9.3),2);
+    if(i==0){y-=lift*36;sc=1+lift*.05}
+    // разворот карточки на весь экран
+    const ex=E.ioExpo(k(t,9.5,10.0));
+    if(i==0&&ex>0){x=lerp(x,0,ex);y=lerp(y-lift*0,0,ex);w=lerp(420,W,ex);h=lerp(580,H,ex);rz=lerp(rz,0,ex);rad=lerp(30,0,ex);sc=lerp(sc,1,ex);z=5}
+    if(i!=0){const fall=E.inExpo(k(t,9.45,9.85));y+=fall*900;rz+=fall*(pos-1)*25}
+    css(el,{left:x+'px',top:y+'px',width:w+'px',height:h+'px',borderRadius:rad+'px',zIndex:z,transform:`rotateX(${rx}deg) rotate(${rz}deg) scale(${sc})`});
+    if(i==0){el.querySelector('.ph').style.height=lerp(360,H,ex)+'px';['.chip','h3','.ln','.bt'].forEach(s=>el.querySelectorAll(s).forEach(n=>n.style.opacity=1-k(t,9.5,9.65)));
+      el.querySelector('.ph').style.setProperty('--x',0)}
+  });
+  // курсор: подлетает, нажимает
+  const cq=E.ioCubic(k(t,8.7,9.15));const cx=lerp(1500,1010,cq),cy=lerp(1000,560,cq);const press=k(t,9.18,9.26)-k(t,9.26,9.36);
+  css($('#cursor'),{left:cx+'px',top:cy+'px',transform:`scale(${1-press*.18})`,opacity:k(t,8.7,8.8)*(1-k(t,9.45,9.55))});
+  const rp=k(t,9.22,9.6);css($('#ripple'),{left:cx+6+'px',top:cy+6+'px',transform:`scale(${E.outExpo(rp)*1.4})`,opacity:rp>0?1-rp:0});
+}
+
+/* ---------- S6: инфографика ---------- */
+const G=[[5,'+','YEARS IN TRAVEL',.62],[1000,'+','HAPPY PILGRIMS',.86],[3,'','UMRA FORMATS',1]];
+const gEls=G.map(([n,suf,cap],i)=>{const d=document.createElement('div');d.className='gauge';d.style.left=(960-210+(i-1)*520)+'px';
+  let ticks='';for(let a=0;a<60;a++){const r1=196,r2=a%5?204:212,an=a/60*6.283;ticks+=`<line x1="${210+Math.cos(an)*r1}" y1="${210+Math.sin(an)*r1}" x2="${210+Math.cos(an)*r2}" y2="${210+Math.sin(an)*r2}"/>`}
+  d.innerHTML=`<svg viewBox="0 0 420 420"><g class="tk" stroke="rgba(255,248,236,.35)" stroke-width="2">${ticks}</g><circle cx="210" cy="210" r="168" fill="none" stroke="rgba(255,248,236,.1)" stroke-width="10"/><circle class="arc" cx="210" cy="210" r="168" fill="none" stroke="#D9B26A" stroke-width="10" stroke-linecap="round" transform="rotate(-90 210 210)"/></svg><div class="num"><span>0</span><small>${suf}</small></div><div class="cap">${cap}</div>`;
+  $('#gauges').append(d);return d});
+function S6(t){
+  const cam=k(t,9.6,11.6);$('#s6bg').style.transform=`scale(${lerp(1.0,1.14,cam)})`;
+  $('#s6sh').style.opacity=E.outCubic(k(t,9.95,10.3));
+  const C=2*Math.PI*168;
+  gEls.forEach((d,i)=>{const q=k(t,10.1+i*.12,10.95+i*.12),e=E.ioExpo(q),ap=E.outExpo(k(t,10.05+i*.12,10.45+i*.12));
+    const out=E.inExpo(k(t,11.2+i*.04,11.5));
+    css(d,{opacity:ap,transform:`scale(${lerp(.6,1,E.outBack(k(t,10.05+i*.12,10.55+i*.12),1.6))*(1-out)}) rotate(${out*90}deg)`});
+    d.querySelector('.arc').style.strokeDasharray=C;d.querySelector('.arc').style.strokeDashoffset=C*(1-e*G[i][3]);
+    d.querySelector('.tk').style.transform=`rotate(${t*30*(i%2?-1:1)}deg)`;d.querySelector('.tk').style.transformOrigin='210px 210px';
+    d.querySelector('.num span').textContent=Math.round(G[i][0]*e)});
+}
+
+/* ---------- S7: сетка фото и «01» маской ---------- */
+const TI=['dome','umbrellas','tower','kaaba-night','domes','clock-night','hero-bg','kaaba-crowd','umbrellas','dome','kaaba-night','tower'];
+const tEls=TI.map((n,i)=>{const d=document.createElement('div');d.className='tile';const c=i%4,r=Math.floor(i/4);
+  d.style.left=(c*480+2)+'px';d.style.top=(r*360+2)+'px';d.innerHTML=`<img src="m/${n}.${n.startsWith('hero')?'webp':'jpg'}">`;$('#tiles').append(d);return d});
+$('#zero1').style.backgroundImage='url(m/kaaba-night.jpg)';
+function S7(t){
+  tEls.forEach((d,i)=>{const c=i%4,r=Math.floor(i/4);const q=k(t,11.5+(c+r)*.06,11.9+(c+r)*.06),e=E.outExpo(q);
+    const out=E.inExpo(k(t,12.35+((c+r)%3)*.03,12.75));
+    const dx=(c-1.5)*480,dy=(r-1)*360;
+    css(d,{transform:`translate(${dx*out*1.4}px,${dy*out*1.4}px) rotateY(${(1-e)*-100}deg) scale(${lerp(.7,1,e)*(1-out*.5)})`,opacity:(q>0?1:0)*(1-out)});
+    d.firstChild.style.transform=`scale(${1.25-.2*e})`});
+  const z=k(t,12.4,12.95),ze=E.outExpo(z);
+  css($('#zero1'),{opacity:z>0?1:0,transform:`translateY(-52%) scale(${lerp(1.6,1,ze)})`,backgroundPosition:`${lerp(-200,-500,k(t,12.4,13.3))}px ${lerp(-650,-560,k(t,12.4,13.3))}px`,letterSpacing:lerp(.1,-.07,ze)+'em'});
+  const cq=E.outExpo(k(t,12.6,12.95));css($('#s7cap'),{opacity:cq,letterSpacing:lerp(.9,.42,cq)+'em'});
+  $('#S7').style.transform=`scale(${1+E.inExpo(k(t,12.85,13.05))*.6})`;$('#S7').style.opacity=1-k(t,12.95,13.05);
+}
+
+/* ---------- S8: частицы собираются в логотип ---------- */
+let PT=[];
+function buildParticles(){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  x.font='800 200px M';x.textAlign='center';x.textBaseline='alphabetic';x.letterSpacing='-9px';x.fillStyle='#fff';x.fillText('UMRA YOUTH',960,330+172);
+  const d=x.getImageData(0,0,W,H).data;seed=11;
+  for(let y=0;y<H;y+=6)for(let X=0;X<W;X+=6){if(d[(y*W+X)*4+3]>128&&rnd()<.82){const a=rnd()*6.283,R=900+rnd()*900;PT.push({tx:X,ty:y,sx:960+Math.cos(a)*R,sy:540+Math.sin(a)*R*.7,d:rnd()*.35,s:1+rnd()*1.6,g:rnd()<.25})}}}
+seed=5;const tags='FAITH • YOUTH • TOGETHER'.split('').map(c=>{const s=document.createElement('span');s.textContent=c===' '?' ':c;$('#lockT').append(s);return s});
+function S8(t){
+  const c=$('#pc').getContext('2d');c.clearRect(0,0,W,H);
+  const fade=k(t,13.85,14.15);
+  for(const p of PT){const q=E.outExpo(k(t,13.0+p.d,13.75+p.d));const x=lerp(p.sx,p.tx,q),y=lerp(p.sy,p.ty,q);
+    c.globalAlpha=(1-fade)*clamp(q*4);c.fillStyle=p.g?'#F0D193':'#FFF8EC';c.fillRect(x-p.s/2,y-p.s/2,p.s*(q<.9?2.4:1.6),p.s*(q<.9?2.4:1.6))}
+  c.globalAlpha=1;
+  const w=$('#lockW');css(w,{opacity:E.outCubic(fade),letterSpacing:lerp(-.03,-.045,E.outExpo(k(t,13.85,14.5)))+'em',transform:`scale(${lerp(1.03,1,E.outExpo(k(t,13.85,14.6)))})`});
+  w.querySelector('.sh').style.backgroundPosition=`${lerp(130,-40,E.ioCubic(k(t,14.35,14.95)))}% 0`;
+  $('#lockL').style.width=E.ioExpo(k(t,14.0,14.45))*560+'px';
+  tags.forEach((s,i)=>{const q=E.outExpo(k(t,14.1+i*.012,14.5+i*.012));css(s,{opacity:q,transform:`translateY(${(1-q)*16}px)`,filter:`blur(${(1-q)*6}px)`})});
+  const lq=E.outExpo(k(t,14.3,14.75));css($('#logo8'),{opacity:lq,transform:`translateY(${(1-lq)*26}px)`});
+  const uq=E.outExpo(k(t,14.42,14.85));css($('#url8'),{opacity:uq,letterSpacing:lerp(.6,.32,uq)+'em'});
+}
+
+/* ---------- зерно ---------- */
+(function(){const g=$('#grain'),x=g.getContext('2d'),id=x.createImageData(512,512);seed=9;for(let i=0;i<id.data.length;i+=4){const v=rnd()*255;id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255}x.putImageData(id,0,0);css(g,{width:W*2+'px',height:H*2+'px'})})();
+
+/* ---------- монтаж ---------- */
+window.DURATION=DUR;
+window.seek=function(t,n){
+  show('#S1',t<1.6);show('#S2',t>=1.42&&t<3.52);show('#S3',t>=3.08&&t<5.65);show('#S4',t>=5.2&&t<8.05);show('#S5',t>=8&&t<10.02);
+  show('#S6',t>=9.98&&t<11.55);show('#S7',t>=11.5&&t<13.06);show('#S8',t>=13);
+  if(t<1.6)S1(t);if(t>=1.42&&t<3.52)S2(t);if(t>=3.08&&t<5.65)S3(t);if(t>=5.2&&t<8.05)S4(t);if(t>=8&&t<10.02)S5(t);if(t>=9.98&&t<11.55)S6(t);if(t>=11.5&&t<13.06)S7(t);if(t>=13)S8(t);
+  // вспышки на ключевых склейках
+  let f=0;[[8.0,.55],[11.5,.35],[13.0,.5],[4.0,.25],[4.5,.25]].forEach(([c,a])=>{if(t>=c&&t<c+.18)f=Math.max(f,a*(1-(t-c)/.18))});$('#flash').style.opacity=f;
+  const h=(n*7919)%997;$('#grain').style.transform=`translate(${-(h%400)}px,${-((h*3)%400)}px)`;
+  hud(t);
+};
+// метки для звука
+window.CUES={whoosh:[1.42,3.1,5.2,7.6,9.45,12.3],hit:[0.0,2.02,3.5,4.0,4.5,5.0,8.0,10.0,11.5,13.0,13.85],tick:[0.3,0.72,8.55,9.2,14.1],riser:[[0.9,1.42],[7.0,7.6],[12.4,13.0]],boom:[2.25,5.6,13.85],plane:[5.95,6.1],count:[[5.95,7.2],[10.1,11.1]],shimmer:[14.3]};
+window.ready=(async()=>{await document.fonts.load('800 200px M');await document.fonts.load('italic 500 40px C');await document.fonts.ready;
+  DOTS=(await (await fetch('dots.json')).json()).map(([lon,lat,c])=>({p:P(lon,lat),c}));
+  await Promise.all([...document.images].map(i=>i.decode().catch(()=>{})));buildParticles();})();
+</script></body></html>
