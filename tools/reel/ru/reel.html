@@ -197,9 +197,11 @@ const archEls=[];
 [[400,560,4],[470,640,1.6],[540,720,1]].forEach(([w,h,sw],i)=>{const p=document.createElementNS('http://www.w3.org/2000/svg','path');
   p.setAttribute('d',AR(960,560,w,h));p.setAttribute('stroke-width',sw);$('#s1arches').append(p);archEls.push(p)});
 const archLen=archEls.map(p=>p.getTotalLength());
-// восьмиконечная звезда (рисунок исламского орнамента)
-(function(){const g=$('#s1star');for(let r of [120,180,240]){const sq=(a)=>{const p=document.createElementNS('http://www.w3.org/2000/svg','rect');
-  p.setAttribute('x',-r/2);p.setAttribute('y',-r/2);p.setAttribute('width',r);p.setAttribute('height',r);p.setAttribute('transform',`rotate(${a})`);g.append(p)};sq(0);sq(45)}})();
+// полумесяц внутри арки
+(function(){const g=$('#s1star');const P='M18.82 9.06A12 12 0 1 0 31.47 24.52A10 10 0 0 1 18.82 9.06Z';
+  const fill=document.createElementNS('http://www.w3.org/2000/svg','path');fill.setAttribute('d',P);fill.setAttribute('fill','#D9B26A');fill.setAttribute('stroke','none');fill.id='moonFill';
+  const line=document.createElementNS('http://www.w3.org/2000/svg','path');line.setAttribute('d',P);line.setAttribute('stroke-width','.35');line.id='moonLine';
+  const wrap=document.createElementNS('http://www.w3.org/2000/svg','g');wrap.setAttribute('transform','scale(7) translate(-21 -20)');wrap.append(fill,line);g.append(wrap)})();
 const parts=[];seed=7;for(let i=0;i<46;i++){const d=document.createElement('i');css(d,{position:'absolute',width:'5px',height:'5px',borderRadius:'50%',background:'#D9B26A'});$('#s1parts').append(d);
   parts.push({el:d,a:rnd()*Math.PI*2,r:180+rnd()*520,s:.4+rnd()*1.2,d:rnd()*.3})}
 function S1(t){
@@ -211,7 +213,9 @@ function S1(t){
   if(t<.3){dot.setAttribute('cx',960);dot.setAttribute('cy',560);dot.setAttribute('r',14*pop);line.setAttribute('width',0)}
   else{dot.setAttribute('r',0);line.setAttribute('x',960-w/2);line.setAttribute('y',lerp(560,840,drop)-h/2);line.setAttribute('width',w*(1-k(t,.95,1.05)));line.setAttribute('height',h);line.setAttribute('rx',h/2)}
   archEls.forEach((p,i)=>{const d=E.ioCubic(k(t,.78+i*.08,1.32+i*.06));p.style.strokeDasharray=archLen[i];p.style.strokeDashoffset=archLen[i]*(1-d);p.style.opacity=i?.55:1});
-  const sg=$('#s1star');sg.setAttribute('transform',`translate(960 560) rotate(${t*40}) scale(${E.outExpo(k(t,.9,1.4))})`);sg.style.opacity=.35*k(t,.9,1.2);
+  const sg=$('#s1star');const mq=k(t,.85,1.4);sg.setAttribute('transform',`translate(960 560) rotate(${lerp(-35,0,E.outExpo(mq))}) scale(${lerp(.6,1,E.outBack(mq,1.4))})`);sg.style.opacity=mq>0?1:0;
+  const ml=$('#moonLine'),mL=ml.getTotalLength();ml.style.strokeDasharray=mL;ml.style.strokeDashoffset=mL*(1-E.ioCubic(k(t,.85,1.25)));
+  $('#moonFill').style.opacity=.85*E.outCubic(k(t,1.1,1.45));
   parts.forEach(p=>{const q=k(t,.95+p.d,1.5);const r=p.r*E.outExpo(q);css(p.el,{left:960+Math.cos(p.a)*r+'px',top:560+Math.sin(p.a)*r*.8+'px',opacity:q>0?(1-q):0,transform:`scale(${p.s})`})});
 }
 
