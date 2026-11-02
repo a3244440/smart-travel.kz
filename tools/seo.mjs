@@ -78,23 +78,22 @@ const VERIFY = {
 
 
 
-// страницы «Умра из <города>» (tools/city_pages.py)
-const CITY_FAQ = JSON.parse(read("tools/city_faq.json"));
-function cityPage(key, name, from) {
-  const path = "/umrah-" + key;
-  return {
-    path, priority: "0.9",
-    title: `Умра ${from} — туры в Мекку и Медину, цены | ${SITE.brand}`, nolang: true,
-    kw: [`умра ${from}`, `умра ${from} цена`, `тур на умру ${from}`, `вылет на умру ${from}`, `умра ${from} 2026`, `паломничество ${from}`, `Мекка ${from}`, `тур в Мекку и Медину ${from}`, `молодёжная умра ${from}`, `Umra Youth ${from}`, `турагентство умра ${name}`, `${name === "Алматы" ? "Алматыдан" : "Астанадан"} Умра`, `Umrah from ${key === "almaty" ? "Almaty" : "Astana"}`],
-    description: `Умра ${from} в трёх форматах: Umra Youth — только молодёжная группа, Umra Family — семьи и старшее поколение, Umra Signature — VIP. Виза, перелёт, отели у Харама, сопровождение. WhatsApp +7 771 666 6669.`,
-    schema: () => [
-      { "@type": "Service", name: `Умра ${from}`, serviceType: "Организация паломничества (Умра)", provider: { "@id": SITE_URL + "/#org" },
-        areaServed: { "@type": "City", name }, url: SITE_URL + path,
-        hasOfferCatalog: { "@type": "OfferCatalog", name: "Форматы Умры", itemListElement: ["Umra Youth", "Umra Family", "Umra Signature"].map(n => ({ "@type": "Offer", itemOffered: { "@type": "Service", name: `${n} ${from}` } })) } },
-      { "@type": "FAQPage", mainEntity: CITY_FAQ[key].map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) },
-      crumbs(`Умра ${from}`, path)
-    ]
-  };
+// посадочные страницы под запросы (tools/landing_pages.py → tools/landing.json)
+const LANDING = JSON.parse(read("tools/landing.json"));
+function landingPage(slug) {
+  const L = LANDING[slug], path = "/" + slug, name = L.h1.split(":")[0];
+  const faq = { "@type": "FAQPage", mainEntity: L.faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) };
+  const main = L.schema === "howto"
+    ? { "@type": "HowTo", name: L.h1, description: L.description, totalTime: "PT4H",
+        step: (L.steps || []).map(([n, t], i) => ({ "@type": "HowToStep", position: i + 1, name: n, text: strip(t) })) }
+    : L.schema === "article"
+    ? { "@type": "Article", headline: L.h1, description: L.description, inLanguage: "ru", url: SITE_URL + path,
+        author: { "@id": SITE_URL + "/#org" }, publisher: { "@id": SITE_URL + "/#org" }, dateModified: new Date().toISOString().slice(0, 10) }
+    : { "@type": "Service", name: L.h1, serviceType: "Организация паломничества (Умра)", provider: { "@id": SITE_URL + "/#org" }, url: SITE_URL + path,
+        areaServed: L.area ? { "@type": "City", name: L.area } : { "@type": "Country", name: "Казахстан" },
+        hasOfferCatalog: { "@type": "OfferCatalog", name: "Форматы Умры", itemListElement: ["Umra Youth", "Umra Family", "Umra Signature"].map(n => ({ "@type": "Offer", itemOffered: { "@type": "Service", name: n } })) } };
+  return { path, priority: "0.9", nolang: true, title: L.title, description: L.description, kw: L.kw,
+    schema: () => [main, faq, crumbs(name, path)] };
 }
 
 const PAGES = {
@@ -136,8 +135,7 @@ const PAGES = {
       image: SITE_URL + "/" + g.photo, url: SITE_URL + "/guides#" + g.id, worksFor: { "@id": SITE_URL + "/#org" },
       homeLocation: { "@type": "Place", name: "Мекка" } }))]
   },
-  "umrah-almaty.html": cityPage("almaty", "Алматы", "из Алматы"),
-  "umrah-astana.html": cityPage("astana", "Астана", "из Астаны"),
+  ...Object.fromEntries(Object.keys(LANDING).map(slug => [slug + ".html", landingPage(slug)])),
   "cabinet.html": {
     path: "/cabinet", titleKey: "title.cabinet", noindex: true,
     description: "Статус заявки на визу в Саудовскую Аравию: введите номер заявки и телефон."
