@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 220">
+  <defs>
+    <linearGradient id="sl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dfeafb"/><stop offset=".45" stop-color="#c3d5f2"/><stop offset="1" stop-color="#8fa9d8"/>
+    </linearGradient>
+    <linearGradient id="cf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9f0fc"/><stop offset=".5" stop-color="#cddbf3"/><stop offset="1" stop-color="#9ab2de"/>
+    </linearGradient>
+    <linearGradient id="sk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f1c6a6"/><stop offset=".5" stop-color="#e2a985"/><stop offset="1" stop-color="#c0835f"/>
+    </linearGradient>
+    <linearGradient id="fg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e7b090"/><stop offset=".6" stop-color="#f0c3a3"/><stop offset="1" stop-color="#d49a76"/>
+    </linearGradient>
+    <linearGradient id="fb" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0f2a86"/><stop offset=".35" stop-color="#3f74e8"/><stop offset=".55" stop-color="#8fb3ff"/><stop offset=".75" stop-color="#2a58cf"/><stop offset="1" stop-color="#0c2370"/>
+    </linearGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000818" flood-opacity=".45"/></filter>
+  </defs>
+  <path d="M296 0 H392 Q366 34 352 62 H320 Q312 30 296 0 Z" fill="url(#fb)"/>
+  <path d="M318 168 H352 Q368 196 396 220 H292 Q312 196 318 168 Z" fill="url(#fb)"/>
+  <g filter="url(#sh)">
+    <!-- рукав рубашки -->
+    <path d="M0 62 H196 Q214 62 214 80 V158 Q214 176 196 176 H0 Z" fill="url(#sl)"/>
+    <path d="M0 150 H200 V176 H0 Z" fill="#7f98c9" opacity=".25"/>
+    <path d="M30 70 Q90 92 150 74" stroke="#a9bfe6" stroke-width="3" fill="none" opacity=".7"/>
+    <path d="M40 150 Q100 132 170 156" stroke="#90a8d6" stroke-width="3" fill="none" opacity=".6"/>
+    <!-- манжета -->
+    <rect x="176" y="56" width="48" height="126" rx="12" fill="url(#cf)"/>
+    <circle cx="200" cy="160" r="5" fill="#f4f7fd" stroke="#9ab0da" stroke-width="1.5"/>
+    <!-- тыльная сторона ладони -->
+    <path d="M222 70 Q262 58 300 64 Q322 68 326 92 L328 150 Q326 172 300 176 Q258 182 222 168 Z" fill="url(#sk)"/>
+    <path d="M240 82 Q270 76 300 82" stroke="#cf9471" stroke-width="2.5" fill="none" opacity=".6"/>
+    <!-- согнутые пальцы (вид на костяшки) -->
+    <rect x="300" y="58" width="62" height="34" rx="16" fill="url(#fg)"/>
+    <rect x="304" y="88" width="64" height="32" rx="15" fill="url(#fg)"/>
+    <rect x="304" y="116" width="62" height="31" rx="15" fill="url(#fg)"/>
+    <rect x="300" y="143" width="56" height="30" rx="14" fill="url(#fg)"/>
+    <path d="M318 91 Q336 95 356 90 M320 119 Q338 123 358 118 M318 146 Q334 150 350 146" stroke="#b97d5c" stroke-width="2.2" fill="none" opacity=".75"/>
+    <path d="M352 66 Q358 75 352 84 M356 96 Q362 104 356 112 M354 124 Q360 132 354 140" stroke="#fff" stroke-width="2" fill="none" opacity=".35"/>
+    <!-- большой палец сверху -->
+    <path d="M250 70 Q276 44 318 46 Q346 48 350 62 Q352 74 336 76 Q306 76 284 82 Q262 88 250 70 Z" fill="url(#sk)"/>
+    <path d="M330 52 Q344 54 346 62" stroke="#fff" stroke-width="2" fill="none" opacity=".4"/>
+    <ellipse cx="338" cy="61" rx="9" ry="6" fill="#f7d7c2" opacity=".75"/>
+  </g>
+</svg>

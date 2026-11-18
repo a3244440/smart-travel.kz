@@ -335,3 +335,53 @@ main h1{font-family:var(--display);font-weight:800;letter-spacing:-.035em;line-h
 .seo-more a{font-size:14px;padding:9px 16px;border-radius:999px;border:1px solid var(--line-2);color:var(--ink-2);text-decoration:none;transition:border-color .25s,color .25s}
 .seo-more a:hover{border-color:var(--brass);color:var(--ink)}
 .city-hero h1{font-family:var(--display);font-weight:800;letter-spacing:-.035em;line-height:1.05;font-size:clamp(32px,4.6vw,56px)}
+
+/* ---------- экран загрузки: руки раздвигают шторы, в «замочной скважине» — Кааба (assets/curtain.js) ---------- */
+html.cur-on{overflow:hidden}
+.cur{position:fixed;inset:0;z-index:200;overflow:hidden;cursor:pointer;--k:1;--pull:30vw;--ease-c:cubic-bezier(.65,0,.35,1)}
+.cur-bg{position:absolute;inset:0;background:radial-gradient(ellipse 45% 55% at 50% 42%,#3d7cf0 0%,#1747b8 40%,#0a2575 75%,#06174f 100%)}
+.cur-key{position:absolute;left:50%;top:41%;width:200px;height:300px;margin:-150px 0 0 -100px;transform:scale(var(--k));opacity:0;
+  filter:drop-shadow(0 0 18px rgba(255,255,255,.9)) drop-shadow(0 0 60px rgba(140,190,255,.9))}
+.cur-win{position:absolute;inset:0;clip-path:path("M100 0a72 72 0 0 1 40 131.8L170 300H30l30-168.2A72 72 0 0 1 100 0Z");background:#bcd6ff}
+.cur-win img{width:100%;height:100%;object-fit:cover;transform:scale(1.18);transition:transform 2.6s var(--ease-out)}
+.cur-key svg{position:absolute;left:-4px;top:-4px;width:208px;height:308px;overflow:visible}
+.cur-key path{fill:none;stroke:#fff;stroke-width:3;opacity:.9}
+.cur-side{position:absolute;top:-2%;bottom:-2%;width:calc(50% + 2px);transition:transform .95s var(--ease-c);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.10),transparent 26%,transparent 62%,rgba(0,8,40,.5)),
+    repeating-linear-gradient(90deg,#0b2483 0,#1d4bcb 2.2%,#78a4ff 3.3%,#2a5ad6 4.4%,#1036a6 6.4%,#0b2483 8.6%)}
+.cur-l{left:0;transform:translateX(0)}
+.cur-r{right:0;transform:translateX(0);background-position:4px 0}
+.cur-l::after,.cur-r::after{content:"";position:absolute;top:0;bottom:0;width:26px;background:linear-gradient(90deg,transparent,rgba(170,200,255,.55),transparent)}
+.cur-l::after{right:0}.cur-r::after{left:0}
+.cur-hand{position:absolute;top:30%;width:clamp(240px,34vw,500px);height:auto;transition:transform .7s var(--ease-out),opacity .4s}
+.cur-l .cur-hand{right:19%;transform:translateX(-120vw)}
+.cur-r .cur-hand{left:19%;top:32%;transform:translateX(120vw) scaleX(-1)}
+.cur-word{position:absolute;left:0;right:0;top:calc(41% + 150px * var(--k) - 64px);text-align:center;color:#fff;pointer-events:none;
+  opacity:0;transform:translateY(16px);transition:opacity .8s,transform 1s var(--ease-out);text-shadow:0 4px 30px rgba(0,20,90,.6)}
+.cur-word small{display:block;font:italic 400 clamp(18px,2.2vw,28px)/1.2 "Playfair Display",var(--serif);opacity:.95;margin-bottom:8px}
+.cur-word b{display:block;font:400 clamp(46px,8.6vw,124px)/1 var(--serif);letter-spacing:.06em;margin:6px 0 10px}
+.cur-word span{display:inline-block;font:600 clamp(12px,1.2vw,15px)/1 var(--sans);letter-spacing:.24em;text-transform:uppercase;
+  padding:12px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.12)}
+/* фаза 1: руки берутся за шторы */
+.cur.p1 .cur-l .cur-hand{transform:translateX(0)}
+.cur.p1 .cur-r .cur-hand{transform:translateX(0) scaleX(-1)}
+/* фаза 2: шторы раздвигаются, в щели загорается скважина */
+.cur.p2 .cur-l{transform:translateX(calc(var(--pull) * -1))}
+.cur.p2 .cur-r{transform:translateX(var(--pull))}
+.cur.p2 .cur-key{opacity:1;transition:opacity .9s .25s ease}
+.cur.p2 .cur-win img{transform:scale(1)}
+.cur.p2 .cur-word{opacity:1;transform:none;transition-delay:.45s}
+/* фаза 3: шторы распахиваются, камера «влетает» в скважину */
+.cur.p3{pointer-events:none}
+.cur.p3 .cur-l{transform:translateX(-102%);transition:transform 1.2s var(--ease-c)}
+.cur.p3 .cur-r{transform:translateX(102%);transition:transform 1.2s var(--ease-c)}
+.cur.p3 .cur-key{transform:scale(calc(var(--k) * 6));opacity:0;filter:none;transition:transform 1.3s var(--ease-c),opacity .6s .6s ease}
+.cur.p3 .cur-word{opacity:0;transform:translateY(-10px);transition:opacity .35s,transform .5s;transition-delay:0s}
+.cur.p3 .cur-bg{opacity:0;transition:opacity .8s .35s ease}
+.cur-key,.cur-side,.cur-hand{will-change:transform}
+@media (max-width:640px){
+  .cur-hand{width:42vw}
+  .cur-l .cur-hand{right:0;top:28%}.cur-r .cur-hand{left:0;top:30%}
+  .cur-word{top:calc(41% + 150px * var(--k) - 44px)}
+}

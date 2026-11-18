@@ -8,8 +8,10 @@
   // первый экран: появление после загрузки фото
   const hero = $(".xh");
   const imgs = [...document.querySelectorAll(".xh img")];
-  Promise.all(imgs.map(i => i.decode ? i.decode().catch(() => {}) : null)).then(() => root.classList.add("xh-ready"));
-  setTimeout(() => root.classList.add("xh-ready"), 1600);
+  // если идёт экран загрузки со шторами — первый экран оживает, когда они раздвигаются
+  const heroIn = () => root.classList.add("xh-ready");
+  if(root.classList.contains("cur-on")) document.addEventListener("curtainopen", () => setTimeout(heroIn, 250), { once:true });
+  else { Promise.all(imgs.map(i => i.decode ? i.decode().catch(() => {}) : null)).then(heroIn); setTimeout(heroIn, 1600); }
 
   // миссия: каждое слово отдельно, проявляется по мере прокрутки
   function splitMission(){
